@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: creg
+  labels:
+    app: certregister
+spec:
+  containers:
+  - name: certreg
+    image: registry.local/certreg:latest
+    ports:
+    - containerPort: 80
+  imagePullSecrets:
+  - name: regcred

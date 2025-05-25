@@ -1,0 +1,95 @@
+from recipes.kvm.adhoc_setup import generic
+
+
+class Docker(generic.SelectMenu):
+    def __init__(self):
+        super().__init__({
+            'portainer': False,
+            'cadvisor': False,
+        },
+            exclusive_list=None,
+            menu_title='Docker')
+
+    def setup(self, session):
+        if self.enable:
+            from recipes.almalinux8 import docker
+            docker.install(session)
+
+            def setup_containers(sess):
+                nonlocal self
+                from recipes.centos.docker import containers
+                if self.selection['portainer']:
+                    containers.create_portainer(sess)
+                if self.selection['cadvisor']:
+                    containers.create_cadvisor(sess)
+            setup_containers(session)
+
+
+class MinDesk(generic.SelectMenu):
+    def __init__(self):
+        super().__init__({
+            'xrdp': False,
+            'vbox libs': False,
+        },
+        exclusive_list=None,
+        menu_title='Desktop')
+
+    def setup(self, session):
+        if self.enable:
+            from recipes.almalinux8 import desktop
+            desktop.install_gui(session)
+            if self.selection['vbox libs']:
+                desktop.install_vbox_additions_libs(session)
+            if self.selection['xrdp']:
+                desktop.install_xrdp(session)
+
+
+class Apps(generic.SelectMenu):
+    def __init__(self):
+        super().__init__({
+            "qemu-kvm": False,
+            "google-auth": False,
+            "openvswitch": False,
+            "vsftpd": False,
+            "pxe": False,
+        },
+            exclusive_list=None,
+            menu_title='Apps')
+
+    def setup(self, session):
+        if self.selection['qemu-kvm']:
+            from recipes.kvm import virt_builder
+            virt_builder.install_kvm(session)
+        if self.selection['google-auth']:
+            from recipes.almalinux8 import google_authenticator
+            google_authenticator.setup(session)
+        if self.selection['openvswitch']:
+            from recipes.almalinux8 import openvswitch
+            openvswitch.install(session)
+        if self.selection['vsftpd']:
+            from recipes import vsftpd
+            vsftpd.vsftpd_server_setup(session)
+        if self.selection['pxe']:
+            from recipes.almalinux8 import pxe
+            pxe.setup_pxe(session)
+
+
+def get_selection():
+    platform = 'centos8stream'
+    vm = {
+        'hostname': 'localhost',
+        'platform': platform,
+        'ssh_options': '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null',
+        'size': 10,
+    }
+    postrun_list = [
+        generic.Initial(platform),
+        MinDesk(),
+        Apps(),
+        Docker(),
+        generic.Languages(platform),
+        generic.BaseApps(platform),
+    ]
+    return [vm, postrun_list]
+
+

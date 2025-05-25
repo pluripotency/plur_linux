@@ -1,0 +1,61 @@
+description:
+  setup kubernetes by kubeadm with CentOS 7
+  requirement:
+    CentOS 7 minimum install
+    user worker with sudo right
+
+install_packages: [
+  ebtables
+  ethtool
+]
+
+create: /etc/sysctl.d/k8s.conf
+  net.bridge.bridge-nf-call-ip6tables = 1
+  net.bridge.bridge-nf-call-iptables = 1
+
+commands:
+  sysctl --system
+
+create: /etc/yum.repos.d/kubernetes.repo
+  [kubernetes]
+  name=Kubernetes
+  baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+  enabled=1
+  gpgcheck=1
+  repo_gpgcheck=1
+  gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+install_packages:
+  kubelet
+  kubeadm
+  kubectl
+
+### Master
+description:
+  Initialize kubernetes master by kubeadm
+
+commands:
+  MASTER_IP=192.168.0.1
+  POD_NETWORK=10.244.0.0/16
+  kubeadm init --apiserver-advertise-address=$MASTER_IP --pod-network-cidr=$POD_NETWORK | tee kubeadm_init.txt
+
+description:
+  create kubectl config
+
+commands:
+  mkdir -p $HOME/.kube
+  sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+description:
+  Setup calico
+
+commands: [
+  CALICO_URL=https://docs.projectcalico.org/v3.1/getting-started
+  CALICO_RBAC=$CALICO_URL/kubernetes/installation/hosted/rbac-kdd.yaml
+  CALICO_NET=$CALICO_URL/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
+  kubectl apply -f $CALICO_RBAC
+  kubectl apply -f $CALICO_NET
+]
+
+

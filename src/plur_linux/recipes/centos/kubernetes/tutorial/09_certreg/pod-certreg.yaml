@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: certreg
+  labels:
+    app: test-certreg
+spec:
+  volumes:
+  - name: certreg-volume
+    hostPath:
+      path: /mnt/MC/work_space/CertRegister
+  containers:
+  - name: certreg
+    image: minion:32767/reg/certreg:1
+    ports:
+    - containerPort: 3001
+    volumeMounts:
+    - mountPath: /home/app/workspace
+      name: certreg-volume
