@@ -1,5 +1,5 @@
+from mini import misc
 from plur import base_shell
-from lib import misc
 from recipes.centos import chrony
 from recipes import firewalld
 from nodes import new_node

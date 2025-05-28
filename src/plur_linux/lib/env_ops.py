@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 import os
 import json
-from plur.ansi_colors import red, yellow, green, cyan, dummy_color
+from mini.ansi_colors import red, yellow, green, cyan, dummy_color
 from mini import menu
 from mini.misc import is_file, read_json, read_toml, write_toml, toml, prepare_dir_if_not_exists
 ACCOUNT_SET_LIST_KEY = 'account_set'

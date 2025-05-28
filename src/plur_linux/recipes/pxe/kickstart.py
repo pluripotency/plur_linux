@@ -1,5 +1,5 @@
+from mini import misc
 from plur import base_shell
-from lib import misc
 
 
 def create_ks_str(dist_url='', disk_dev='sda', with_console=True):

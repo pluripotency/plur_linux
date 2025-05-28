@@ -1,12 +1,17 @@
+from mini import misc
 from plur import base_shell
 from plur import session_wrap
-from lib import misc
 from recipes import firewalld
 
+def search_not_root(session):
+    for node in reversed(session.nodes):
+        if node.username != 'root':
+            return node.username
+    return False
 
 @session_wrap.sudo
 def install_xrdp(session):
-    [base_shell.run(session, a) for a in [
+    _ = [base_shell.run(session, a) for a in [
         'dnf -y install epel-release',
         'dnf -y install xrdp tigervnc-server',
         'systemctl enable xrdp --now'
@@ -17,7 +22,7 @@ def install_xrdp(session):
 @session_wrap.sudo
 def install_gui(session):
     session.set_timeout(3600)
-    [base_shell.run(session, a) for a in [
+    _ = [base_shell.run(session, a) for a in [
         'dnf -y groupinstall "Server with GUI" --nobest',
         'systemctl set-default graphical'
     ]]
@@ -58,7 +63,7 @@ def install_xrdp_a8(session):
 
 def install_gui_a8a9(session):
     install_gui(session)
-    username = misc.search_not_root(session)
+    username = search_not_root(session)
     if username:
         session_wrap.su(username)(gsettings)(session)
 

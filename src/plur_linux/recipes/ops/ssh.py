@@ -72,10 +72,6 @@ def one_liner_to_remote_node(remote_node, one_liner_str):
 
 
 def scp(session, src_path, dst_path, password='', options='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null', timeout=3600):
-    # from plur import ansi_colors
-    # print(ansi_colors.yellow('#########################'))
-    # print(ansi_colors.yellow('using scp in plur3_centos'))
-    # print(ansi_colors.yellow('#########################'))
     action = f'scp -r {options} {src_path} {dst_path}'
 
     rows = expects_on_login(password)

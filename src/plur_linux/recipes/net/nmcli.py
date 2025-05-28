@@ -1,6 +1,6 @@
 import re
+from mini import ansi_colors
 from plur import base_shell
-from plur import ansi_colors
 from . import nmcli_str
 
 

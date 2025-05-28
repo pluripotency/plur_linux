@@ -1,7 +1,7 @@
 #! /usr/bin/env python
+from mini.ansi_colors import *
 from plur import base_shell
 from plur import session_wrap
-from plur.ansi_colors import *
 
 
 def install_libguestfs(session):

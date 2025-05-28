@@ -1,5 +1,5 @@
 from plur import base_shell
-from plur.ansi_colors import *
+from mini.ansi_colors import *
 
 
 def init(dir_path, packages):

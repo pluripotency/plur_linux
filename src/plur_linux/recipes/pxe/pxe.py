@@ -1,5 +1,5 @@
 from mini import misc
-from plur import ansi_colors
+from mini import ansi_colors
 from plur import session_wrap
 from plur import base_shell
 from recipes import firewalld

@@ -1,8 +1,8 @@
 #! /usr/bin/env python
 import re
+from mini import ansi_colors
 from plur import base_shell
 from plur import session_wrap
-from plur import ansi_colors
 from recipes.net import lldp, nmcli, centos6, nsswitch, ifcfg
 
 

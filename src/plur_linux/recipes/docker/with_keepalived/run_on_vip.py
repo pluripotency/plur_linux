@@ -1,5 +1,5 @@
+from mini import misc
 from plur import base_shell
-from lib import misc
 
 
 def run_on_vip_str(repo_list, vip, base_dir=None):

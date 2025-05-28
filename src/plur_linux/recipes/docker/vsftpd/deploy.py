@@ -1,8 +1,8 @@
 import os
 import re
+from mini import misc
 from plur import session_wrap
 from plur import base_shell
-from lib import misc
 from recipes.ops import ssh
 
 

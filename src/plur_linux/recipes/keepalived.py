@@ -1,7 +1,7 @@
 import re
+from mini import misc
 from plur import session_wrap
 from plur import base_shell
-from lib import misc
 
 keepalived_selinux_allowed_dir = '/usr/libexec/keepalived'
 

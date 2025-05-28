@@ -1,6 +1,6 @@
+from mini import misc
 from plur import session_wrap
 from plur import base_shell
-from lib import misc
 
 
 def prepare_iso(iso_name, iso_url, www_iso_dir):

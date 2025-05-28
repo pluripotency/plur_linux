@@ -38,7 +38,7 @@ def deploy_test_page(session, server_name):
 
 
 def deploy_gakunin_php(session):
-    from lib.misc import read_lines
+    from mini.misc import read_lines
     # dir path on this script
     cwd = os.path.dirname(__file__)
     php_page_lines = read_lines(f'{cwd}/index.php')

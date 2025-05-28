@@ -1,6 +1,6 @@
 import re
+from mini import misc
 from plur import base_shell
-from lib import misc
 from . import ops
 
 def uncomment(contents, key):

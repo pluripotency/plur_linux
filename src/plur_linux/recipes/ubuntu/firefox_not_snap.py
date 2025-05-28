@@ -1,5 +1,5 @@
+from mini import misc
 from plur import base_shell
-from lib import misc
 """
 snap firefox can't use fileupload
 use mozilla firefox:

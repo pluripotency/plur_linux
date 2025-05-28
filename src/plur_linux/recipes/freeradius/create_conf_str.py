@@ -1,4 +1,4 @@
-from lib import misc
+from mini import misc
 
 ex_client_list = [
     {

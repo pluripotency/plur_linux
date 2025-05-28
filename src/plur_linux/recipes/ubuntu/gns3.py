@@ -1,5 +1,5 @@
+from mini import misc
 from plur import base_shell
-from lib import misc
 from . import docker_ce
 from . import ops
 
@@ -9,7 +9,7 @@ waitprompt = base_shell.output_methods.waitprompt
 
 def install_gns3(session):
     session.do(base_shell.create_sequence('sudo add-apt-repository ppa:gns3/ppa', [
-        ['Press \[ENTER] to continue or Ctrl-c to cancel.', send_line, '']
+        [r'Press \[ENTER] to continue or Ctrl-c to cancel.', send_line, '']
         , ['', waitprompt, '']
     ]))
     ops.sudo_apt_install_y(['gns3-gui gns3-server'])

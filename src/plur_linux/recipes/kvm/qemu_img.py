@@ -1,9 +1,9 @@
 #! /usr/bin/env python
 import os
+from mini.ansi_colors import red, light_blue
 from mini import menu
 from plur import base_shell
 from plur import output_methods
-from plur.ansi_colors import red, light_blue
 from plur import session_wrap
 import re
 

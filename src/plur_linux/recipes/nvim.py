@@ -59,7 +59,7 @@ def install_appimage(version='latest', arch="linux-x86_64"):
     return func
 
 def input_nvim_params(self):
-    from lib.menu import get_input
+    from mini.menu import get_input
     self.nvim_version = get_input(expression=r'^(latest|v\d(\.\d{1,2}){1,2})$', message='nvim ver[v0.10.4, latest, etc.]', default_value=self.nvim_version) 
     return {
         'version': self.nvim_version,

@@ -28,7 +28,7 @@ def install_python(version, venv_name, venv_dir):
     return inner
 
 def input_uv_params(self):
-    from lib.menu import get_input
+    from mini.menu import get_input
     self.python_venv_dir = '$HOME/.virtualenv'
     self.python_version = get_input(expression=r'^3(\.\d{1,2})?$', message='python ver[3.13, 3, etc.]' + f'({self.python_version}): ', default_value=self.python_version)
     self.python_venv = get_input(expression=r'^v\w+$', message=f'venv({self.python_venv}): ', default_value=self.python_venv)
