@@ -13,15 +13,6 @@ dock_gl41r_list = [['dock' + ('000' + str(num))[-3:], num] for num in range(101,
 labdock_host_list = [['lab' + ('000' + str(num))[-3:], num] for num in range(64, 66)]
 min_dock_list = [[f"dock{('000' + str(num))[-3:]}", num] for num in range(101, 103)]
 
-branch_dict = {
-    #    ip seg                 gw                bridge     syslog_segment
-    'w': ['172.25.2.{0}/22',   '172.25.3.254',   'br2.0002', '172.25.3'],
-    'y': ['10.64.244.{0}/23',  '10.64.245.254',  'br2.0313', '10.64.250'],
-    't': ['10.3.96.{0}/23',    '10.3.97.254',    'br2.1117', '10.3.5'],
-    'k': ['172.21.244.{0}/23', '172.21.245.254', 'br2.0883', '172.21.250'],
-    'o': ['10.5.76.{0}/23',    '10.5.77.254',    'br2.1476', '10.5.99'],
-}
-
 def install_base(session):
     chrony.configure(session)
     if not base_shell.check_command_exists(session, 'git'):

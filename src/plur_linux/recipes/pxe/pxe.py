@@ -151,17 +151,7 @@ def create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list):
 
 
 def setup_pxe_base(pxe_ip, dist_dir, www_iso_dir):
-    if re.search(r'^10\.30\.0\.', pxe_ip):
-        subnet_params = {
-            'subnet': '10.30.0.0',
-            'netmask': '255.255.255.0',
-            'gateway': '10.30.0.1',
-            'nameservers': '172.25.3.221',
-            'dh_range': '10.30.0.200 10.30.0.250',
-            'broadcast': '10.30.0.255',
-        }
-        allowed_net = '10.30.0.0/24'
-    elif re.search(r'^192\.168\.0\.', pxe_ip):
+    if re.search(r'^192\.168\.0\.', pxe_ip):
         subnet_params = {
             'subnet': '192.168.0.0',
             'netmask': '255.255.255.0',
