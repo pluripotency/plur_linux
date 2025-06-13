@@ -4,11 +4,11 @@ import sys
 sys.path.append(os.pardir)
 from plur import base_shell
 from plur import session_wrap
-from recipes.kvm import virsh
-from recipes.kvm import qemu_img
+from plur_linux.recipes.kvm import virsh
+from plur_linux.recipes.kvm import qemu_img
 import getpass
 import re
-from recipes.ops import ssh
+from plur_linux.recipes.ops import ssh
 
 
 def get_backingfile_path(node, filepath):

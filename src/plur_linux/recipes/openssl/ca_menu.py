@@ -2,9 +2,9 @@ import copy
 from mini.ansi_colors import green, yellow 
 from mini.menu import choose_num, select_2nd
 from mini import misc
-from lib.lib_selection import get_obj_by_definition
+from plur_linux.lib.lib_selection import get_obj_by_definition
 from plur import session_wrap
-from recipes.openssl import ca
+from plur_linux.recipes.openssl import ca
 CA_CERT_DEFINITION_TOML_STR = r"""
 [country_name]
 type = 'string'

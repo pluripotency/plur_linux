@@ -242,7 +242,7 @@ def create_host_seed_iso(vm, remote_kvm=None):
 
     @session_wrap.bash()
     def run_create_iso_sh_remote(session):
-        from recipes.ops import ssh as ssh_ops
+        from plur_linux.recipes.ops import ssh as ssh_ops
         ssh_ops.one_liner_to_remote_node(remote_kvm, f'sudo rm -rf {seed_iso_sh_dir}')(session)
         dst_path = f'{remote_kvm.username}@{remote_kvm.access_ip}:/tmp'
         ssh_ops.scp_from_local(seed_iso_sh_dir, dst_path, remote_kvm.password)

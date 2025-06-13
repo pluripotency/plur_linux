@@ -1,4 +1,4 @@
-from recipes.kvm.adhoc_setup import generic
+from plur_linux.recipes.kvm.adhoc_setup import generic
 
 
 class Docker(generic.SelectMenu):
@@ -12,12 +12,12 @@ class Docker(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from recipes.almalinux8 import docker
+            from plur_linux.recipes.almalinux8 import docker
             docker.install(session)
 
             def setup_containers(sess):
                 nonlocal self
-                from recipes.centos.docker import containers
+                from plur_linux.recipes.centos.docker import containers
                 if self.selection['portainer']:
                     containers.create_portainer(sess)
                 if self.selection['cadvisor']:
@@ -36,7 +36,7 @@ class MinDesk(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from recipes.almalinux8 import desktop
+            from plur_linux.recipes.almalinux8 import desktop
             desktop.install_gui(session)
             if self.selection['vbox libs']:
                 desktop.install_vbox_additions_libs(session)
@@ -58,19 +58,19 @@ class Apps(generic.SelectMenu):
 
     def setup(self, session):
         if self.selection['qemu-kvm']:
-            from recipes.kvm import virt_builder
+            from plur_linux.recipes.kvm import virt_builder
             virt_builder.install_kvm(session)
         if self.selection['google-auth']:
-            from recipes.almalinux8 import google_authenticator
+            from plur_linux.recipes.almalinux8 import google_authenticator
             google_authenticator.setup(session)
         if self.selection['openvswitch']:
-            from recipes.almalinux8 import openvswitch
+            from plur_linux.recipes.almalinux8 import openvswitch
             openvswitch.install(session)
         if self.selection['vsftpd']:
-            from recipes import vsftpd
+            from plur_linux.recipes import vsftpd
             vsftpd.vsftpd_server_setup(session)
         if self.selection['pxe']:
-            from recipes.almalinux8 import pxe
+            from plur_linux.recipes.almalinux8 import pxe
             pxe.setup_pxe(session)
 
 

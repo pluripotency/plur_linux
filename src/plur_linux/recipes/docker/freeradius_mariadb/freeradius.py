@@ -1,8 +1,8 @@
 import os
 from plur import base_shell
 
-from recipes.docker import dock_util
-from recipes.docker import dock_net
+from plur_linux.recipes.docker import dock_util
+from plur_linux.recipes.docker import dock_net
 
 
 def copy_scripts(session):

@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.pardir)
 from plur import base_shell as shell
-from recipes.ops import git
+from plur_linux.recipes.ops import git
 
 
 def remove_old_repos(repos):

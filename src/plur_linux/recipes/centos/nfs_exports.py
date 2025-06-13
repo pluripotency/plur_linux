@@ -71,7 +71,7 @@ def edit_idmapd_conf(session):
 
 def create_exports_contents(nfs_exports):
     """
-    >>> from nodes.KVM import nodes
+    >>> from plur_linux.nodes.KVM import nodes
     >>> import json
     >>> json.dumps(create_exports_contents(nodes().vpf14.nfs_exports), indent=2)
     """

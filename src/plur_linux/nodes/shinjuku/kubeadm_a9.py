@@ -1,6 +1,6 @@
-from nodes import new_node
-from recipes.kubernetes import common
-from recipes.kubernetes import kubeadm
+from plur_linux.nodes import new_node
+from plur_linux.recipes.kubernetes import common
+from plur_linux.recipes.kubernetes import kubeadm
 
 platform = 'almalinux9'
 host_list = [

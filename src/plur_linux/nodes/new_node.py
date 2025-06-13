@@ -1,5 +1,5 @@
 from plur import base_node
-from lib import env_ops
+from plur_linux.lib import env_ops
 from mini import misc
 from mini import menu
 concat_dict = misc.concat_dict

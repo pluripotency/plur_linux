@@ -1,8 +1,8 @@
 from mini import misc
 from plur import base_shell
-from recipes.centos import chrony
-from recipes import firewalld
-from nodes import new_node
+from plur_linux.recipes.centos import chrony
+from plur_linux.recipes import firewalld
+from plur_linux.nodes import new_node
 
 a8base_image = 'a8base_image'
 a8docker_image = 'a8docker_image'
@@ -18,7 +18,7 @@ dhguest_desk_image = 'dhguest_c7_desk_img'
 
 
 def a8base_update(session):
-    from recipes.almalinux8 import ops
+    from plur_linux.recipes.almalinux8 import ops
     ops.a8base_update(session)
 
 
@@ -44,7 +44,7 @@ def create_a8base_image():
 
 
 def create_a8docker_image():
-    from recipes.almalinux8 import docker
+    from plur_linux.recipes.almalinux8 import docker
     return misc.Node(a8_cloudimage(a8docker_image, [
         a8base_update,
         docker.install,
@@ -53,7 +53,7 @@ def create_a8docker_image():
 
 def create_a8desk_image():
     def func(session):
-        from recipes.almalinux8 import desktop
+        from plur_linux.recipes.almalinux8 import desktop
         desktop.install_gui(session)
         desktop.install_xrdp(session)
 
@@ -64,7 +64,7 @@ def create_a8desk_image():
 
 
 def c7base_update(session):
-    from recipes.ops import ops
+    from plur_linux.recipes.ops import ops
     ops.c7base_update(session)
     base_shell.run(session, 'sudo yum install -y ' + ' '.join([
         'wget'
@@ -98,9 +98,9 @@ def create_c7base_image():
 def create_c7desk_image():
     def desk_setup(session):
         firewalld.configure(services=['ssh'], ports=['3389/tcp'], add=True)(session)
-        from recipes.centos.desktop import c7
+        from plur_linux.recipes.centos.desktop import c7
         c7.minimul_to_mindesk(session)
-        from recipes.centos import xrdp
+        from plur_linux.recipes.centos import xrdp
         xrdp.install(session)
         c7.configure_desktop(session)
         base_shell.run(session, 'sudo rm -f /etc/sysconfig/network-scripts/ifcfg-eth0')
@@ -127,14 +127,14 @@ def create_rsyslog_image():
 
 
 def create_gluster_image():
-    from recipes.centos.glusterfs import gluster
+    from plur_linux.recipes.centos.glusterfs import gluster
     return misc.Node(c7_cloudimage(gluster_image, gluster.install_server))
 
 
 def dhguest_update(session):
-    from recipes.centos import chrony
+    from plur_linux.recipes.centos import chrony
     chrony.configure(session)
-    from recipes.ops import ops
+    from plur_linux.recipes.ops import ops
     ops.disable_selinux(session)
     ops.disable_ipv6(session)
     firewalld.configure(services=['ssh'], add=True)(session)
@@ -186,9 +186,9 @@ def create_dhguest_desk_image():
         dhguest_update(session)
 
         firewalld.configure(services=['ssh'], ports=['3389/tcp'], add=True)(session)
-        from recipes.centos.desktop import c7
+        from plur_linux.recipes.centos.desktop import c7
         c7.minimul_to_mindesk(session)
-        from recipes.centos import xrdp
+        from plur_linux.recipes.centos import xrdp
         xrdp.install(session)
         c7.configure_desktop(session)
         base_shell.run(session, 'sudo yum install -y seahorse')

@@ -1,6 +1,6 @@
 from plur.base_shell import *
 from plur import session_wrap
-from recipes import firewalld
+from plur_linux.recipes import firewalld
 
 
 # https://docs.rstudio.com/resources/install-r/

@@ -1,6 +1,6 @@
 from mini import misc
 from plur import base_shell
-from recipes.ubuntu import ops
+from plur_linux.recipes.ubuntu import ops
 
 
 def uninstall_old(session):

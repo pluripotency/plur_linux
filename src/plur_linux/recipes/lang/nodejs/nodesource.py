@@ -2,7 +2,7 @@ from plur import base_shell
 from plur import session_wrap
 
 
-# setup from nodesource
+# setup from plur_linux.nodesource
 def setup(version='18.x'):
     @session_wrap.sudo
     def for_centos7(session):

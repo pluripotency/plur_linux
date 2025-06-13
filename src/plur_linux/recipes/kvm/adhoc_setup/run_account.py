@@ -3,10 +3,10 @@ from mini.misc import concat_dict, toml
 from plur import base_node
 from plur import session_wrap
 from plur import log_param_templates
-from recipes.kvm import virsh
-from recipes.kvm.kvm_menu import lib_kvm_module
-from nodes import new_node
-from recipes.kvm.kvm_menu import runner
+from plur_linux.recipes.kvm import virsh
+from plur_linux.recipes.kvm.kvm_menu import lib_kvm_module
+from plur_linux.nodes import new_node
+from plur_linux.recipes.kvm.kvm_menu import runner
 
 
 bash_target_definition_toml_str = """

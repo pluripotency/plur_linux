@@ -1,6 +1,6 @@
 from plur import base_node
 from plur import session_wrap_by_node_dict
-from lib import env_ops
+from plur_linux.lib import env_ops
 from mini.ansi_colors import blue, green, cyan
 from mini.menu import choose_num, select_2nd, get_input
 from . import lib

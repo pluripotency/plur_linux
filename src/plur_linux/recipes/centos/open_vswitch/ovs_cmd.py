@@ -49,7 +49,7 @@ def del_port(session, port):
 def configure(session, node):
     if hasattr(node, 'ovsinfo'):
         if not base_shell.check_command_exists(session, 'ovs-vsctl'):
-            from recipes.centos.open_vswitch import install
+            from plur_linux.recipes.centos.open_vswitch import install
             install.from_openstack(session)
         ovsconf(session, node.ovsinfo)
         if base_shell.check_command_exists(session, 'virsh'):

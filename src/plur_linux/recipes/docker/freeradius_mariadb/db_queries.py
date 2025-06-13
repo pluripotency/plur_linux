@@ -1,4 +1,4 @@
-from recipes.docker import mariadb
+from plur_linux.recipes.docker import mariadb
 
 
 def create_db_queries_str(db_name, db_user, db_pass):

@@ -1,4 +1,4 @@
-from recipes.kvm.adhoc_setup import generic
+from plur_linux.recipes.kvm.adhoc_setup import generic
 
 
 class MinDesk(generic.SelectMenu):
@@ -12,7 +12,7 @@ class MinDesk(generic.SelectMenu):
     def setup(self, session):
         if self.enable:
             if self.selection['xrdp']:
-                from recipes.desktop import fedora
+                from plur_linux.recipes.desktop import fedora
                 fedora.install_xwindow(session)
                 if self.selection['xrdp']:
                     fedora.install_xrdp(session)

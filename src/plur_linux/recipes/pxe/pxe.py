@@ -2,11 +2,11 @@ from mini import misc
 from mini import ansi_colors
 from plur import session_wrap
 from plur import base_shell
-from recipes import firewalld
-from recipes.pxe import dhcpd
-from recipes.pxe import httpd
-from recipes.pxe import kickstart
-from recipes.pxe import prepare_iso
+from plur_linux.recipes import firewalld
+from plur_linux.recipes.pxe import dhcpd
+from plur_linux.recipes.pxe import httpd
+from plur_linux.recipes.pxe import kickstart
+from plur_linux.recipes.pxe import prepare_iso
 import re
 
 

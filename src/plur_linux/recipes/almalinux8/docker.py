@@ -1,8 +1,8 @@
 from plur import base_shell
 from plur import session_wrap
-from recipes.centos.docker import docker_ce
-from recipes.centos.docker import docker_compose
-from recipes import firewalld
+from plur_linux.recipes.centos.docker import docker_ce
+from plur_linux.recipes.centos.docker import docker_compose
+from plur_linux.recipes import firewalld
 
 
 @session_wrap.sudo

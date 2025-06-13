@@ -1,5 +1,5 @@
 from plur import session_wrap
-from recipes.kvm.cloud_image import cloud_image_ops
+from plur_linux.recipes.kvm.cloud_image import cloud_image_ops
 
 
 def create(

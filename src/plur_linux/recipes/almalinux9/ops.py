@@ -1,4 +1,4 @@
-from recipes.almalinux8 import ops
+from plur_linux.recipes.almalinux8 import ops
 
 
 def a9base_just_update(session):

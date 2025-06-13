@@ -9,7 +9,7 @@ https://www.cisco.com/c/ja_jp/support/docs/ip/lightweight-directory-access-proto
 
 
 def conf_syslog(session):
-    from recipes.syslog import rsyslog
+    from plur_linux.recipes.syslog import rsyslog
     template_name = 'slapd_local4'
     logging_path = '/var/log/local4/slapd.log'
     rule_list = [
@@ -18,7 +18,7 @@ def conf_syslog(session):
         f'& ~ # for {template_name}',
     ]
     rsyslog.setup(rule_list)(session)
-    from recipes.syslog import logrotate
+    from plur_linux.recipes.syslog import logrotate
     rotate_name = template_name
     logrotate.add_standard_logrotate(rotate_name, [
         logging_path

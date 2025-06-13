@@ -109,7 +109,7 @@ class BaseApps(SelectMenu):
 
         selection[self.nvim_key] = False
         extra_menu = {}
-        from recipes import nvim
+        from plur_linux.recipes import nvim
         extra_menu[self.nvim_key] = nvim.input_nvim_params
         super().__init__(selection, exclusive_list, 'Base Apps', extra_menu=extra_menu)
 
@@ -120,19 +120,19 @@ class BaseApps(SelectMenu):
             dot_nvim = False
             if self.selection[self.nvim_key]:
                 dot_nvim = True
-                from recipes import nvim
+                from plur_linux.recipes import nvim
                 nvim.install_appimage(**self.extra_params[self.nvim_key])(session)
             if self.selection['vim']:
                 packages += ['vim']
             elif 'vim(src)' in self.selection and self.selection['vim(src)']:
-                from recipes.source_install import vim
+                from plur_linux.recipes.source_install import vim
                 vim.install(session)
             if self.selection['tmux']:
                 packages += ['tmux']
             if self.selection['git']:
                 packages += ['git']
             else:
-                from recipes import git
+                from plur_linux.recipes import git
                 if 'git(ius)' in self.selection and self.selection['git(ius)']:
                     git.dict_git['centos7']['ius'](session)
                 elif 'gi(src)' in self.selection and self.selection['git(src)']:
@@ -140,13 +140,13 @@ class BaseApps(SelectMenu):
 
             if len(packages) > 0:
                 if re.search('^ubuntu', platform):
-                    from recipes.ubuntu import ops as ubuntu_ops
+                    from plur_linux.recipes.ubuntu import ops as ubuntu_ops
                     ubuntu_ops.sudo_apt_install_y(packages)
                 else:
                     base_shell.yum_y_install(packages)(session)
 
             if self.selection['dotfiles']:
-                from recipes.source_install import dotfiles
+                from plur_linux.recipes.source_install import dotfiles
                 dotfiles.setup(session, dot_nvim)
 
 
@@ -204,7 +204,7 @@ class Initial(SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from recipes.ops import ops
+            from plur_linux.recipes.ops import ops
             if has_true(self.selection, 'disable_selinux'):
                 ops.disable_selinux(session)
             elif has_true(self.selection, 'permissive_selinux'):
@@ -224,8 +224,8 @@ class Initial(SelectMenu):
                 ops.remove_cockpit(session)
 
             if has_true(self.selection, 'legacy_devname') or has_true(self.selection, 'ttyS0'):
-                from recipes.ops import fs
-                from recipes.ops import grub
+                from plur_linux.recipes.ops import fs
+                from plur_linux.recipes.ops import grub
                 grub_path = '/etc/default/grub'
                 backed_up_grub_path = fs.backup(grub_path)(session)
                 if re.search('^ubuntu', self.platform):
@@ -244,7 +244,7 @@ class Initial(SelectMenu):
 
 class Languages(SelectMenu):
     def __init__(self, platform):
-        from recipes.lang import go
+        from plur_linux.recipes.lang import go
         self.python_version = '3.13'
         self.python_venv = 'v3'
         self.uv_key = f'python(uv)'
@@ -275,11 +275,11 @@ class Languages(SelectMenu):
             [self.uv_key, self.pyenv_key, self.python3_key],
         ]
         extra_menu = {}
-        from recipes.lang import uv
+        from plur_linux.recipes.lang import uv
         extra_menu[self.uv_key] = uv.input_uv_params
-        from recipes.lang import pyenv
+        from plur_linux.recipes.lang import pyenv
         extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
-        from recipes.lang.nodejs import nodebrew
+        from plur_linux.recipes.lang.nodejs import nodebrew
         extra_menu[self.nodebrew_key] = nodebrew.input_node_params
 
         super().__init__(selection, exclusive_list, 'Languages', extra_menu=extra_menu)
@@ -287,23 +287,23 @@ class Languages(SelectMenu):
     def setup(self, session):
         if self.enable:
             if has_true(self.selection, self.go_key):
-                from recipes.lang import go
+                from plur_linux.recipes.lang import go
                 go.install(self.go_version)(session)
             if has_true(self.selection, self.rust_key):
-                from recipes.lang import rust
+                from plur_linux.recipes.lang import rust
                 rust.install(session)
             if has_true(self.selection, self.uv_key):
-                from recipes.lang import uv
+                from plur_linux.recipes.lang import uv
                 uv.install_python(**self.extra_params[self.uv_key])(session)
             elif has_true(self.selection, self.pyenv_key):
-                from recipes.lang import pyenv
+                from plur_linux.recipes.lang import pyenv
                 pyenv.install(**self.extra_params[self.pyenv_key])(session)
             elif has_true(self.selection, self.python3_key):
-                from recipes.lang import python3 as python_setup
+                from plur_linux.recipes.lang import python3 as python_setup
                 python_setup.install_python3(self.python_venv)(session)
             if has_true(self.selection, self.nodebrew_key):
-                from recipes.lang.nodejs import nodebrew
+                from plur_linux.recipes.lang.nodejs import nodebrew
                 nodebrew.install(**self.extra_params[self.nodebrew_key])(session)
             elif has_true(self.selection, self.nodesource_key):
-                from recipes.lang.nodejs import nodesource
+                from plur_linux.recipes.lang.nodejs import nodesource
                 nodesource.setup(self.nodesource_version)(session)

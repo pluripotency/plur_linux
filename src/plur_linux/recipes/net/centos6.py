@@ -1,5 +1,5 @@
 from plur import base_shell
-from recipes.net import lldp, resolve_conf, persistentnet, ifcfg
+from plur_linux.recipes.net import lldp, resolve_conf, persistentnet, ifcfg
 
 
 def configure_sysconfig_network(hostname=None, gateway=None):

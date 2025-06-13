@@ -1,5 +1,5 @@
 from plur import base_shell
-from recipes.ops import user as user_ops, sshd_config
+from plur_linux.recipes.ops import user as user_ops, sshd_config
 
 
 def setup_with_network(session):
@@ -9,10 +9,10 @@ def setup_with_network(session):
     session.sudo_i()
 
     if hasattr(current_node, 'ifaces'):
-        from recipes.net import network
+        from plur_linux.recipes.net import network
         network.configure(current_node)(session)
     if hasattr(current_node, 'ovsinfo'):
-        from recipes.centos.open_vswitch import ovs_cmd
+        from plur_linux.recipes.centos.open_vswitch import ovs_cmd
         ovs_cmd.configure(session, current_node)
         base_shell.run(session, 'service network restart')
     offline_setup(session, current_node)
@@ -23,10 +23,10 @@ def setup_with_network(session):
 def offline_setup(session, node):
     # user must be root
     if node.platform == 'centos6':
-        from recipes.centos import ntp
+        from plur_linux.recipes.centos import ntp
         ntp.configure(session, node)
     elif node.platform in ['centos7']:
-        from recipes.centos import chrony
+        from plur_linux.recipes.centos import chrony
         chrony.configure(session)
 
     if hasattr(node, 'offline_setups'):
@@ -43,10 +43,10 @@ def offline_setup(session, node):
             })(session)
 
         if 'iptables' in offline_setups:
-            from recipes.centos import iptables
+            from plur_linux.recipes.centos import iptables
             iptables.setup_iptables(session, offline_setups['iptables'])
         elif 'firewalld' in offline_setups:
-            from recipes import firewalld
+            from plur_linux.recipes import firewalld
             firewalld.configure(services=offline_setups['firewalld']['services'], ports=offline_setups['firewalld']['ports'])(session)
 
 

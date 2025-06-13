@@ -5,7 +5,7 @@ sys.path.append(os.pardir)
 
 from plur import base_shell
 
-from recipes.ops import ops
+from plur_linux.recipes.ops import ops
 
 
 def install_packages_for_sp(session):
@@ -53,7 +53,7 @@ def conf_httpd(server_name, httpd_certs=None):
     def func(session):
         session.sudo_i()
 
-        from recipes.centos.shibboleth import httpd
+        from plur_linux.recipes.centos.shibboleth import httpd
         httpd.configure_for_sp(server_name, httpd_certs)(session)
 
         deploy_test_page(session, server_name)
@@ -107,7 +107,7 @@ def conf_shibd(server_name, idp_entity_id):
 
 def setup(server_name, httpd_certs=None, idp_entity_id='https://c7idp.r/idp/shibboleth'):
     def func(session):
-        from recipes.centos import chrony
+        from plur_linux.recipes.centos import chrony
         chrony.configure(session)
         [func(session) for func in [
             install_packages_for_sp,

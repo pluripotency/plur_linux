@@ -57,7 +57,7 @@ def install(version, venv_name, venv_dir):
         install_pyenv(session)
         setup_python_by_pyenv(version)(session)
         if venv_name:
-            from recipes.lang import python3
+            from plur_linux.recipes.lang import python3
             python3.create_virtualenv(venv_name, python_path='~/.pyenv/shims/python', venv_dir=venv_dir)(session)
     return func
 

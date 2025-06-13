@@ -1,5 +1,5 @@
 from mini import misc
-from nodes import new_node
+from plur_linux.nodes import new_node
 
 a8base_image = 'a8base_image'
 a8docker_image = 'a8docker_image'
@@ -7,7 +7,7 @@ a8desk_image = 'a8desk_image'
 
 
 def a8base_update(session):
-    from recipes.almalinux8 import ops
+    from plur_linux.recipes.almalinux8 import ops
     ops.a8base_update(session)
 
 
@@ -33,7 +33,7 @@ def create_a8base_image():
 
 
 def create_a8docker_image():
-    from recipes.almalinux8 import docker
+    from plur_linux.recipes.almalinux8 import docker
     return a8_cloudimage(a8docker_image, [
         a8base_update,
         docker.install,
@@ -42,7 +42,7 @@ def create_a8docker_image():
 
 def create_a8desk_image():
     def func(session):
-        from recipes.almalinux8 import desktop
+        from plur_linux.recipes.almalinux8 import desktop
         desktop.install_gui(session)
         desktop.install_xrdp(session)
 

@@ -1,7 +1,7 @@
 from mini.ansi_colors import blue, green
 from mini.menu import choose_num
-from nodes.guests import dock, a8images, a9images
-from nodes.shinjuku import kubeadm_a9
+from plur_linux.nodes.guests import dock, a8images, a9images
+from plur_linux.nodes.shinjuku import kubeadm_a9
 
 vm_nodes = [
     ['a8images', a8images],

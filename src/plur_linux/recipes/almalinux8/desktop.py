@@ -1,4 +1,4 @@
-from recipes.desktop import redhat
+from plur_linux.recipes.desktop import redhat
 
 
 def install_xrdp(session):

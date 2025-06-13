@@ -1,6 +1,6 @@
 from plur.base_shell import run, create_sequence
 from plur.output_methods import waitprompt, send_line, send_pass
-from recipes.openssl.ca_commands import rows_pem
+from plur_linux.recipes.openssl.ca_commands import rows_pem
 
 
 def generate_ca_key_and_pem(cakey, cacert, passphrase, params, expiration_days='365'):

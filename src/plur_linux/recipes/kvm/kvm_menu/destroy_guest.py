@@ -1,7 +1,7 @@
 from mini.menu import *
-from recipes.kvm.kvm_menu import lib_vm_module, lib
-from recipes.kvm import spawn
-from nodes import new_node
+from plur_linux.recipes.kvm.kvm_menu import lib_vm_module, lib
+from plur_linux.recipes.kvm import spawn
+from plur_linux.nodes import new_node
 
 
 def destroy_guest_by_input(session):

@@ -1,6 +1,6 @@
 from plur import base_shell
-from recipes import repos
-from recipes.source_install import git as git_source_install
+from plur_linux.recipes import repos
+from plur_linux.recipes.source_install import git as git_source_install
 
 
 def remove_package(session):

@@ -1,6 +1,6 @@
 from plur.base_shell import *
 from plur import session_wrap
-from recipes import ipv4
+from plur_linux.recipes import ipv4
 from . import ldap_server
 
 

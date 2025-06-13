@@ -1,7 +1,7 @@
 from mini import misc
 from plur import session_wrap
 from plur import base_shell
-from recipes import firewalld
+from plur_linux.recipes import firewalld
 from . import common
 
 
@@ -65,10 +65,10 @@ def enable_epel_iptables(session):
 
 @session_wrap.sudo
 def setup_kubeadm(session):
-    from recipes.ops import ops
+    from plur_linux.recipes.ops import ops
     ops.permissive_selinux(session)
 
-    from recipes.kubernetes import cri_o
+    from plur_linux.recipes.kubernetes import cri_o
     #cri_o.install_from_okd(session)
     cri_o.install_from_crio_repo(session)
 

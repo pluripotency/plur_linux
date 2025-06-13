@@ -3,7 +3,7 @@ import re
 from mini import ansi_colors
 from plur import base_shell
 from plur import session_wrap
-from recipes.net import lldp, nmcli, centos6, nsswitch, ifcfg
+from plur_linux.recipes.net import lldp, nmcli, centos6, nsswitch, ifcfg
 
 
 def configure(current_node):

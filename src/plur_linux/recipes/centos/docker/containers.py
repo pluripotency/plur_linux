@@ -1,5 +1,5 @@
 from plur import base_shell
-from recipes import firewalld
+from plur_linux.recipes import firewalld
 
 
 def create_portainer(session):

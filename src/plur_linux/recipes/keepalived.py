@@ -206,7 +206,7 @@ def put_sample_scripts(session):
 
 @session_wrap.sudo
 def install_c7(session):
-    from recipes import firewalld
+    from plur_linux.recipes import firewalld
     firewalld.install_if_not_exists(session)
     firewalld.add_rich_rule('vrrp')(session)
 
@@ -235,7 +235,7 @@ def configure_c7(gd, vi_list, backup_org_conf=False):
 
 @session_wrap.sudo
 def install_a8(session):
-    from recipes import firewalld
+    from plur_linux.recipes import firewalld
     firewalld.install_if_not_exists(session)
     firewalld.add_rich_rule('vrrp')(session)
 
@@ -274,7 +274,7 @@ def configure_a8(gd, vi_list, backup_org_conf=False):
 
 @session_wrap.sudo
 def install_a9(session):
-    from recipes import firewalld
+    from plur_linux.recipes import firewalld
     firewalld.install_if_not_exists(session)
     firewalld.add_rich_rule('vrrp')(session)
 

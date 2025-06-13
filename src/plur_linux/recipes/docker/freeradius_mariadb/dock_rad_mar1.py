@@ -1,12 +1,12 @@
 #! /usr/bin/env python
 from plur import base_shell
 from plur import output_methods
-from recipes.docker import dock_util
-from recipes.docker import mariadb
-from recipes.docker.freeradius_mariadb import db_queries
-from recipes.docker.freeradius_mariadb import freeradius
-from recipes.docker.freeradius_mariadb import nginx
-from recipes.docker.phpmyadmin import phpmyadmin_setup
+from plur_linux.recipes.docker import dock_util
+from plur_linux.recipes.docker import mariadb
+from plur_linux.recipes.docker.freeradius_mariadb import db_queries
+from plur_linux.recipes.docker.freeradius_mariadb import freeradius
+from plur_linux.recipes.docker.freeradius_mariadb import nginx
+from plur_linux.recipes.docker.phpmyadmin import phpmyadmin_setup
 
 
 def create_params(mysql_root_password, db_container_name):

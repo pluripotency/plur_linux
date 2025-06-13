@@ -1,5 +1,5 @@
 from plur import base_shell
-from recipes.centos.kubernetes import kubeadm
+from plur_linux.recipes.centos.kubernetes import kubeadm
 
 
 def install_kvm2(session):

@@ -6,13 +6,12 @@ from plur import log_param_templates
 from mini.ansi_colors import blue, red, green
 from mini.menu import get_input, choose_num, get_y_n, select_2nd
 from mini import misc
-from recipes.kvm.kvm_menu import runner as kvm_menu_runner
-from recipes.kvm.kvm_menu import lib_kvm_module
-from recipes.kvm.kvm_menu import lib_vm_module
-
+from .recipes.kvm.kvm_menu import runner as kvm_menu_runner
+from .recipes.kvm.kvm_menu import lib_kvm_module
+from .recipes.kvm.kvm_menu import lib_vm_module
 
 def kvm_expand_volume():
-    from recipes.kvm import qemu_img
+    from .recipes.kvm import qemu_img
 
     default_size = 20
     size = int(
@@ -40,7 +39,6 @@ def kvm_expand_volume():
         kvm, qemu_img.expand_guest_raw_ext4(raw_disk_path, size, lv_path), log_params
     )
 
-
 def configure_network():
     num = choose_num(["vm", "kvm", "Me"], "vm or kvm")
     if num == 0:
@@ -53,9 +51,8 @@ def configure_network():
             lib_kvm_module.kvm_module_list, blue("Please select from kvm")
         )
         node = select_2nd(node_module.create_nodes())
-    from recipes import setup
+    from plur_linux.recipes import setup
     session_wrap.ssh(node)(setup.setup_with_network)()
-
 
 def post_run():
     num = choose_num(["vm", "kvm"], "vm or kvm")
@@ -71,11 +68,10 @@ def post_run():
         node = select_2nd(node_module.create_nodes())
 
     def func(session):
-        from recipes import setup
+        from plur_linux.recipes import setup
         setup.run_setup_list(session, node)
 
     session_wrap.ssh(node)(func)()
-
 
 def docker_menu():
     def func():
@@ -83,7 +79,7 @@ def docker_menu():
             lib_vm_module.vm_nodes + lib_kvm_module.kvm_module_list + [["Me", ""]]
         )
         num = choose_num([n[0] for n in all_nodes], "Select node to deploy")
-        from recipes.docker import git_repository
+        from plur_linux.recipes.docker import git_repository
 
         if num == len(all_nodes) - 1:
             print(red("in Me"))
@@ -94,9 +90,8 @@ def docker_menu():
 
     select_2nd([["deploy git_repository", func]], "Start Docker", vertical=True)
 
-
 def change_password_by_libguestfs():
-    from recipes.kvm.cloud_image import cloud_image_ops
+    from plur_linux.recipes.kvm.cloud_image import cloud_image_ops
 
     @session_wrap.sudo
     def on_kvm_sudo(session):
@@ -119,7 +114,6 @@ def change_password_by_libguestfs():
     log_params = log_param_templates.normal_on_tmp()
     kvm_menu_runner.run_on(kvm, on_kvm_sudo, log_params)
 
-
 def kvm_menu():
     select_2nd(
         [
@@ -135,11 +129,13 @@ def kvm_menu():
         vertical=True,
     )
 
-
-if __name__ == "__main__":
+def main_menu():
     main_menu_list = [
         ["Ad Hoc Setup", kvm_menu_runner.ad_hoc_setup],
         ["KVM Menu", kvm_menu],
     ]
     while True:
-        select_2nd(main_menu_list, green("Please select from Recipes"), vertical=True)
+        select_2nd(main_menu_list, green("Please select from plur_linux.recipes"), vertical=True)
+
+if __name__ == "__main__":
+    main_menu()

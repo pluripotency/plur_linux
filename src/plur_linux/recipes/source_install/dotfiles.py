@@ -12,7 +12,7 @@ def setup(session, nvim=False):
     if len(packages) > 0:
         platform = session.nodes[-1].platform
         if re.search('^ubuntu', platform):
-            from recipes.ubuntu import ops as ubuntu_ops
+            from plur_linux.recipes.ubuntu import ops as ubuntu_ops
             ubuntu_ops.sudo_apt_install_y(packages)
         else:
             base_shell.run(session, 'sudo yum install -y ' + ' '.join(packages))

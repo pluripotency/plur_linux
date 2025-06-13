@@ -190,27 +190,27 @@ def setup(server_params, ldap_params, sp_server_name=None, httpd_certs=None):
             'mod_ssl',
             'wget'
         ]})
-        from recipes import firewalld
+        from plur_linux.recipes import firewalld
         firewalld.configure(services=['ssh', 'https'])(session)
-        from recipes.centos.jdk import openjdk8
+        from plur_linux.recipes.centos.jdk import openjdk8
         openjdk8.setup(session)
 
-        # from recipes.centos.tomcat import tomcat7
+        # from plur_linux.recipes.centos.tomcat import tomcat7
         # tomcat7.setup(session)
         # oracle_jdk8.setup({'jce': True})(session)
-        # from recipes.centos.tomcat import tomcat8
+        # from plur_linux.recipes.centos.tomcat import tomcat8
         # tomcat8.setup(session)
-        # from recipes.centos.tomcat import tomcat85
+        # from plur_linux.recipes.centos.tomcat import tomcat85
         # tomcat85.setup(session)
 
-        from recipes.centos.tomcat import tomcat9
+        from plur_linux.recipes.centos.tomcat import tomcat9
         tomcat9.setup(session)
 
     @session_wrap.sudo
     def configure_packages(session):
-        from recipes.centos.shibboleth import httpd as conf_httpd
-        from recipes.centos.shibboleth import tomcat as conf_tomcat
-        from recipes.centos.shibboleth import syslog as conf_syslog
+        from plur_linux.recipes.centos.shibboleth import httpd as conf_httpd
+        from plur_linux.recipes.centos.shibboleth import tomcat as conf_tomcat
+        from plur_linux.recipes.centos.shibboleth import syslog as conf_syslog
 
         [func(session) for func in [
             conf_httpd.configure(server_params['server_name'], httpd_certs),
@@ -221,11 +221,11 @@ def setup(server_params, ldap_params, sp_server_name=None, httpd_certs=None):
 
     @session_wrap.sudo
     def configure_idp(session):
-        from recipes.centos.shibboleth import jakarta
-        from recipes.centos.shibboleth import saml_nameid_properties
-        from recipes.centos.shibboleth import logback
-        from recipes.centos.shibboleth import idp_properties
-        from recipes.centos.shibboleth import ldap_properties
+        from plur_linux.recipes.centos.shibboleth import jakarta
+        from plur_linux.recipes.centos.shibboleth import saml_nameid_properties
+        from plur_linux.recipes.centos.shibboleth import logback
+        from plur_linux.recipes.centos.shibboleth import idp_properties
+        from plur_linux.recipes.centos.shibboleth import ldap_properties
 
         [func(session) for func in [
             jakarta.link(shib_home),
@@ -239,9 +239,9 @@ def setup(server_params, ldap_params, sp_server_name=None, httpd_certs=None):
 
     @session_wrap.sudo
     def configure_for_sp(session):
-        from recipes.centos.shibboleth import metadata_provider
-        from recipes.centos.shibboleth import attribute_resolver
-        from recipes.centos.shibboleth import attribute_filter
+        from plur_linux.recipes.centos.shibboleth import metadata_provider
+        from plur_linux.recipes.centos.shibboleth import attribute_resolver
+        from plur_linux.recipes.centos.shibboleth import attribute_filter
         [func(session) for func in [
             metadata_provider.configure(sp_server_name, shib_home),
             attribute_resolver.configure(sp_server_name),
@@ -249,7 +249,7 @@ def setup(server_params, ldap_params, sp_server_name=None, httpd_certs=None):
         ]]
 
     def run(session):
-        from recipes.centos import chrony
+        from plur_linux.recipes.centos import chrony
         chrony.configure(session)
         install_packages_for_idp(session)
         configure_packages(session)

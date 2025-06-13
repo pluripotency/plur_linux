@@ -1,11 +1,11 @@
 from plur import base_shell
 from mini import misc
-from recipes import firewalld
-from recipes.centos.docker import setup_docker
-from recipes.ops import sshd_config
-from recipes.centos.glusterfs import gluster
-from recipes.centos import chrony
-from nodes import new_node
+from plur_linux.recipes import firewalld
+from plur_linux.recipes.centos.docker import setup_docker
+from plur_linux.recipes.ops import sshd_config
+from plur_linux.recipes.centos.glusterfs import gluster
+from plur_linux.recipes.centos import chrony
+from plur_linux.nodes import new_node
 
 dock_list = [['dock' + ('000' + str(num))[-3:], num] for num in range(101, 105)]
 a8dock_list = [['a8dock' + ('000' + str(num))[-3:], num] for num in range(105, 109)]

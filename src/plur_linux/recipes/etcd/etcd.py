@@ -1,7 +1,7 @@
 from plur import base_shell
 from plur import session_wrap
-from recipes.ops import ops
-from recipes import firewalld as conf_firewalld
+from plur_linux.recipes.ops import ops
+from plur_linux.recipes import firewalld as conf_firewalld
 
 node_2379 = lambda node_ip: 'http://{0}:2379'.format(node_ip)
 node_2380 = lambda node_ip: 'http://{0}:2380'.format(node_ip)

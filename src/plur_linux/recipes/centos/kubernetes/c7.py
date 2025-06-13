@@ -1,6 +1,6 @@
 from plur import base_shell
 from plur import session_wrap
-from recipes.ops import ops
+from plur_linux.recipes.ops import ops
 
 
 def install_packages(session):

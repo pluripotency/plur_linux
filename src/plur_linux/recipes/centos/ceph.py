@@ -6,9 +6,9 @@ sys.path.append(os.pardir)
 from plur import base_shell
 from plur import session_wrap
 
-from recipes import repos, firewalld
-from recipes.ops import ops
-from recipes.centos import chrony
+from plur_linux.recipes import repos, firewalld
+from plur_linux.recipes.ops import ops
+from plur_linux.recipes.centos import chrony
 
 ceph_repos = """[ceph-noarch]
 name=Ceph noarch packages

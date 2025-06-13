@@ -1,6 +1,6 @@
 from plur.base_shell import *
 from plur import session_wrap
-from recipes import firewalld
+from plur_linux.recipes import firewalld
 
 enable_tcp_list = [
     r's/^#\$ModLoad imtcp$/$ModLoad imtcp/'

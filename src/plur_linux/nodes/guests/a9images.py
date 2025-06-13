@@ -1,10 +1,10 @@
-from nodes import new_node
+from plur_linux.nodes import new_node
 a9base_image =   'a9baseimage'
 a9docker_image = 'a9dockerimage'
 a9desk_image =   'a9deskimage'
 
 def a9base_update(session):
-    from recipes.almalinux9 import ops
+    from plur_linux.recipes.almalinux9 import ops
     ops.a9base_update(session)
 
 def a9_cloudimage(hostname, run_post):
@@ -27,7 +27,7 @@ def create_a9base_image():
     return a9_cloudimage(a9base_image, [])
 
 def create_a9docker_image():
-    from recipes.almalinux9 import docker
+    from plur_linux.recipes.almalinux9 import docker
     return a9_cloudimage(a9docker_image, [
         a9base_update,
         docker.install,
@@ -35,7 +35,7 @@ def create_a9docker_image():
 
 def create_a9desk_image():
     def func(session):
-        from recipes.almalinux9 import desktop
+        from plur_linux.recipes.almalinux9 import desktop
         desktop.install_gui(session)
         desktop.install_xrdp(session)
 

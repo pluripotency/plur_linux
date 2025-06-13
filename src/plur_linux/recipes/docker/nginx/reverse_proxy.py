@@ -1,5 +1,5 @@
 from plur import base_shell
-from recipes.docker import dock_util
+from plur_linux.recipes.docker import dock_util
 
 
 def reverse_proxy_conf(proxy_list, htpasswd_path, port=80, logname='proxy'):

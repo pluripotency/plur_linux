@@ -288,7 +288,7 @@ def create_user_data_str(mac):
 @session_wrap.sudo
 def setup_pxe(session):
     base_shell.run(session, f'mkdir {tftp_boot_dir}')
-    from recipes.ubuntu import ops
+    from plur_linux.recipes.ubuntu import ops
     ops.sudo_apt_install_y([
         'dnsmasq',
         'nginx',

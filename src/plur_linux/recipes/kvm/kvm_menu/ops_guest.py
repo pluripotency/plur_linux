@@ -3,8 +3,8 @@ from mini.menu import re, choose_num, get_y_n
 from plur import base_node
 from plur import base_shell
 from plur import session_wrap
-from recipes.kvm import virsh
-from recipes.kvm.kvm_menu import runner, lib
+from plur_linux.recipes.kvm import virsh
+from plur_linux.recipes.kvm.kvm_menu import runner, lib
 
 
 def start_vm(session):
@@ -38,7 +38,7 @@ def setup_adhoc(session):
 
 
 def configure_nic(session):
-    from nodes import new_node
+    from plur_linux.nodes import new_node
     hostname = lib.select_vmname(session, yellow("Please select vmname: "))
     vm_dict = new_node.create_single_iface_node_dict(hostname)
     vm_dict["hostname"] = hostname
@@ -50,10 +50,10 @@ def configure_nic(session):
         capt = base_shell.run(session, "cat /etc/issue")
         if re.search("Ubuntu", capt):
             session.nodes[-1].platform = "ubuntu"
-            from recipes.ubuntu import netplan
+            from plur_linux.recipes.ubuntu import netplan
             netplan.configure(vm_node)(session)
         else:
-            from recipes.net import network
+            from plur_linux.recipes.net import network
             session_wrap.sudo(network.configure(vm_node))(session)
 
     if get_y_n("Do you want to run "):

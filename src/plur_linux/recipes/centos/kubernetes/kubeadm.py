@@ -5,8 +5,8 @@ sys.path.append(os.pardir)
 
 from plur import base_shell
 from plur import session_wrap
-from recipes.ops import ops
-from recipes import firewalld
+from plur_linux.recipes.ops import ops
+from plur_linux.recipes import firewalld
 
 k8s_conf = """
 net.ipv4.ip_forward = 1
@@ -65,7 +65,7 @@ def kubeadm_only(kube_version=None):
     #     kube_version = '1.11.0'
 
     def func(session):
-        from recipes.centos.docker import setup_docker
+        from plur_linux.recipes.centos.docker import setup_docker
         setup_docker.install_docker_if_not_installed(session)
         install_kubeadm(kube_version)(session)
     return func
@@ -84,7 +84,7 @@ def copy_additional(ssh_host, password=None):
     script_dir = os.path.dirname(__file__)
     @session_wrap.bash()
     def func(session2):
-        from recipes.ops import ssh
+        from plur_linux.recipes.ops import ssh
         ssh.scp(session2, os.path.join(script_dir, 'tutorial'), f'{ssh_host}:~', password)
         ssh.scp(session2, os.path.join(script_dir, 'dashboard'), f'{ssh_host}:~', password)
     return func

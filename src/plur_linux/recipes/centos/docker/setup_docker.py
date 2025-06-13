@@ -1,9 +1,9 @@
 import os
 from plur import base_shell
 from plur import session_wrap
-from recipes.ops import ops
-from recipes.centos import chrony
-from recipes import firewalld
+from plur_linux.recipes.ops import ops
+from plur_linux.recipes.centos import chrony
+from plur_linux.recipes import firewalld
 
 
 @session_wrap.sudo
@@ -33,10 +33,10 @@ def install_docker_ce(session):
     firewalld.configure(add=True)(session)
     chrony.configure(session)
 
-    from recipes.centos.docker import docker_ce
+    from plur_linux.recipes.centos.docker import docker_ce
     docker_ce.install(version=None)(session)
 
-    from recipes.centos.docker import utils
+    from plur_linux.recipes.centos.docker import utils
     utils.create_script_to_count_restart(session)
 
 

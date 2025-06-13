@@ -20,7 +20,7 @@ def prepare(session):
         'unzip'
     ]})
 
-    from recipes.source_install import autoconf
+    from plur_linux.recipes.source_install import autoconf
     autoconf.source_install(session, version='2.69')
 
     shell.run(session, '. ~/.bashrc')

@@ -2,14 +2,14 @@ from plur import base_shell
 from plur import base_node
 from plur import session_wrap
 from plur import log_param_templates
-from recipes.kvm import virsh
-from recipes.kvm.kvm_menu import lib_kvm_module
-from recipes.kvm.kvm_menu import lib_vm_module
+from plur_linux.recipes.kvm import virsh
+from plur_linux.recipes.kvm.kvm_menu import lib_kvm_module
+from plur_linux.recipes.kvm.kvm_menu import lib_vm_module
 from mini.ansi_colors import red, cyan
 from mini.menu import re, get_input, choose_num, select_2nd, get_y_n
-from lib.lib_selection import Selection
+from plur_linux.lib.lib_selection import Selection
 from mini import misc
-from recipes.kvm import spawn
+from plur_linux.recipes.kvm import spawn
 from . import lib
 
 
@@ -76,7 +76,7 @@ def interact(session):
 
 
 def menu_on_kvm():
-    from recipes.kvm.kvm_menu import ops_guest, create_guest, destroy_guest, snapshot
+    from plur_linux.recipes.kvm.kvm_menu import ops_guest, create_guest, destroy_guest, snapshot
 
     selection = Selection("create_defined_guest")
     selection.set_title("last")
@@ -131,16 +131,16 @@ def create_defined_guest():
 
 
 def select_adhoc(connect_method_list, hostname=None):
-    from recipes.kvm.adhoc_setup.select_post_run import select_post_run
-    from recipes.kvm.adhoc_setup import arch
-    from recipes.kvm.adhoc_setup import almalinux9
-    from recipes.kvm.adhoc_setup import almalinux8
-    from recipes.kvm.adhoc_setup import centos8stream
-    from recipes.kvm.adhoc_setup import centos7
-    from recipes.kvm.adhoc_setup import fedora
-    from recipes.kvm.adhoc_setup import ubuntu_jammy
-    from recipes.kvm.adhoc_setup import ubuntu_noble
-    from recipes.kvm.adhoc_setup import debian10
+    from plur_linux.recipes.kvm.adhoc_setup.select_post_run import select_post_run
+    from plur_linux.recipes.kvm.adhoc_setup import arch
+    from plur_linux.recipes.kvm.adhoc_setup import almalinux9
+    from plur_linux.recipes.kvm.adhoc_setup import almalinux8
+    from plur_linux.recipes.kvm.adhoc_setup import centos8stream
+    from plur_linux.recipes.kvm.adhoc_setup import centos7
+    from plur_linux.recipes.kvm.adhoc_setup import fedora
+    from plur_linux.recipes.kvm.adhoc_setup import ubuntu_jammy
+    from plur_linux.recipes.kvm.adhoc_setup import ubuntu_noble
+    from plur_linux.recipes.kvm.adhoc_setup import debian10
 
     [vm_dict, post_run_list] = select_2nd(
         [

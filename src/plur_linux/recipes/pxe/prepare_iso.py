@@ -62,7 +62,7 @@ def prepare_a8_iso_old(username, access_ip, password):
             url = f'http://ftp.riken.jp/Linux/almalinux/8/isos/x86_64/{iso_name}'
             base_shell.run(session, f'curl -O {url}')
 
-        from recipes.ops import ssh
+        from plur_linux.recipes.ops import ssh
         ssh.scp(session, iso_name, f'{username}@{access_ip}:{dst_dir}', password)
         iso_path = f'{dst_dir}/{iso_name}'
         return iso_path

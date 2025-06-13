@@ -1,9 +1,9 @@
 from mini.menu import get_y_n, choose_num
 from mini import misc
 from plur import base_node
-from lib.lib_selection import Selection
-from recipes.kvm.kvm_menu import lib_vm_module, runner
-from nodes import new_node
+from plur_linux.lib.lib_selection import Selection
+from plur_linux.recipes.kvm.kvm_menu import lib_vm_module, runner
+from plur_linux.nodes import new_node
 
 
 def create_guest_by_select(session):

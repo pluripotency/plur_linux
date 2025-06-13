@@ -1,5 +1,5 @@
 from plur import base_shell
-from recipes.kvm.adhoc_setup import generic
+from plur_linux.recipes.kvm.adhoc_setup import generic
 
 class Desktop(generic.SelectMenu):
     def __init__(self):
@@ -27,7 +27,7 @@ class Desktop(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from recipes.ubuntu import desktop_noble
+            from plur_linux.recipes.ubuntu import desktop_noble
             enable_xrdp = self.selection['xrdp']
             if self.selection['ubuntu-desktop']:
                 desktop_noble.install_gnome(session, enable_xrdp)
@@ -45,7 +45,7 @@ class Desktop(generic.SelectMenu):
             else:
                 base_shell.run(session, 'sudo systemctl set-default multi-user.target')
             if self.selection['xfreerdp']:
-                from recipes.rdp import xfreerdp
+                from plur_linux.recipes.rdp import xfreerdp
                 xfreerdp.setup(session)
 
 class Docker(generic.SelectMenu):
@@ -59,7 +59,7 @@ class Docker(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from recipes.ubuntu import docker_ce
+            from plur_linux.recipes.ubuntu import docker_ce
             docker_ce.install(session)
 
                 # [base_shell.run(session, action) for action in [
@@ -69,9 +69,9 @@ class Docker(generic.SelectMenu):
 
             def setup_containers(sess):
                 if self.selection['firecracker']:
-                    from recipes.ubuntu import firecracker
+                    from plur_linux.recipes.ubuntu import firecracker
                     firecracker.install(session)
-                from recipes.centos.docker import containers
+                from plur_linux.recipes.centos.docker import containers
                 if self.selection['portainer']:
                     containers.create_portainer(sess)
                 if self.selection['cadvisor']:
@@ -89,10 +89,10 @@ class Apps(generic.SelectMenu):
 
     def setup(self, session):
         if self.selection['gns3']:
-            from recipes.ubuntu import gns3
+            from plur_linux.recipes.ubuntu import gns3
             gns3.install(session)
         if self.selection['gns3']:
-            from recipes.ubuntu import openvswitch
+            from plur_linux.recipes.ubuntu import openvswitch
             openvswitch.install_openvswitch(session)
 
 def get_selection():

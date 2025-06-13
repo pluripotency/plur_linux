@@ -3,7 +3,7 @@ import re
 from mini import misc
 from plur import session_wrap
 from plur import base_shell
-from recipes.ops import ssh
+from plur_linux.recipes.ops import ssh
 
 
 def scp_docker_image(dst_path, password):
@@ -54,7 +54,7 @@ def scp_local_files(pasv_ip, dst_path, password):
 
 
 def start(session, pasv_ip, node_dict):
-    from recipes import firewalld
+    from plur_linux.recipes import firewalld
     firewalld.configure(ports=['20-21/tcp', '21100-21110/tcp'], add=True)(session)
 
     username =  node_dict['username']

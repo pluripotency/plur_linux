@@ -5,14 +5,14 @@ from mini.ansi_colors import red, blue, yellow
 from plur import base_node
 from plur import base_shell
 from plur import session_wrap
-from recipes.kvm import virsh
-from recipes.kvm import qemu_img
-from recipes.net import network
-from recipes.ops import ssh as ssh_ops, ops
+from plur_linux.recipes.kvm import virsh
+from plur_linux.recipes.kvm import qemu_img
+from plur_linux.recipes.net import network
+from plur_linux.recipes.ops import ssh as ssh_ops, ops
 
-from recipes import setup
-from recipes.kvm import cloudinit_ops
-from recipes.kvm.cloud_image import (
+from plur_linux.recipes import setup
+from plur_linux.recipes.kvm import cloudinit_ops
+from plur_linux.recipes.kvm.cloud_image import (
     cloud_image_ops,
     centos as cloud_image_centos,
     ubuntu as cloud_image_ubuntu,
@@ -308,7 +308,7 @@ def start_domain_by_define_offline(vm, org_xml):
 
 def start_domain_by_virt_install(vm, iso_full_path):
     def func(session):
-        from recipes.kvm import virt_install_str
+        from plur_linux.recipes.kvm import virt_install_str
 
         hostname = vm.hostname
         vcpu = vm.vcpu
@@ -441,12 +441,12 @@ def on_spawn_console(vm):
         # hostname setting is needed for non-cloudinit
         ops.set_hostname(vm.hostname)(session)
         if re.search("^ubuntu", org_vm.platform):
-            from recipes.ubuntu import netplan
-            from recipes.ubuntu import ops as ubuntu_ops
+            from plur_linux.recipes.ubuntu import netplan
+            from plur_linux.recipes.ubuntu import ops as ubuntu_ops
             ubuntu_ops.disable_ipv6(session)
             netplan.configure(vm)(session)
         elif org_vm.platform == 'arch':
-            from recipes.dists.arch import ops as arch_ops
+            from plur_linux.recipes.dists.arch import ops as arch_ops
             arch_ops.configure_network(vm.ifaces)(session)
         else:
             network.configure(vm)(session)
@@ -495,10 +495,10 @@ def on_create_console_with_cloudinit(vm):
     def offline_setups(session):
         # hostname and first nic are configured by seediso
         if re.search("^ubuntu", vm.platform):
-            from recipes.ubuntu import netplan
+            from plur_linux.recipes.ubuntu import netplan
             netplan.configure(vm)(session)
         elif vm.platform == 'arch':
-            from recipes.dists.arch import ops as arch_ops
+            from plur_linux.recipes.dists.arch import ops as arch_ops
             arch_ops.configure_network(vm.ifaces)(session)
         else:
             network.configure(vm)(session)

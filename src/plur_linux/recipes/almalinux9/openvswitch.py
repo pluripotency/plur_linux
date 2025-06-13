@@ -1,4 +1,4 @@
-from recipes.openvswitch import redhat
+from plur_linux.recipes.openvswitch import redhat
 
 
 def install(session):

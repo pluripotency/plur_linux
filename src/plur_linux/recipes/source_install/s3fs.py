@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.pardir)
 
 from plur import base_shell as shell
-from recipes.source_install import base as src_base
+from plur_linux.recipes.source_install import base as src_base
 
 
 def runnable():

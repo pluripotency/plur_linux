@@ -22,7 +22,7 @@ def install_packages(session):
 #
 #     @session_wrap.bash()
 #     def func(session2):
-#         from recipes.ops import ssh
+#         from plur_linux.recipes.ops import ssh
 #         ssh.scp(session2, os.path.join(script_dir, 'ldap'), 'root@%s:/etc/raddb/mods-enabled/' % current_node.access_ip)
 #         ssh.scp(session2, os.path.join(script_dir, 'default'), 'root@%s:/etc/raddb/sites-available/' % current_node.access_ip)
 #     func()
@@ -56,7 +56,7 @@ def setup():
         ['user001', 'pass001', 100],
         ['user002', 'pass002', 200]
     ]
-    from recipes.centos.openldap import radius as ldap_server_radius
+    from plur_linux.recipes.centos.openldap import radius as ldap_server_radius
 
     def func(session):
         ldap_server_radius.setup(ldap_params, user_list=user_list)(session)

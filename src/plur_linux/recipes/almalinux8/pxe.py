@@ -1,4 +1,4 @@
-from recipes.pxe import pxe
+from plur_linux.recipes.pxe import pxe
 
 
 def setup_pxe_uefi(session):

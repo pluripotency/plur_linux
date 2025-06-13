@@ -6,7 +6,7 @@ from plur import session_wrap
 
 @session_wrap.sudo
 def install_required(session):
-    from recipes.ops import ops
+    from plur_linux.recipes.ops import ops
     ops.disable_selinux(session)
     base_shell.run(session, 'yum groupinstall -y development tools')
     base_shell.run(session, 'yum install -y ' + ' '.join([

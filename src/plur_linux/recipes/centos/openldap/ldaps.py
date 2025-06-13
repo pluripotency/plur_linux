@@ -101,7 +101,7 @@ def setup(cert_params=None):
     @session_wrap.sudo
     def func(session):
         if 'common_name' in cert_params:
-            from recipes import firewalld
+            from plur_linux.recipes import firewalld
             # port 636
             firewalld.configure(
                 services=['ldaps'],

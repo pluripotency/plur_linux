@@ -1,7 +1,7 @@
 from mini.menu import *
 from plur import session_wrap
 from plur import base_shell
-from recipes.kvm.kvm_ops import snapshot
+from plur_linux.recipes.kvm.kvm_ops import snapshot
 from . import lib
 
 

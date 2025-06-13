@@ -1,9 +1,9 @@
 from mini import menu
-from nodes import util
-from recipes.ops import ops
-from nodes import new_c7
-from nodes.guests.images import gluster_image
-from recipes.centos.glusterfs import vol, gluster
+from plur_linux.nodes import util
+from plur_linux.recipes.ops import ops
+from plur_linux.nodes import new_c7
+from plur_linux.nodes.guests.images import gluster_image
+from plur_linux.recipes.centos.glusterfs import vol, gluster
 gl41_image_comp = f'{gluster_image}.comp.qcow2'
 
 create_base_node = new_c7.create_base_node

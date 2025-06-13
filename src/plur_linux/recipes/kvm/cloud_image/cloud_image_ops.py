@@ -1,6 +1,6 @@
 from plur import base_shell
-from recipes.kvm import virt_builder
-from recipes.kvm import qemu_img
+from plur_linux.recipes.kvm import virt_builder
+from plur_linux.recipes.kvm import qemu_img
 cloud_image_download_dir = '$HOME/Downloads/vm'
 tmp_image_dir = '/tmp'
 

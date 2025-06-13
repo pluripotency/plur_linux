@@ -1,7 +1,7 @@
 import re
 from plur import base_shell
 from plur import session_wrap
-from recipes import repos
+from plur_linux.recipes import repos
 
 def alias_appimage(install_path):
     def func(session):
@@ -33,7 +33,7 @@ def install_platform_dependancy(session):
         base_shell.run(session, 'sudo dnf install -y fuse tar ripgrep fd-find unzip wget gcc')
         # base_shell.run(session, 'sudo dnf install -y fuse tar')
     elif re.search('^ubuntu', platform):
-        from recipes.ubuntu import ops
+        from plur_linux.recipes.ubuntu import ops
         ops.sudo_apt_install_y(['libfuse2 fd-find ripgrep gcc'])
     elif platform in ['centos7']:
         repos.install_with_repo(['fuse-sshfs'], 'centos7', 'epel')(session)

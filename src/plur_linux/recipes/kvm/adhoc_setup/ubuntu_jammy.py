@@ -1,5 +1,5 @@
-from nodes.util import *
-from recipes.kvm.adhoc_setup import run_account, generic
+from plur_linux.nodes.util import *
+from plur_linux.recipes.kvm.adhoc_setup import run_account, generic
 
 
 class MinDesk(generic.SelectMenu):
@@ -27,7 +27,7 @@ class MinDesk(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from recipes.ubuntu import desktop
+            from plur_linux.recipes.ubuntu import desktop
             no_recommends = self.selection['no-install-recommends']
             ja_support = self.selection['ja-support']
             if self.selection['ubuntu-desktop']:
@@ -45,7 +45,7 @@ class MinDesk(generic.SelectMenu):
             else:
                 base_shell.run(session, 'sudo systemctl set-default graphical.target')
             if self.selection['xfreerdp']:
-                from recipes.rdp import xfreerdp
+                from plur_linux.recipes.rdp import xfreerdp
                 xfreerdp.setup(session)
 
 
@@ -60,7 +60,7 @@ class Docker(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from recipes.ubuntu import docker_ce
+            from plur_linux.recipes.ubuntu import docker_ce
             docker_ce.install(session)
 
                 # [base_shell.run(session, action) for action in [
@@ -70,9 +70,9 @@ class Docker(generic.SelectMenu):
 
             def setup_containers(sess):
                 if self.selection['firecracker']:
-                    from recipes.ubuntu import firecracker
+                    from plur_linux.recipes.ubuntu import firecracker
                     firecracker.install(session)
-                from recipes.centos.docker import containers
+                from plur_linux.recipes.centos.docker import containers
                 if self.selection['portainer']:
                     containers.create_portainer(sess)
                 if self.selection['cadvisor']:
@@ -93,15 +93,15 @@ class Apps(generic.SelectMenu):
 
     def setup(self, session):
         if self.selection['firefox no snap']:
-            from recipes.ubuntu import firefox_not_snap
+            from plur_linux.recipes.ubuntu import firefox_not_snap
             firefox_not_snap.setup(session)
         if self.selection['gns3']:
-            from recipes.ubuntu import gns3
+            from plur_linux.recipes.ubuntu import gns3
             gns3.install(session)
         if self.selection['openvswitch']:
-            from recipes.ubuntu import openvswitch
+            from plur_linux.recipes.ubuntu import openvswitch
             openvswitch.install_openvswitch(session)
-        from recipes.ubuntu import pxe_jammy
+        from plur_linux.recipes.ubuntu import pxe_jammy
         if self.selection['pxe_uefi']:
             pxe_jammy.setup_pxe(session)
 

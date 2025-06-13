@@ -146,7 +146,7 @@ def setup_nm(session):
 
 
 def configure_by_nmcli(ifaces):
-    from recipes.net import nmcli
+    from plur_linux.recipes.net import nmcli
     @session_wrap.sudo
     def func(session):
         nmcli.remove_duped_entries(session, ifaces)

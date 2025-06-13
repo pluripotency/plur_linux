@@ -1,6 +1,6 @@
 from plur import base_shell
 from plur import base_node
-from recipes.ops import ops
+from plur_linux.recipes.ops import ops
 
 
 def tz_asia_tokyo(session):

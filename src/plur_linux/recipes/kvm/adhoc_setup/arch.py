@@ -1,6 +1,6 @@
 from plur import base_shell
-from recipes.kvm.adhoc_setup import generic
-from recipes.dists.arch import ops
+from plur_linux.recipes.kvm.adhoc_setup import generic
+from plur_linux.recipes.dists.arch import ops
 
 
 class Desktop(generic.SelectMenu):
@@ -98,13 +98,13 @@ class BaseApps(generic.SelectMenu):
                 ops.pacman_install(packages)(session)
 
             if self.selection['dotfiles']:
-                from recipes.source_install import dotfiles
+                from plur_linux.recipes.source_install import dotfiles
                 dotfiles.setup(session)
 
 
 class Languages(generic.SelectMenu):
     def __init__(self):
-        from recipes.lang import go
+        from plur_linux.recipes.lang import go
         self.go_version = go.go_install_version
         self.go_key = f'go({self.go_version})'
         self.rust_key = 'rust(latest)'
@@ -121,10 +121,10 @@ class Languages(generic.SelectMenu):
         if self.enable:
             packages = []
             if self.selection[self.go_key]:
-                from recipes.lang import go
+                from plur_linux.recipes.lang import go
                 go.install(self.go_version)(session)
             if self.selection[self.rust_key]:
-                from recipes.lang import rust
+                from plur_linux.recipes.lang import rust
                 rust.install(session)
             if self.selection[self.zig_key]:
                 packages += ['zig']

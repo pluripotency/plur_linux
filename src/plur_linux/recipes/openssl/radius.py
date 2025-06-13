@@ -1,6 +1,6 @@
 from plur import base_shell
-from recipes.openssl import commands as cmd
-from recipes.openssl import ca
+from plur_linux.recipes.openssl import commands as cmd
+from plur_linux.recipes.openssl import ca
 
 
 def create_rad_files(rad_cert_dir='/etc/raddb/certs/', rad_ca_dir='/etc/raddb/certs/'):

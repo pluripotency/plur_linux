@@ -3,11 +3,11 @@ from mini.ansi_colors import red, light_red
 from mini.menu import get_input, choose_num
 from mini import misc
 from plur import base_node
-from nodes import new_node
+from plur_linux.nodes import new_node
 
 class VmAccount:
     def __init__(self, vm):
-        from lib import env_ops
+        from plur_linux.lib import env_ops
         self.vm = vm
         self.env_account_set_list = env_ops.EnvAccountSet()
         self.user_list = self.env_account_set_list.get_current_index_account_set_as_user_list()

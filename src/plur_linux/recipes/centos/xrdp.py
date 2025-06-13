@@ -6,7 +6,7 @@ sys.path.append(os.pardir)
 from plur import base_shell as shell
 from plur import session_wrap
 
-from recipes import repos, firewalld
+from plur_linux.recipes import repos, firewalld
 
 
 @session_wrap.sudo

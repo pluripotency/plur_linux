@@ -1,8 +1,8 @@
 from plur import base_shell
-from nodes.util import *
-from recipes.ubuntu import ops as ubuntu_ops
-from nodes import new_node
-from recipes.ubuntu import docker_ce
+from plur_linux.nodes.util import *
+from plur_linux.recipes.ubuntu import ops as ubuntu_ops
+from plur_linux.nodes import new_node
+from plur_linux.recipes.ubuntu import docker_ce
 
 ubu_update_image = 'ubu_update_image'
 ubu_docker_image = 'ubu_docker_image'

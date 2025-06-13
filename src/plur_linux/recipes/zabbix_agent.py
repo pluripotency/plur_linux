@@ -1,6 +1,6 @@
 from plur import session_wrap
 from plur import base_shell
-from recipes import firewalld
+from plur_linux.recipes import firewalld
 
 
 def install_zabbix_agent():

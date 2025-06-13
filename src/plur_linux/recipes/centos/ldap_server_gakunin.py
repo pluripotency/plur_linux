@@ -5,7 +5,7 @@ sys.path.append(os.pardir)
 
 from plur import base_shell as shell
 from plur import session_wrap
-from recipes.centos.openldap import ldap_server
+from plur_linux.recipes.centos.openldap import ldap_server
 
 
 

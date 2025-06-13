@@ -300,7 +300,7 @@ def expand(session, raw_disk_path, expand_size, lv_path, fs_type):
 
 
 def select_path_for_qemu_img(session):
-    from recipes.ops.fs import catalogue_dir
+    from plur_linux.recipes.ops.fs import catalogue_dir
     selected = menu.select_2nd([
         ['/vm_images', '/vm_images'],
         ['/var/lib/libvirt/images', '/var/lib/libvirt/images'],

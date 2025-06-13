@@ -5,7 +5,7 @@ sys.path.append(os.pardir)
 
 from plur import base_shell as shell
 
-from recipes.ops import ops
+from plur_linux.recipes.ops import ops
 
 
 def install_packages_for_sp(session):
