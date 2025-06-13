@@ -10,6 +10,8 @@ requires-python = ">=3.11"
 dependencies = [
   "plur",
 ]
+[project.scripts]
+server_menu = "plur_linux.server_menu:main_menu"
 
 [build-system]
 requires = ["hatchling"]

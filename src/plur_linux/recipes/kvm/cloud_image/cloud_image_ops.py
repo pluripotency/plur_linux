@@ -31,7 +31,7 @@ def curl_if_not_exist(session, local_file_path, url):
 def copy_image(session, org_image_file_name, url, dst_image_file_name):
     base_shell.work_on(session, cloud_image_download_dir)
     curl_if_not_exist(session, org_image_file_name, url)
-    base_shell.run(session, f'\cp -f {org_image_file_name} {tmp_image_dir}/{dst_image_file_name}')
+    base_shell.run(session, rf'\cp -f {org_image_file_name} {tmp_image_dir}/{dst_image_file_name}')
     return f'{tmp_image_dir}/{dst_image_file_name}'
 
 

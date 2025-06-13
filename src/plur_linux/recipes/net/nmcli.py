@@ -16,7 +16,7 @@ def con_mod_ipv4_str_list(iface):
         autoconnect = False
     one_line += f' c.autoconnect yes' if autoconnect else ' c.autoconnect no'
 
-    if 'mtu' in iface and re.match('\d{2,5}', iface['mtu']):
+    if 'mtu' in iface and re.match(r'\d{2,5}', iface['mtu']):
         one_line += f' 802-3-ethernet.mtu {str(iface["mtu"])}'
     if one_line != '':
         commands += [con_mod + one_line]
@@ -26,7 +26,7 @@ def con_mod_ipv4_str_list(iface):
         ip = iface['ip']
         if ip is None:
             pass
-        elif re.match('(\d{1,3}\.){3}\d{1,3}/\d{1,2}', ip):
+        elif re.match(r'(\d{1,3}\.){3}\d{1,3}/\d{1,2}', ip):
             two_line = f' ipv4.method manual ipv4.address {ip}'
             if 'gateway' in iface:
                 two_line += f' ipv4.gateway ' + iface['gateway']

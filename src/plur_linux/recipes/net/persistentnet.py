@@ -4,7 +4,7 @@ import re
 
 udev_str = lambda ifname, mac: 'SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="%s", NAME="%s"' % (mac, ifname)
 
-dev16_dev_list = map(lambda x: re.split('\s+', x), filter(lambda x: re.match('^eth.+', x), """
+dev16_dev_list = map(lambda x: re.split(r'\s+', x), filter(lambda x: re.match('^eth.+', x), """
 eth0    94:18:82:00:23:18
 eth1    94:18:82:00:23:19
 eth2    94:18:82:00:23:1a
