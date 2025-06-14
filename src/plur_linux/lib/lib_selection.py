@@ -72,9 +72,9 @@ def get_obj_by_definition(input_definition, default_values, color=cyan):
             elif v_type == 'bool':
                 if k in default_values:
                     default_value = default_values[k]
-                    obj[k] = get_y_n(f'{message}(default={default_value}):', default=default_value, colored=False)
+                    obj[k] = get_y_n(f'{message}(default={default_value}):', default=default_value)
                 else:
-                    obj[k] = get_y_n(f'{message}:', colored=False)
+                    obj[k] = get_y_n(f'{message}:')
     print(color(toml.dumps(obj)))
     if get_y_n('OK?'):
         return obj

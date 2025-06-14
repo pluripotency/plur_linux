@@ -4,6 +4,7 @@ import json
 from mini.ansi_colors import red, yellow, green, cyan, dummy_color
 from mini import menu
 from mini.misc import is_file, read_json, read_toml, write_toml, toml, prepare_dir_if_not_exists
+from plur_linux.lib.lib_selection import get_obj_by_definition
 ACCOUNT_SET_LIST_KEY = 'account_set'
 SELECTED_ACCOUNT_SET_INDEX_KEY = 'selected_account_set_index'
 ACCOUNT_SET_DEFINITION_TOML_STR = r"""
@@ -261,7 +262,7 @@ class EnvAccountSet():
         ]
 
     def add_account_set(self):
-        account_set  = menu.get_obj_by_definition(self.account_set_definition, default_account_set)
+        account_set  = get_obj_by_definition(self.account_set_definition, default_account_set)
         if account_set:
             current_account_set_list = self.get_account_set_list()
             current_account_set_list += [account_set]
@@ -270,7 +271,7 @@ class EnvAccountSet():
     def set_account_set(self, index):
         current_account_set_list = self.get_account_set_list()
         target_account_set = current_account_set_list[index]
-        account_set  = menu.get_obj_by_definition(self.account_set_definition, target_account_set)
+        account_set  = get_obj_by_definition(self.account_set_definition, target_account_set)
         if account_set:
             current_account_set_list[index] = account_set
             self.set(ACCOUNT_SET_LIST_KEY, current_account_set_list)
@@ -377,13 +378,13 @@ class EnvAccountSet():
 #         return self.get_user_list_group()[self.get_current_index()]
 #
 #     def add_user(self, group_index):
-#         user = menu.get_obj_by_definition(self.user_input_definition, default_user)
+#         user = get_obj_by_definition(self.user_input_definition, default_user)
 #         if user:
 #             self.set_user_list(user, group_index)
 #
 #     def set_user(self, index, group_index):
 #         cur_user = self.get_user_list_group()[group_index][index]
-#         user = menu.get_obj_by_definition(self.user_input_definition, cur_user)
+#         user = get_obj_by_definition(self.user_input_definition, cur_user)
 #         if user:
 #             self.set_user_list(user, group_index, index)
 #
@@ -483,7 +484,7 @@ class EnvKVM():
         return self.get(KVM_LIST_KEY)
 
     def add_kvm(self):
-        kvm_dict = menu.get_obj_by_definition(self.kvm_definition, default_kvm)
+        kvm_dict = get_obj_by_definition(self.kvm_definition, default_kvm)
         if kvm_dict:
             current_kvm_list = self.get_kvm_list()
             current_kvm_list += [kvm_dict]
@@ -492,7 +493,7 @@ class EnvKVM():
     def set_kvm(self, index):
         current_kvm_list = self.get_kvm_list()
         target_kvm_dict = current_kvm_list[index]
-        kvm_dict = menu.get_obj_by_definition(self.kvm_definition, target_kvm_dict)
+        kvm_dict = get_obj_by_definition(self.kvm_definition, target_kvm_dict)
         if kvm_dict:
             current_kvm_list[index] = kvm_dict
             self.set(KVM_LIST_KEY, current_kvm_list)
@@ -564,7 +565,7 @@ class EnvSegments():
             segments = self.env_dict['segments']
             if index < len(segments):
                 cur_segment = segments[index]
-        tmp_segment = menu.get_obj_by_definition(self.segment_definition, cur_segment)
+        tmp_segment = get_obj_by_definition(self.segment_definition, cur_segment)
         if tmp_segment:
             current_segments = self.get(SEGMENTS_KEY)
             if len(segments) == index:
@@ -692,3 +693,6 @@ def get_env_password(username):
         if user['username'] == username:
             env_password = user['password']
     return env_password
+
+def env_menu():
+    EnvMenu().run_menu()
