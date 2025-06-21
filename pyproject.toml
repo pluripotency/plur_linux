@@ -12,6 +12,7 @@ dependencies = [
 ]
 [project.scripts]
 server_menu = "plur_linux.server_menu:main_menu"
+env_menu = "plur_linux.lib.env_ops:env_menu"
 
 [build-system]
 requires = ["hatchling"]

@@ -692,3 +692,6 @@ def get_env_password(username):
         if user['username'] == username:
             env_password = user['password']
     return env_password
+
+def env_menu():
+    EnvMenu().run_menu()
