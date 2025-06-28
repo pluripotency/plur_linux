@@ -1,8 +1,7 @@
 import copy
 from mini.ansi_colors import green, yellow 
-from mini.menu import choose_num, select_2nd
+from mini.menu import choose_num, select_2nd, get_obj_by_definition
 from mini import misc
-from plur_linux.lib.lib_selection import get_obj_by_definition
 from plur import session_wrap
 from plur_linux.recipes.openssl import ca
 CA_CERT_DEFINITION_TOML_STR = r"""
