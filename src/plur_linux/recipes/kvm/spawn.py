@@ -337,6 +337,21 @@ def start_domain_by_virt_install(vm, iso_full_path):
 
     return func
 
+def restart_domain(vm, created_seed_iso_path):
+    hostname = vm.hostname
+
+    @virsh.console(vm)
+    def on_console(session):
+        base_shell.run(session, "")
+
+    def on_kvm(session):
+        on_console(session)
+        virsh.shutdown_from_kvm(session, hostname)
+        base_shell.run(session, f"virsh change-media {hostname} --path sda --eject")
+        base_shell.run(session, f"sudo rm -f {created_seed_iso_path}")
+        base_shell.run(session, f'sudo virsh start {hostname}')
+
+    return on_kvm
 
 def start_domain_with_reset(vm, org_xml):
     def func(session):
@@ -749,12 +764,9 @@ def create_vm_by_virt_install_cloudinit(vm):
             base_shell.run(session, f"mv -f {created_image_path} {vdisk_dir}")
 
             start_domain_by_virt_install(vm, created_seed_iso_path)(session)
+            restart_domain(vm, created_seed_iso_path)(session)
 
             on_create_console_with_cloudinit(vm)(session)
-            base_shell.run(
-                session, f"virsh change-media {vm.hostname} --path sda --eject"
-            )
-            base_shell.run(session, f"sudo rm -f {created_seed_iso_path}")
 
             on_kvm_post(vm)(session)
 
