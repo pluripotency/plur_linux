@@ -6,8 +6,7 @@ from plur_linux.recipes.kvm import virsh
 from plur_linux.recipes.kvm.kvm_menu import lib_kvm_module
 from plur_linux.recipes.kvm.kvm_menu import lib_vm_module
 from mini.ansi_colors import red, cyan
-from mini.menu import re, get_input, choose_num, select_2nd, get_y_n
-from plur_linux.lib.lib_selection import Selection
+from mini.menu import re, get_input, choose_num, select_2nd, get_y_n, Selection
 from mini import misc
 from plur_linux.recipes.kvm import spawn
 from . import lib

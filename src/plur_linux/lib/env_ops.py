@@ -666,13 +666,14 @@ class EnvMenu:
 
     def run_menu(self):
         while True:
-            menu.select_2nd([
+            result = menu.select_2nd([
                 ['Show Current Env', self.show],
                 ['Account Set', self.env_account_set.account_set_list_menu],
-                # ['User List Group', self.env_user_list.user_list_group_menu],
                 ['Set KVM segments', self.env_segments.segments_menu],
                 ['Set KVM', self.env_kvm.kvm_list_menu],
             ])
+            if not result:
+                return
 
 def get_current_index_user_list():
     return EnvAccountSet().get_current_index_account_set_as_user_list()

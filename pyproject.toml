@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+  "mini>=0.1.0",
   "plur",
 ]
 [project.scripts]

@@ -6,6 +6,7 @@ from plur import log_param_templates
 from mini.ansi_colors import blue, red, green
 from mini.menu import get_input, choose_num, get_y_n, select_2nd
 from mini import misc
+from .lib import env_ops
 from .recipes.kvm.kvm_menu import runner as kvm_menu_runner
 from .recipes.kvm.kvm_menu import lib_kvm_module
 from .recipes.kvm.kvm_menu import lib_vm_module
@@ -133,6 +134,7 @@ def main_menu():
     main_menu_list = [
         ["Ad Hoc Setup", kvm_menu_runner.ad_hoc_setup],
         ["KVM Menu", kvm_menu],
+        ["Env Menu", env_ops.env_menu]
     ]
     while True:
         select_2nd(main_menu_list, green("Please select from plur_linux.recipes"), vertical=True)
