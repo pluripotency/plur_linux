@@ -4,11 +4,58 @@ from plur import session_wrap
 PACKMAN_NOCONFIRM = 'pacman --noconfirm'
 
 def pacman_update(session):
-    base_shell.run(session, f'sudo {PACKMAN_NOCONFIRM} -Sy --needed archlinux-keyring && sudo {PACKMAN_NOCONFIRM}  -Syyu')
+    base_shell.run(session, f'sudo pacman-key --init && pacman {PACKMAN_NOCONFIRM} -Sy archlinux-keyring && sudo {PACKMAN_NOCONFIRM}  -Syyu')
+    # base_shell.run(session, f'sudo {PACKMAN_NOCONFIRM} -Sy --needed archlinux-keyring && sudo {PACKMAN_NOCONFIRM}  -Syyu')
 
 def pacman_install(packages):
     def func(session):
         base_shell.run(session, f'sudo {PACKMAN_NOCONFIRM} -Syy ' + ' '.join(packages))
+    return func
+
+def install_desktop(distro_list, nm=True, lightdm=False):
+    def func(session):
+        packages = [
+            'noto-fonts-cjk'
+            , 'fcitx5-im'
+            , 'fcitx5-mozc'
+            , 'firefox'
+        ]
+        # to start, startxfce4
+        if 'xfce4' in distro_list:
+            packages += ['xfce4']
+        if 'i3' in distro_list:
+            # https://blog.livewing.net/install-arch-linux-2021
+            # Win+Enter   > terminal
+            # Win+D       > dmenu
+            # Win+Shift+Q > close window
+            # Win+Shift+E > logout
+            packages += [
+                'i3',
+                'alacritty',
+                'dmenu',
+            ]
+        packages += [
+            'xorg'
+            , 'xorg-server'
+        ]
+        if lightdm:
+            packages += [
+                'lightdm'
+                , 'lightdm-gtk-greeter'
+            ]
+        if nm:
+            packages += [
+                'networkmanager'
+            ]
+        session.set_timeout(30*60)
+        pacman_update(session)
+        pacman_install(packages)(session)
+        session.set_timeout()
+        base_shell.run(session, 'sudo localectl set-x11-keymap jp')
+        if nm:
+            base_shell.run(session, 'sudo systemctl enable --now NetworkManager')
+        if lightdm:
+            base_shell.run(session, 'sudo systemctl enable --now lightdm')
     return func
 
 def install_yay(session):

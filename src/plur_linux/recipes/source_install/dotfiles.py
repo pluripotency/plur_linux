@@ -13,7 +13,10 @@ def setup(session, nvim=False):
         platform = session.nodes[-1].platform
         if re.search('^ubuntu', platform):
             from plur_linux.recipes.ubuntu import ops as ubuntu_ops
-            ubuntu_ops.sudo_apt_install_y(packages)
+            ubuntu_ops.sudo_apt_install_y(packages)(session)
+        elif re.search('^arch', platform):
+            from plur_linux.recipes.dists.arch import ops as arch_ops
+            arch_ops.pacman_install(packages)(session)
         else:
             base_shell.run(session, 'sudo yum install -y ' + ' '.join(packages))
     if not base_shell.check_dir_exists(session, '~/.tmux'):

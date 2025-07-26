@@ -9,58 +9,18 @@ class Desktop(generic.SelectMenu):
             "xfce4": True,
             "i3": False,
             "NetworkManager": True,
-            "lightdm": False,
+            "lightdm": True,
         }
-        exclusive_list = [
-            "xfce4",
-            "i3",
-        ]
-        super().__init__(selection, exclusive_list, 'Desktop')
+        super().__init__(selection, [], 'Desktop')
 
     def setup(self, session):
         if self.enable:
-            packages = [
-                'noto-fonts-cjk'
-                , 'fcitx5-im'
-                , 'fcitx5-mozc'
-                , 'firefox'
-            ]
-            # to start, startxfce4
+            distro_list = []
             if self.selection['xfce4']:
-                packages += ['xfce4']
-            elif self.selection['i3']:
-                # https://blog.livewing.net/install-arch-linux-2021
-                # Win+Enter   > terminal
-                # Win+D       > dmenu
-                # Win+Shift+Q > close window
-                # Win+Shift+E > logout
-                packages += [
-                    'i3',
-                    'alacritty',
-                    'dmenu',
-                ]
-            packages += [
-                'xorg'
-                , 'xorg-server'
-            ]
-            if self.selection['lightdm']:
-                packages += [
-                    'lightdm'
-                    , 'lightdm-gtk-greeter'
-                ]
-            if self.selection['NetworkManager']:
-                packages += [
-                    'networkmanager'
-                ]
-            session.set_timeout(30*60)
-            ops.pacman_install(packages)(session)
-            session.set_timeout()
-            base_shell.run(session, 'sudo localectl set-x11-keymap jp')
-            if self.selection['NetworkManager']:
-                base_shell.run(session, 'sudo systemctl enable --now NetworkManager')
-            if self.selection['lightdm']:
-                base_shell.run(session, 'sudo systemctl enable --now lightdm')
-
+                distro_list += ['xfce4']
+            if self.selection['i3']:
+                distro_list += ['i3']
+            ops.install_desktop(distro_list, nm=self.selection['NetworkManager'], lightdm=self.selection['lightdm'])(session)
 
 class BaseApps(generic.SelectMenu):
     def __init__(self):
@@ -105,21 +65,30 @@ class BaseApps(generic.SelectMenu):
 class Languages(generic.SelectMenu):
     def __init__(self):
         from plur_linux.recipes.lang import go
+        self.python_version = '3.13'
+        self.uv_key = f'python(uv)'
         self.go_version = go.go_install_version
         self.go_key = f'go({self.go_version})'
         self.rust_key = 'rust(latest)'
         self.zig_key = 'zig'
 
         selection = {
+            f"{self.uv_key}": False,
             f"{self.go_key}": False,
             f"{self.rust_key}": False,
             f"{self.zig_key}": False,
         }
-        super().__init__(selection, [], 'Languages')
+        extra_menu = {}
+        from plur_linux.recipes.lang import uv
+        extra_menu[self.uv_key] = uv.input_uv_params
+        super().__init__(selection, [], 'Languages', extra_menu=extra_menu)
 
     def setup(self, session):
         if self.enable:
             packages = []
+            if generic.has_true(self.selection, self.uv_key):
+                from plur_linux.recipes.lang import uv
+                uv.install_python(**self.extra_params[self.uv_key])(session)
             if self.selection[self.go_key]:
                 from plur_linux.recipes.lang import go
                 go.install(self.go_version)(session)
