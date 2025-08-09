@@ -198,6 +198,8 @@ def prepare_cloudinit_vdisk(session, vm):
                 cloud_image_func = cloud_image_centos.create_almalinux("8")
             elif platform == "almalinux9":
                 cloud_image_func = cloud_image_centos.create_almalinux("9")
+            elif platform == "almalinux10":
+                cloud_image_func = cloud_image_centos.create_almalinux10
             elif platform == "centos8stream":
                 cloud_image_func = cloud_image_centos.create_centos_stream("8")
             elif platform == "centos9stream":
