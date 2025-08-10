@@ -8,8 +8,8 @@ class Desktop(generic.SelectMenu):
         selection = {
             "xfce4": True,
             "i3": False,
-            "NetworkManager": True,
-            "lightdm": True,
+            "sway": False,
+            "NetworkManager": False,
         }
         super().__init__(selection, [], 'Desktop')
 
@@ -18,9 +18,11 @@ class Desktop(generic.SelectMenu):
             distro_list = []
             if self.selection['xfce4']:
                 distro_list += ['xfce4']
+            if self.selection['sway']:
+                distro_list += ['sway']
             if self.selection['i3']:
                 distro_list += ['i3']
-            ops.install_desktop(distro_list, nm=self.selection['NetworkManager'], lightdm=self.selection['lightdm'])(session)
+            ops.install_desktop(distro_list, nm=self.selection['NetworkManager'])(session)
 
 class BaseApps(generic.SelectMenu):
     def __init__(self):
@@ -38,7 +40,9 @@ class BaseApps(generic.SelectMenu):
     def setup(self, session):
         if self.enable:
             packages = []
+            nvim = False
             if self.selection['neovim']:
+                nvim = True
                 if not base_shell.check_command_exists(session, 'zig'):
                     packages += ['zig']
                 packages += ['neovim ripgrep fd']
@@ -59,14 +63,14 @@ class BaseApps(generic.SelectMenu):
 
             if self.selection['dotfiles']:
                 from plur_linux.recipes.source_install import dotfiles
-                dotfiles.setup(session)
+                dotfiles.setup(session, nvim)
 
 
 class Languages(generic.SelectMenu):
     def __init__(self):
         from plur_linux.recipes.lang import go
         self.python_version = '3.13'
-        self.uv_key = f'python(uv)'
+        self.uv_key = 'python(uv)'
         self.go_version = go.go_install_version
         self.go_key = f'go({self.go_version})'
         self.rust_key = 'rust(latest)'

@@ -12,7 +12,7 @@ def pacman_install(packages):
         base_shell.run(session, f'sudo {PACKMAN_NOCONFIRM} -Syy ' + ' '.join(packages))
     return func
 
-def install_desktop(distro_list, nm=True, lightdm=False):
+def install_desktop(distro_list, nm=False):
     def func(session):
         packages = [
             'noto-fonts-cjk'
@@ -20,32 +20,46 @@ def install_desktop(distro_list, nm=True, lightdm=False):
             , 'fcitx5-mozc'
             , 'firefox'
         ]
-        # to start, startxfce4
-        if 'xfce4' in distro_list:
-            packages += ['xfce4']
-        if 'i3' in distro_list:
-            # https://blog.livewing.net/install-arch-linux-2021
-            # Win+Enter   > terminal
-            # Win+D       > dmenu
-            # Win+Shift+Q > close window
-            # Win+Shift+E > logout
+        if 'xfce4' in distro_list or 'i3' in distro_list:
+            # to start, startxfce4
+            if 'xfce4' in distro_list:
+                packages += [
+                    'xfce4',
+                ]
+            if 'i3' in distro_list:
+                # https://blog.livewing.net/install-arch-linux-2021
+                # Win+Enter   > terminal
+                # Win+D       > dmenu
+                # Win+Shift+Q > close window
+                # Win+Shift+E > logout
+                packages += [
+                    'i3',
+                    'alacritty',
+                    'dmenu',
+                    'feh',
+                ]
             packages += [
-                'i3',
-                'alacritty',
-                'dmenu',
-            ]
-        packages += [
-            'xorg'
-            , 'xorg-server'
-        ]
-        if lightdm:
-            packages += [
-                'lightdm'
-                , 'lightdm-gtk-greeter'
+                'xorg',
+                'xorg-server',
+                'lightdm',
+                'lightdm-gtk-greeter',
             ]
         if nm:
             packages += [
-                'networkmanager'
+                'networkmanager',
+            ]
+        if 'sway' in distro_list:
+            packages += [
+                'sway',
+                'xorg-xwayland',
+                'qt5-wayland',
+                'foot',
+                'wmenu',
+            ]
+            packages += [
+                'lightdm',
+                'lightdm-webkit2-greeter',
+                'lightdm-webkit-theme-litarvan',
             ]
         session.set_timeout(30*60)
         pacman_update(session)
@@ -54,8 +68,7 @@ def install_desktop(distro_list, nm=True, lightdm=False):
         base_shell.run(session, 'sudo localectl set-x11-keymap jp')
         if nm:
             base_shell.run(session, 'sudo systemctl enable --now NetworkManager')
-        if lightdm:
-            base_shell.run(session, 'sudo systemctl enable --now lightdm')
+        base_shell.run(session, 'sudo systemctl enable --now lightdm')
     return func
 
 def install_yay(session):
