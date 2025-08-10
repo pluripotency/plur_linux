@@ -115,16 +115,12 @@ def systemd_networkd_str(ip_with_prefix, gw, dns_list, domain='local', ifname='e
         [Match]
         Name={ifname}
 
-        [Address]
-        Address={ip_with_prefix}
-
         [Network]
-        DHCP=no
+        Address={ip_with_prefix}
+        Gateway={gw}
         DNS={' '.join(dns_list)}
         Domain={domain}
 
-        [Route]
-        Gateway={gw}
         """)
     return contents
 
