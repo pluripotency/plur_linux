@@ -61,7 +61,7 @@ def create_almalinux(version='8'):
     return receive_func
 
 
-def create_fedora(major='41', miner='1.4'):
+def create_fedora(major='42', miner='1.1'):
     def receive_func(image_name):
         def func(session):
             org_image_file_name = f'Fedora-Cloud-Base-Generic-{major}-{miner}.x86_64.qcow2'
