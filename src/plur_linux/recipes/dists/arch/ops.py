@@ -71,6 +71,15 @@ def install_desktop(distro_list, nm=False):
         base_shell.run(session, 'sudo systemctl enable --now lightdm')
     return func
 
+def install_for_vbox_additions(session):
+    pacman_update(session)
+    pacman_install([
+        'linux-headers',
+    ])(session)
+    pacman_install([
+        'base-devel --needed',
+    ])(session)
+
 def install_yay(session):
     pacman_install(misc.del_indent_lines("""
     git

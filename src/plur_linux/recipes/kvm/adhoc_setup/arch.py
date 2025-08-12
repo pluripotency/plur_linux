@@ -10,6 +10,7 @@ class Desktop(generic.SelectMenu):
             "i3": False,
             "sway": False,
             "NetworkManager": False,
+            "for vbox": False,
         }
         super().__init__(selection, [], 'Desktop')
 
@@ -23,6 +24,8 @@ class Desktop(generic.SelectMenu):
             if self.selection['i3']:
                 distro_list += ['i3']
             ops.install_desktop(distro_list, nm=self.selection['NetworkManager'])(session)
+            if self.selection["for vbox"]:
+                ops.install_for_vbox_additions(session)
 
 class BaseApps(generic.SelectMenu):
     def __init__(self):
