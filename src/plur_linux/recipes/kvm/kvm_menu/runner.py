@@ -132,6 +132,7 @@ def create_defined_guest():
 def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup.select_post_run import select_post_run
     from plur_linux.recipes.kvm.adhoc_setup import arch
+    from plur_linux.recipes.kvm.adhoc_setup import almalinux10
     from plur_linux.recipes.kvm.adhoc_setup import almalinux9
     from plur_linux.recipes.kvm.adhoc_setup import almalinux8
     from plur_linux.recipes.kvm.adhoc_setup import centos8stream
@@ -144,6 +145,7 @@ def select_adhoc(connect_method_list, hostname=None):
     [vm_dict, post_run_list] = select_2nd(
         [
             ["AlmaLinux9", almalinux9.get_selection],
+            ["AlmaLinux10", almalinux10.get_selection],
             ["AlmaLinux8", almalinux8.get_selection],
             ["Fedora", fedora.get_selection],
             ["Arch", arch.get_selection],

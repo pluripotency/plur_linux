@@ -4,12 +4,81 @@ from plur import session_wrap
 PACKMAN_NOCONFIRM = 'pacman --noconfirm'
 
 def pacman_update(session):
-    base_shell.run(session, f'sudo {PACKMAN_NOCONFIRM} -Sy --needed archlinux-keyring && sudo {PACKMAN_NOCONFIRM}  -Syyu')
+    base_shell.run(session, f'sudo pacman-key --init && pacman {PACKMAN_NOCONFIRM} -Sy archlinux-keyring && sudo {PACKMAN_NOCONFIRM}  -Syyu')
+    # base_shell.run(session, f'sudo {PACKMAN_NOCONFIRM} -Sy --needed archlinux-keyring && sudo {PACKMAN_NOCONFIRM}  -Syyu')
 
 def pacman_install(packages):
     def func(session):
         base_shell.run(session, f'sudo {PACKMAN_NOCONFIRM} -Syy ' + ' '.join(packages))
     return func
+
+def install_desktop(distro_list, nm=False):
+    def func(session):
+        packages = [
+            'noto-fonts-cjk'
+            , 'fcitx5-im'
+            , 'fcitx5-mozc'
+            , 'firefox'
+        ]
+        if 'xfce4' in distro_list or 'i3' in distro_list:
+            # to start, startxfce4
+            if 'xfce4' in distro_list:
+                packages += [
+                    'xfce4',
+                ]
+            if 'i3' in distro_list:
+                # https://blog.livewing.net/install-arch-linux-2021
+                # Win+Enter   > terminal
+                # Win+D       > dmenu
+                # Win+Shift+Q > close window
+                # Win+Shift+E > logout
+                packages += [
+                    'i3',
+                    'alacritty',
+                    'dmenu',
+                    'feh',
+                ]
+            packages += [
+                'xorg',
+                'xorg-server',
+                'lightdm',
+                'lightdm-gtk-greeter',
+            ]
+        if nm:
+            packages += [
+                'networkmanager',
+            ]
+        if 'sway' in distro_list:
+            packages += [
+                'sway',
+                'xorg-xwayland',
+                'qt5-wayland',
+                'foot',
+                'wmenu',
+            ]
+            packages += [
+                'lightdm',
+                'lightdm-webkit2-greeter',
+                'lightdm-webkit-theme-litarvan',
+            ]
+        session.set_timeout(30*60)
+        pacman_update(session)
+        pacman_install(packages)(session)
+        session.set_timeout()
+        base_shell.run(session, 'sudo localectl set-x11-keymap jp')
+        if nm:
+            base_shell.run(session, 'sudo systemctl enable --now NetworkManager')
+        base_shell.run(session, 'sudo systemctl enable --now lightdm')
+    return func
+
+def install_for_vbox_additions(session):
+    pacman_update(session)
+    pacman_install([
+        'linux-headers',
+    ])(session)
+    pacman_install([
+        'base-devel --needed',
+    ])(session)
 
 def install_yay(session):
     pacman_install(misc.del_indent_lines("""
@@ -55,16 +124,12 @@ def systemd_networkd_str(ip_with_prefix, gw, dns_list, domain='local', ifname='e
         [Match]
         Name={ifname}
 
-        [Address]
-        Address={ip_with_prefix}
-
         [Network]
-        DHCP=no
+        Address={ip_with_prefix}
+        Gateway={gw}
         DNS={' '.join(dns_list)}
         Domain={domain}
 
-        [Route]
-        Gateway={gw}
         """)
     return contents
 
