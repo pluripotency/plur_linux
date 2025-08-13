@@ -671,8 +671,6 @@ class EnvMenu:
                 ['Set KVM segments', self.env_segments.segments_menu],
                 ['Set KVM', self.env_kvm.kvm_list_menu],
             ])
-            if not result:
-                return
 
 def get_current_index_user_list():
     return EnvAccountSet().get_current_index_account_set_as_user_list()

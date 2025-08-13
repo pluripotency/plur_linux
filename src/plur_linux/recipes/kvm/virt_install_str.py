@@ -24,17 +24,20 @@ def create_vnet_opt_str(vnet):
     }
     """
     mac = vnet['mac']
+    net_type = 'default'
     if 'type' in vnet:
         net_type = vnet['type']
-    else:
-        net_type = 'default'
     net_source = vnet['net_source']
     if net_type == 'openvswitch':
         vnet_opt_str = f'--network bridge={net_source},model=virtio,mac={mac},virtualport_type=openvswitch'
     elif net_type == 'bridge':
         vnet_opt_str = f'--network bridge={net_source},model=virtio,mac={mac}'
+    elif net_type == 'direct':
+        vnet_opt_str = f'--network type=direct,source={net_source},model=virtio,mac={mac}'
+    elif net_type == 'default':
+        vnet_opt_str = f'--network network={net_source},model=virtio,mac={mac}'
     else:
-        vnet_opt_str = f'--network type=direct,source=={net_source},model=virtio,mac={mac}'
+        vnet_opt_str = f'--network network={net_source},model=virtio,mac={mac}'
     return vnet_opt_str
 
 

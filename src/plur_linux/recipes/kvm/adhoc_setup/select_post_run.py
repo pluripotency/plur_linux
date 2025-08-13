@@ -91,7 +91,11 @@ def create_ssh_params(node_dict):
         access_ip = node_dict['access_ip']
     else:
         access_ip = '127.0.0.1'
-    node_dict['access_ip'] = get_input('^' + misc.IPV4_EXP_STR + '$', f'IP (Default: {access_ip}): ', 'Invalid IP', access_ip)
+    tmp_access_ip = get_input('^(|' + misc.IPV4_EXP_STR + ')$', f'IP (blank to set hostname): ', 'Invalid IP', '')
+    if tmp_access_ip == '':
+        node_dict['access_ip'] = node_dict['hostname']
+    else:
+        node_dict['access_ip'] = tmp_access_ip
     node_dict['ssh_options' ]= '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
     return node_dict
 
