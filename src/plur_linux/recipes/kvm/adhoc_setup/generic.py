@@ -172,7 +172,7 @@ class Initial(SelectMenu):
                 "disable_ipv6": True,
                 "tz Asia/Tokyo": True,
                 "keymap jp106": True,
-                "remove cockpit": False,
+                "remove cockpit": True,
                 "disable_selinux": False,
                 "permissive_selinux": False,
                 "enforce_selinux": False,
