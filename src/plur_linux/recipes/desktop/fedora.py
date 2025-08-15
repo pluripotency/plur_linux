@@ -1,4 +1,5 @@
 from plur import base_shell
+from . import redhat
 
 
 def install_xwindow(session):
@@ -10,15 +11,19 @@ def install_xwindow(session):
     #         'vlgothic-fonts',
     #     ]
     # })
-    # [base_shell.run(session, a) for a in [
-    #     'sudo systemctl set-default graphical.target'
-    # ]]
-    [base_shell.run(session, a) for a in [
+    _ = [base_shell.run(session, a) for a in [
         'sudo dnf -y group install gnome-desktop base-x',
+        'sudo dnf -y install firefox',
         # 'sudo dnf -y group install "Basic Desktop" GNOME',
         'sudo systemctl set-default graphical.target'
     ]]
+    redhat.gsettings(session)
 
+def install_ghostty(session):
+    [base_shell.run(session, a) for a in [
+        'sudo dnf -y copr enable scottames/ghostty',
+        'sudo dnf -y install ghostty',
+    ]]
 
 def install_xrdp(session):
     base_shell.yum_install(session, {
@@ -26,10 +31,7 @@ def install_xrdp(session):
             'xrdp',
         ]
     })
-    [base_shell.run(session, a) for a in [
-        'sudo systemctl enable xrdp',
-        'sudo systemctl start xrdp',
-    ]]
+    base_shell.service_on(session, 'xrdp')
 
 
 """

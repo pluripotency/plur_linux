@@ -29,6 +29,17 @@ def console_login(kvm, vm, start_action):
                 [kvm.waitprompt, success_f(False)],
                 [vm.waitprompt, success_f(True)],
             ]
+        elif re.search('^fedora', vm.platform):
+            login_rows = [
+                ['(' + vm.hostname + '|localhost) login: ', send_line_f(vm.username)],
+                ['Password: ', wait([
+                    [kvm.waitprompt, success_f(False)],
+                    [vm.waitprompt, success_f(True)],
+                ], send_pass_f(vm.password))],
+                ["Permission denied, please try again.+password:", get_pass],
+                [kvm.waitprompt, success_f(False)],
+                [vm.waitprompt, success_f(True)],
+            ]
         else:
             login_rows = [
                 ['(' + vm.hostname + '|localhost|ubuntu) login: ', wait([

@@ -1,5 +1,5 @@
 from plur_linux.nodes.util import *
-from plur_linux.recipes.kvm.adhoc_setup import run_account, generic
+from plur_linux.recipes.kvm.adhoc_setup import generic
 
 
 class MinDesk(generic.SelectMenu):

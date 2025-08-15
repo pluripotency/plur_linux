@@ -255,6 +255,9 @@ class Languages(SelectMenu):
         self.go_key = f'go({self.go_version})'
 
         self.rust_key = 'rust(latest)'
+        
+        self.zig_version = '0.14.1'
+        self.zig_key = 'zig'
 
         self.node_version = 'v22'
         self.nodesource_version = f'{self.node_version}.x'
@@ -269,6 +272,7 @@ class Languages(SelectMenu):
             f"{self.nodesource_key}": False,
             f"{self.go_key}": False,
             f"{self.rust_key}": False,
+            self.zig_key: False,
         }
         exclusive_list = [
             [self.nodebrew_key, self.nodesource_key],
@@ -281,11 +285,16 @@ class Languages(SelectMenu):
         extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
         from plur_linux.recipes.lang.nodejs import nodebrew
         extra_menu[self.nodebrew_key] = nodebrew.input_node_params
+        from plur_linux.recipes.lang import zig
+        extra_menu[self.zig_key] = zig.input_zig_params
 
         super().__init__(selection, exclusive_list, 'Languages', extra_menu=extra_menu)
 
     def setup(self, session):
         if self.enable:
+            if has_true(self.selection, self.zig_key):
+                from plur_linux.recipes.lang import zig
+                zig.install_zig(self.zig_version)(session)
             if has_true(self.selection, self.go_key):
                 from plur_linux.recipes.lang import go
                 go.install(self.go_version)(session)
