@@ -108,12 +108,29 @@ def install_lubuntu(session, enable_xrdp=False):
         setup_xrdp(session, 'lxde')
 
 def install_i3wm(session, enable_xrdp=False):
-    install_desktop(['i3wm'])(session)
+    pkgs = misc.del_indent_lines("""
+    i3
+    alacritty
+    fcitx-mozc
+    """)
+    # to start fcitx, add exec --no-startup-id fcitx
+    # to start config, fcitx-config-gtk3
+    install_desktop(pkgs)(session)
+    for line in misc.del_indent_lines('''
+    export DefaultImModule=fcitx
+    export GTK_IM_MODULE=fcitx
+    export QT_IM_MODULE=fcitx
+    export XMODIFIERS="@im=fcitx"
+    '''):
+        base_shell.idempotent_append(session, '$HOME/.profile', line, line)
     if enable_xrdp:
         setup_xrdp(session, 'i3wm')
-        base_shell.here_doc(session, '~/.xinitrc', misc.del_indent('''
+        for line in misc.del_indent_lines('''
+        export XAUTHORITY=$HOME/.Xauthority
+        '''):
+            base_shell.idempotent_append(session, '$HOME/.profile', line, line)
+        base_shell.here_doc(session, '~/.xinitrc', misc.del_indent_lines('''
         xset s off
-        xset -dpms
+        # xset -dpms
         xset s noblank
-
         '''))
