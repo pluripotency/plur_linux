@@ -31,6 +31,8 @@ def create_startwm(deskdist):
     # dbus-launch --exit-with-session /usr/bin/startlxqt
     # Budgie
     # env GNOME_SHELL_SESSION_MODE=Budgie:GNOME dbus-launch --exit-with-session /usr/bin/budgie-desktop
+    # i3
+    # exec i3
     """)
     if deskdist == 'xfce':
         contents = uncomment(contents, 'startxfce4')
@@ -42,6 +44,8 @@ def create_startwm(deskdist):
         contents = uncomment(contents, 'cinamon-session')
     elif deskdist == 'lxde':
         contents = uncomment(contents, 'startlxde')
+    elif deskdist == 'i3wm':
+        contents = uncomment(contents, 'exec i3')
 
     def func(session):
         base_shell.here_doc(session, startwm_path, contents)
@@ -102,3 +106,14 @@ def install_lubuntu(session, enable_xrdp=False):
     install_desktop(pkgs)(session)
     if enable_xrdp:
         setup_xrdp(session, 'lxde')
+
+def install_i3wm(session, enable_xrdp=False):
+    install_desktop(['i3wm'])(session)
+    if enable_xrdp:
+        setup_xrdp(session, 'i3wm')
+        base_shell.here_doc(session, '~/.xinitrc', misc.del_indent('''
+        xset s off
+        xset -dpms
+        xset s noblank
+
+        '''))

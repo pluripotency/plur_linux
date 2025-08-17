@@ -9,8 +9,9 @@ class Desktop(generic.SelectMenu):
             'mate-desktop': False,
             'cinamon-desktop': False,
             'lubuntu-desktop': False,
+            'i3wm': False,
             'xrdp': False,
-            'startx': True,
+            'graphical.target': True,
             'xfreerdp': False,
 
         }
@@ -36,11 +37,13 @@ class Desktop(generic.SelectMenu):
             elif self.selection['mate-desktop']:
                 desktop_noble.install_mate(session, enable_xrdp)
             elif self.selection['cinamon-desktop']:
-                desktop_noble.install_mate(session, enable_xrdp)
+                desktop_noble.install_cinamon(session, enable_xrdp)
             elif self.selection['lubuntu-desktop']:
                 desktop_noble.install_lubuntu(session, enable_xrdp)
+            elif self.selection['i3wm']:
+                desktop_noble.install_i3wm(session, enable_xrdp)
 
-            if self.selection['startx']:
+            if self.selection['graphical.target']:
                 base_shell.run(session, 'sudo systemctl set-default graphical.target')
             else:
                 base_shell.run(session, 'sudo systemctl set-default multi-user.target')

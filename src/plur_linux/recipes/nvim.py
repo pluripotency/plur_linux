@@ -34,7 +34,7 @@ def install_platform_dependancy(session):
         # base_shell.run(session, 'sudo dnf install -y fuse tar')
     elif re.search('^ubuntu', platform):
         from plur_linux.recipes.ubuntu import ops
-        ops.sudo_apt_install_y(['libfuse2 fd-find ripgrep gcc'])
+        ops.sudo_apt_install_y(['libfuse2 unzip xz-utils fd-find ripgrep gcc'])(session)
     elif platform in ['centos7']:
         repos.install_with_repo(['fuse-sshfs'], 'centos7', 'epel')(session)
 
