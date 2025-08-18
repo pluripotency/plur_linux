@@ -94,7 +94,7 @@ class Apps(generic.SelectMenu):
         if self.selection['gns3']:
             from plur_linux.recipes.ubuntu import gns3
             gns3.install(session)
-        if self.selection['gns3']:
+        if self.selection['openvswitch']:
             from plur_linux.recipes.ubuntu import openvswitch
             openvswitch.install_openvswitch(session)
 

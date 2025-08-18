@@ -190,7 +190,7 @@ def setup_pxe_base(pxe_ip, dist_dir, www_iso_dir):
 
 def get_primary_ip(session):
     primary_ip = None
-    for line in base_shell.run(session, 'ip -4 -br a').splitlines():
+    for line in base_shell.run(session, 'ip -4 -br a | cat').splitlines():
         if not primary_ip and re.search('^eth', line):
             primary_ip = re.split(r'\s+', line)[2].split('/')[0]
     if not primary_ip:

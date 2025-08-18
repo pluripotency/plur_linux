@@ -17,6 +17,7 @@ def install_kvm(session):
     base_shell.yum_install(session, {'packages': [
         'qemu-kvm',
         'libvirt',
+        'virt-install',
         'virt-manager'
     ]})
     base_shell.service_on(session, 'libvirtd')

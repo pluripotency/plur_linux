@@ -54,6 +54,7 @@ class Apps(generic.SelectMenu):
             "pxe_uefi": False,
             "ca": False,
             "qemu-kvm": False,
+            "google-auth": False,
             "openldap": False,
             # "vpn_ldap": False,
             "rad_ldap": False,
@@ -73,6 +74,9 @@ class Apps(generic.SelectMenu):
         if self.selection['qemu-kvm']:
             from plur_linux.recipes.kvm import virt_builder
             virt_builder.install_kvm(session)
+        if self.selection['google-auth']:
+            from plur_linux.recipes.almalinux8 import google_authenticator
+            google_authenticator.setup(session)
         if self.selection['openvswitch']:
             from plur_linux.recipes.almalinux9 import openvswitch
             openvswitch.install(session)
