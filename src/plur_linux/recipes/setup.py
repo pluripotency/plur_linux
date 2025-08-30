@@ -1,3 +1,4 @@
+import re
 from plur import base_shell
 from plur_linux.recipes.ops import user as user_ops, sshd_config
 
@@ -36,6 +37,8 @@ def offline_setup(session, node):
 
         if 'sshd_config' in offline_setups:
             sshd_config.apply_and_restart(offline_setups['sshd_config'])(session)
+        elif re.search('^arch', node.platform):
+            pass
         else:
             sshd_config.apply_and_restart({
                 'policy': 'root_without_password',
