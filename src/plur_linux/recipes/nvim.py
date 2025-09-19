@@ -17,7 +17,8 @@ def add_additional(session):
     if base_shell.check_command_exists(session, 'npm'):
         base_shell.run(session, 'npm i -g neovim')
     if base_shell.check_command_exists(session, 'uv'):
-        base_shell.run(session, 'uv tool install --upgrade pynvim neovim pylint')
+        base_shell.run(session, 'uv tool install --upgrade pynvim')
+        base_shell.run(session, 'uv tool install pylint')
 
 def install_platform_dependancy(session):
     platform = session.nodes[-1].platform
