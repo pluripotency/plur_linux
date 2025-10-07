@@ -1,4 +1,4 @@
-from misc import misc
+from mini import misc
 from plur import base_shell
 from plur import session_wrap
 
