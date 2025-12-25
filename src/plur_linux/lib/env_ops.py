@@ -208,7 +208,7 @@ class EnvAccountSet():
             self.env_ops = env_ops
         else:
             self.env_ops = EnvOpsBase()
-        self.title = 'Account Set'
+        self.title = 'Set Account'
         self.env_dict = self.env_ops.env_dict
         self.get = self.env_ops.get
         self.set = self.env_ops.set
@@ -303,10 +303,10 @@ class EnvAccountSet():
     def account_set_list_menu(self):
         while True:
             current_index = self.get_current_index()
-            menu_list, header_with_message = self.create_menu_table(cyan('Select Account Set Menu'))
+            menu_list, header_with_message = self.create_menu_table(cyan('Select Set Account Menu'))
             menu_list += [
-                green('Add account set'),
-                red('Delete account set'),
+                green('Add account'),
+                red('Delete account'),
                 green(f'Select index(current: {current_index + 1})'),
                 'Back']
             num = menu.choose_num(menu_list, message=header_with_message, color=dummy_color)
@@ -668,7 +668,7 @@ class EnvMenu:
         while True:
             result = menu.select_2nd([
                 ['Show Current Env', self.show],
-                ['Account Set', self.env_account_set.account_set_list_menu],
+                ['Set Account', self.env_account_set.account_set_list_menu],
                 ['Set KVM segments', self.env_segments.segments_menu],
                 ['Set KVM', self.env_kvm.kvm_list_menu],
             ])
