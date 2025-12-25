@@ -59,6 +59,7 @@ class Apps(generic.SelectMenu):
             # "vpn_ldap": False,
             "rad_ldap": False,
             # "rad_mysql": False,
+            "glusterfs_server": False,
         },
             exclusive_list=['pxe', 'pxe_uefi'],
             menu_title='Apps',
@@ -91,6 +92,9 @@ class Apps(generic.SelectMenu):
             from plur_linux.recipes.almalinux9 import pxe
             pxe.setup_pxe_uefi(session)
 
+        if self.selection['glusterfs_server']:
+            from plur_linux.recipes.almalinux9 import glusterfs
+            glusterfs.install_glusterfs(session)
 
 def get_selection():
     platform = 'almalinux9'

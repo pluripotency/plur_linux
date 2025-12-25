@@ -7,7 +7,7 @@ from plur_linux.recipes.centos.glusterfs import vol, gluster
 gluster_image_comp = f'{a9gluster_image}.comp.qcow2'
 
 HEAD_A9GL = 'a9gl'
-hosts_a9gl = [[HEAD_A9GL + ('000' + str(num))[-3:], num] for num in range(44, 47)]
+hosts_a9gl = [[HEAD_A9GL + ('000' + str(num))[-3:], num] for num in range(41, 47)]
 
 def select_num_and_hostlist():
     host_list = hosts_a9gl
