@@ -1,18 +1,16 @@
 from mini import menu
 from plur_linux.nodes import util
 from plur_linux.recipes.ops import ops
-from plur_linux.nodes import new_c7
-from plur_linux.nodes.guests.images import gluster_image
+from plur_linux.nodes import new_node
+from plur_linux.nodes.guests.a9images import a9gluster_image
 from plur_linux.recipes.centos.glusterfs import vol, gluster
-gl41_image_comp = f'{gluster_image}.comp.qcow2'
+gluster_image_comp = f'{a9gluster_image}.comp.qcow2'
 
-create_base_node = new_c7.create_base_node
-
-HEAD_KGL = 'kgl'
-hosts_kgl = [[HEAD_KGL + ('000' + str(num))[-3:], num] for num in range(24, 27)]
+HEAD_A9GL = 'a9gl'
+hosts_a9gl = [[HEAD_A9GL + ('000' + str(num))[-3:], num] for num in range(44, 47)]
 
 def select_num_and_hostlist():
-    host_list = hosts_kgl
+    host_list = hosts_a9gl
     selected_num = menu.choose_num([host[0] for host in host_list])
     return selected_num, host_list
 
@@ -23,13 +21,14 @@ def create_gluster_dict(hv='kvm'):
     hostname = host_list[selected_num][0]
 
     if hv == 'kvm':
-        # gl41_image is needed
         size_str = menu.get_input(r'\d{1,3}G', 'size of vdb by G:', 'err: input size ex) 100G', '100G')
         options = {
+            'platform': 'almalinux9',
             'prepare_vdisk': {
-                'org_path': f'/vm_images/{gl41_image_comp}',
                 'type': 'copy',
-                'size': None
+                'cloudinit': True,
+                'org_path': f'/vm_images/{gluster_image_comp}',
+                'size': 10,
             },
             'additional_vdisks': [{
                 'format': 'raw',
@@ -40,20 +39,20 @@ def create_gluster_dict(hv='kvm'):
     else:
         options = {}
 
-    node_dict = create_base_node(hostname, ip_seed, options)
+    node_dict = new_node.create_single_iface_node_dict(hostname, ip_seed, options)
     segment = node_dict['ifaces'][0]['segment']
     hosts = [[segment['ip_base_prefix'] + f'.{host[1]}', host[0]] for host in host_list]
     if hv == 'kvm':
         run_post = [
             ops.create_hosts(hosts),
             vol.add_disk(),
-            gluster.install_server
+            gluster.enable_service
         ]
     else:
         run_post = [
             ops.create_hosts(hosts),
             vol.add_disk(dev='/dev/sdb'),
-            gluster.install_server
+            gluster.enable_service
         ]
     node_dict['setups'] = {'run_post': run_post}
     return node_dict
@@ -72,7 +71,7 @@ def create_replica():
     selected_num, host_list = select_num_and_hostlist()
     ip_seed = host_list[selected_num][1]
     hostname = host_list[selected_num][0]
-    node_dict = create_base_node(hostname, ip_seed)
+    node_dict = new_node.create_single_iface_node_dict(hostname, ip_seed)
     node_dict['setups'] = {'run_post': [
         vol.create_replica_on_first([host[0] for host in host_list]),
     ]}
@@ -90,7 +89,7 @@ def create_nodes():
 def destroy_node():
     selected_num, host_list = select_num_and_hostlist()
     hostname = host_list[selected_num][0]
-    return util.node(new_c7.destroy_c7_dict(hostname))
+    return util.node(new_node.destroy_c7_dict(hostname))
 
 
 def destroy_nodes():

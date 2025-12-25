@@ -6,6 +6,16 @@ from mini import misc
 
 
 @session_wrap.sudo
+def enable_service(session):
+    firewalld.configure(services=['glusterfs'], add=True)(session)
+    base_shell.service_on(session, 'glusterd')
+    base_shell.here_doc(session, '/etc/sysctl.d/fs_inotify.conf', [
+        'fs.inotify.max_user_watches=1000000',
+    ])
+    base_shell.run(session, 'sysctl --system')
+
+
+@session_wrap.sudo
 def install_server(session):
     ops.disable_selinux(session)
     # base_shell.run(session, 'setsebool -P nis_enabled on')

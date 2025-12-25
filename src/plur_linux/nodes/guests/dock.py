@@ -1,9 +1,6 @@
 from plur import base_shell
-from mini import misc
-from plur_linux.recipes import firewalld
 from plur_linux.recipes.centos.docker import setup_docker
 from plur_linux.recipes.ops import sshd_config
-from plur_linux.recipes.centos.glusterfs import gluster
 from plur_linux.recipes.centos import chrony
 from plur_linux.nodes import new_node
 

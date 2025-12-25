@@ -2,6 +2,7 @@ from plur_linux.nodes import new_node
 a9base_image =   'a9baseimage'
 a9docker_image = 'a9dockerimage'
 a9desk_image =   'a9deskimage'
+a9gluster_image =   'a9glusterimage'
 
 def a9base_update(session):
     from plur_linux.recipes.almalinux9 import ops
@@ -44,11 +45,19 @@ def create_a9desk_image():
         func
     ])
 
+def create_a9gluster_image():
+    from plur_linux.recipes.almalinux9 import glusterfs
+    return a9_cloudimage(a9gluster_image, [
+        a9base_update,
+        glusterfs.install_glusterfs,
+    ])
+
 def create_nodes():
     return [
         ['create ' + a9base_image,   create_a9base_image],
         ['create ' + a9docker_image, create_a9docker_image],
         ['create ' + a9desk_image,   create_a9desk_image],
+        ['create ' + a9gluster_image,   create_a9gluster_image],
     ]
 
 def destroy_nodes():
@@ -56,4 +65,5 @@ def destroy_nodes():
         a9base_image
         , a9docker_image
         , a9desk_image
+        , a9glusterimage
     ]]
