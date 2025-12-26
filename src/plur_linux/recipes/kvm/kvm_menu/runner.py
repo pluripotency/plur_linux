@@ -21,43 +21,16 @@ def run_on(kvm, func, log_params=None):
         session_wrap.bash(log_params=log_params)(func)()
 
 
-def create_vm_dict(vm_dict, by_libguestfs=False):
+def create_vm_dict(vm_dict):
     def func(session):
-        kvm_platform = session.nodes[-1].platform
         vm = base_node.Node(vm_dict)
         if "prepare_vdisk" in vm_dict and "type" in vm_dict['prepare_vdisk']:
-            vdisk_type = vm_dict['prepare_vdisk']["type"]
-            if vdisk_type == "cloud_image":
-                if by_libguestfs:
-                    hostname = vm_dict['hostname']
-                    username = vm_dict['username']
-                    platform = vm_dict['platform']
-                    if re.search("^ubuntu", platform):
-                        vm.waitprompt = rf"{username}@(ubuntu|{hostname}):.+\$ "
-                    else:
-                        vm.waitprompt = rf"\[?{username}@(localhost|{hostname}) .+\]\$ "
-                    spawn.create_vm_by_libguestfs(vm)(session)
-                else:
-                    if kvm_platform == "centos7":
-                        spawn.create_vm_by_cloudinit(vm)(session)
-                    else:
-                        spawn.create_vm_by_virt_install_cloudinit(vm)(session)
-            elif vdisk_type == "copy":
-                if "cloudinit" in vm_dict['prepare_vdisk'] and "cloudinit" in vm_dict['prepare_vdisk']:
-                    if kvm_platform == "centos7":
-                        spawn.create_vm_by_cloudinit(vm)(session)
-                    else:
-                        spawn.create_vm_by_virt_install_cloudinit(vm)(session)
-                else:
-                    spawn.create_vm_by_copy_vdisk(vm)(session)
-            else:
-                spawn.create_vm_by_copy_vdisk(vm)(session)
-
+            spawn.create_vm_by_virt_install_cloudinit(vm)(session)
     return func
 
 
-def create_vm_dict_on(kvm, vm_dict, by_libguestfs=False):
-    run_on(kvm, create_vm_dict(vm_dict, by_libguestfs), log_params=None)
+def create_vm_dict_on(kvm, vm_dict):
+    run_on(kvm, create_vm_dict(vm_dict), log_params=None)
 
 
 def interact(session):
@@ -113,22 +86,6 @@ def create_defined_guest():
 
     create_vm_dict_on(kvm, vm_dict)
 
-
-# def create_defined_guest_from_history():
-#     selection = Selection("history")
-#     selection.load("last")
-#     kvm_module = misc.find(
-#         selection.selected_list, lambda index, obj: obj["key"] == "kvm_module"
-#     )
-#     vm_module = misc.find(
-#         selection.selected_list, lambda index, obj: obj["key"] == "vm_module"
-#     )
-#     kvm = lib_kvm_module.extract_kvm(kvm_module)
-#     vm = lib_vm_module.extract_vm(vm_module)
-#     if get_y_n("Do you want to create_defined_guest"):
-#         create_vm_on(kvm, vm)
-
-
 def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup.select_post_run import select_post_run
     from plur_linux.recipes.kvm.adhoc_setup import arch
@@ -136,7 +93,6 @@ def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup import almalinux9
     from plur_linux.recipes.kvm.adhoc_setup import almalinux8
     from plur_linux.recipes.kvm.adhoc_setup import centos8stream
-    from plur_linux.recipes.kvm.adhoc_setup import centos7
     from plur_linux.recipes.kvm.adhoc_setup import fedora
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_jammy
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_noble
@@ -153,7 +109,6 @@ def select_adhoc(connect_method_list, hostname=None):
             ["AlmaLinux8", almalinux8.get_selection],
             ["Ubuntu jammy", ubuntu_jammy.get_selection],
             ["CentOS8Stream", centos8stream.get_selection],
-            ["CentOS7", centos7.get_selection],
         ],
         "Ad Hoc Setup: select OS",
     )
@@ -181,19 +136,11 @@ def ad_hoc_setup():
                 session_wrap.bash(log_params=log_param_templates.normal())(virsh.console(vm)(post_run))()
     elif login_method == 'create vm':
         kvm = lib_kvm_module.select_kvm()
-        num = choose_num([
-            'cloudinit',
-            'libguestfs',
-        ], message='select create method')
-        if num == 0:
-            by_libguestfs = False
-        else:
-            by_libguestfs = True
         if get_y_n('Do you want to run '):
             vm_dict['setups'] = {
                 'run_post': post_run
             }
-            create_vm_dict_on(kvm, vm_dict, by_libguestfs=by_libguestfs)
+            create_vm_dict_on(kvm, vm_dict)
 
 
 # def destroy_guest(by_input=False):

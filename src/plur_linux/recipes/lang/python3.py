@@ -1,16 +1,5 @@
 from plur import base_shell
 
-def setup_python36u(session):
-    """
-    Procedure from
-    https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-local-programming-environment-on-centos-7
-    """
-    url = 'https://centos7.iuscommunity.org/ius-release.rpm'
-    [f(session) for f in [
-        base_shell.yum_y_install([url]),
-        base_shell.yum_y_install(['python36u'])
-    ]]
-
 def create_virtualenv(env_name, python_path='python3', venv_dir='$HOME/.virtualenv'):
     def func(session):
         base_shell.work_on(session, venv_dir)

@@ -92,22 +92,6 @@ def git_clone(project_dir, repos):
     return lambda session: [base_shell.run(session, a) for a in actions]
 
 
-def pm2_dump(session):
-    actions = [
-        'pm2 dump'
-    ]
-    platform = session.nodes[-1].platform
-    if platform == 'centos6':
-        actions += [
-            'sudo su -c "env PATH=$PATH:/usr/bin pm2 startup centos6 -u $LOGNAME --hp $HOME"'
-        ]
-    elif platform == 'centos7':
-        actions += [
-            'sudo su -c "env PATH=$PATH:/usr/bin pm2 startup centos -u $LOGNAME --hp $HOME"'
-        ]
-    [base_shell.run(session, a) for a in actions]
-
-
 def session_info(username, hostname, password='', platform='centos'):
     sp = hostname.split('.')
     if len(sp) > 1:

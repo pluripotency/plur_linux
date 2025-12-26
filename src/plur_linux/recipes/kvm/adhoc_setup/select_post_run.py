@@ -106,9 +106,7 @@ def create_create_vm_params(node_dict):
     username = node_dict['username']
     hostname = node_dict['hostname']
     platform = node_dict['platform']
-    if platform == 'centos7':
-        partition = ['/dev/vda', 1]
-    elif re.search('^ubuntu', platform):
+    if re.search('^ubuntu', platform):
         partition = ['/dev/vda', 1]
     else:
         partition = ['/dev/vda', 2]
@@ -139,7 +137,6 @@ class VmConnect:
             ]
         self.node_dict = None
         self.selected_con = None
-        # self.select_con_menu()
 
     def get_format_con(self):
         if not self.selected_con:
@@ -157,8 +154,11 @@ class VmConnect:
         return red('something wrong in VmConnect')
 
     def select_con_menu(self):
-        num = choose_num(self.connect_method_list)
-        selected = self.connect_method_list[num]
+        if len(self.connect_method_list) == 1:
+            selected = self.connect_method_list[0]
+        else:
+            num = choose_num(self.connect_method_list)
+            selected = self.connect_method_list[num]
         self.selected_con = selected
         if selected == 'ssh':
             self.node_dict = create_ssh_params(self.initial_node_dict)

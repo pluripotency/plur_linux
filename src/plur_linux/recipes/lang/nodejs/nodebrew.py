@@ -56,7 +56,7 @@ def install(version):
 
 def input_node_params(self):
     from mini.menu import get_input
-    self.node_version = get_input(expression=r'^v\d{2}(\.\d{1,2})?$', message='node ver[v22, v20.16, etc.]' + f'({self.node_version}): ', default_value=self.node_version)
+    self.node_version = get_input(expression=r'^v\d{2}(\.\d{1,2})?$', message='node ver[v24, v20.16, etc.]' + f'({self.node_version}): ', default_value=self.node_version)
     return {
         'version': self.node_version,
     }

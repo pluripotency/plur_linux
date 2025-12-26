@@ -48,9 +48,8 @@ def create_node_dict_env_bound(hostname, ifaces, vnets, overwrite_dict={}, login
     overwrite_dict = merge_offline_setup(overwrite_dict, user_list)
     return concat_dict([
         {
-            'org_xml': 'rhel7.xml',
             'org_hostname': 'localhost',
-            'platform': 'centos7',
+            'platform': 'almalinux9',
             'diskformat': 'qcow2',
 
             'vcpu': 2,
@@ -110,7 +109,7 @@ def destroy_node(hostname, overwrite_dict={}):
     return base_node.Node(destroy_node_dict(hostname, overwrite_dict))
 
 
-def create_kvm_dict(hostname, access_ip, overwrite_dict={}, username='root', platform='centos7'):
+def create_kvm_dict(hostname, access_ip, overwrite_dict={}, username='root', platform='almalinux9'):
     user_list = env_ops.get_current_index_user_list()
     login_password = ''
     for user in user_list:

@@ -22,14 +22,6 @@ def setup_with_network(session):
 
 
 def offline_setup(session, node):
-    # user must be root
-    if node.platform == 'centos6':
-        from plur_linux.recipes.centos import ntp
-        ntp.configure(session, node)
-    elif node.platform in ['centos7']:
-        from plur_linux.recipes.centos import chrony
-        chrony.configure(session)
-
     if hasattr(node, 'offline_setups'):
         offline_setups = node.offline_setups
         if 'users' in offline_setups and isinstance(offline_setups['users'], list):

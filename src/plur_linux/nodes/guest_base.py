@@ -12,12 +12,11 @@ medium = {
     'vmem': 2048
 }
 kvm = {
-    'platform': 'centos7',
+    'platform': 'almalinux9',
 }
 c7base = {
-    'org_xml': 'rhel7.xml',
     'org_hostname': 'localhost',
-    'platform': 'centos7',
+    'platform': 'almalinux9',
     'diskformat': 'qcow2',
 }
 

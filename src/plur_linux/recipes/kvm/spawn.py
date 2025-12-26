@@ -22,36 +22,6 @@ xml_dir = "/etc/libvirt/qemu"
 vdisk_dir = "/vm_images"
 diskformat = "qcow2"
 
-def create_virt_xml(session, hostname, vcpu, vmem, org_xml):
-    import uuid
-
-    base_shell.sed_pipe(
-        session,
-        org_xml,
-        hostname + ".xml",
-        [
-            ["<name>.*</name>", f"<name>{hostname}</name>"],
-            ["<uuid>.*</uuid>", f"<uuid>{uuid.uuid4()}</uuid>"],
-            [
-                "<memory unit='KiB'>.*</memory>",
-                f"<memory unit='KiB'>{int(vmem) * 1024}</memory>",
-            ],
-            [
-                "<currentMemory unit='KiB'>.*</currentMemory>",
-                f"<currentMemory unit='KiB'>{int(vmem) * 1024}</currentMemory>",
-            ],
-            [
-                "<vcpu placement='static'>.*</vcpu>",
-                f"<vcpu placement='static'>{vcpu}</vcpu>",
-            ],
-        ],
-    )
-
-def define_domain(session, org_xml, hostname, vcpu, vmem):
-    base_shell.work_on(session, xml_dir)
-    create_virt_xml(session, hostname, vcpu, vmem, org_xml)
-    virsh.define(session, hostname)
-
 def prepare_additional_vdisk(session, vm):
     hostname = vm.hostname
     vdisk_list = []
@@ -148,31 +118,6 @@ def prepare_backing_or_copy_vdisk(session, vm):
         cloud_image_ops.resize_to(vdisk_path, size)(session)
     return created_image_path
 
-def prepare_libguestfs_vdisk(session, vm):
-    hostname = vm.hostname
-    root_password = find_root_password(vm)
-
-    if hasattr(vm, "prepare_vdisk") and "type" in vm.prepare_vdisk:
-        vdisk_type = vm.prepare_vdisk["type"]
-        if vdisk_type == "cloud_image":
-            cloud_image_func = None
-            if vm.platform == "centos7":
-                cloud_image_func = cloud_image_centos.create7
-            if not cloud_image_func:
-                print(red("vdisk: unknown os platform"))
-                sys.exit(1)
-            size = vm.prepare_vdisk["size"] if "size" in vm.prepare_vdisk else 8
-            created_image_path = cloud_image_func(hostname, root_password, size=size)(
-                session
-            )
-            base_shell.work_on(session, vdisk_dir)
-            base_shell.run(session, f"mv {created_image_path} .")
-        else:
-            created_image_path = prepare_backing_or_copy_vdisk(session, vm)
-        return created_image_path
-    print(red("vm must have prepare_vdisk and type"))
-    sys.exit(1)
-
 def prepare_cloudinit_vdisk(session, vm):
     hostname = vm.hostname
     platform = vm.platform
@@ -180,14 +125,12 @@ def prepare_cloudinit_vdisk(session, vm):
         vdisk_type = vm.prepare_vdisk["type"]
         if vdisk_type == "cloud_image":
             cloud_image_func = None
-            if platform == "centos7":
-                cloud_image_func = cloud_image_centos.create_centos7_cloudinit
-            elif platform == "arch":
-                cloud_image_func = cloud_image_arch.create_arch
+            if platform == "almalinux9":
+                cloud_image_func = cloud_image_centos.create_almalinux("9")
             elif platform == "almalinux8":
                 cloud_image_func = cloud_image_centos.create_almalinux("8")
-            elif platform == "almalinux9":
-                cloud_image_func = cloud_image_centos.create_almalinux("9")
+            elif platform == "arch":
+                cloud_image_func = cloud_image_arch.create_arch
             elif platform == "almalinux10":
                 cloud_image_func = cloud_image_centos.create_almalinux10
             elif platform == "centos8stream":
@@ -275,23 +218,6 @@ def create_vnet_xml(session, xml_dir, vnet):
     base_shell.here_doc(session, filename, contents)
     return filename
 
-def start_domain_by_define_offline(vm, org_xml):
-    def func(session):
-        hostname = vm.hostname
-        vcpu = vm.vcpu
-        vmem = vm.vmem
-        define_domain(session, org_xml, hostname, vcpu, vmem)
-        attach_vdisk(session, vm, offline=True)
-        base_shell.run(session, f"rm -f {xml_dir}/networks/525400*.xml")
-        if hasattr(vm, "vnets"):
-            base_shell.work_on(session, xml_dir)
-            for vnet in vm.vnets:
-                filename = create_vnet_xml(session, xml_dir, vnet)
-                virsh.attach_vnet(session, vm.hostname, filename, offline=True)
-
-        virsh.start(session, vm.hostname)
-    return func
-
 def start_domain_by_virt_install(vm, iso_full_path):
     def func(session):
         from plur_linux.recipes.kvm import virt_install_str
@@ -335,30 +261,6 @@ def restart_domain(vm, created_seed_iso_path):
         base_shell.run(session, f"sudo rm -f {created_seed_iso_path}")
         base_shell.run(session, f'sudo virsh start {hostname}')
     return on_kvm
-
-def start_domain_with_reset(vm, org_xml):
-    def func(session):
-        hostname = vm.hostname
-        vcpu = vm.vcpu
-        vmem = vm.vmem
-        define_domain(session, org_xml, hostname, vcpu, vmem)
-
-        base_shell.work_on(session, xml_dir)
-        virsh.start(session, hostname)
-        attach_vdisk(session, vm, offline=False)
-
-        base_shell.run(session, f"rm -f {xml_dir}/networks/525400*.xml")
-        if hasattr(vm, "vnets"):
-            for vnet in vm.vnets:
-                filename = create_vnet_xml(session, xml_dir, vnet)
-                virsh.attach_vnet(session, vm.hostname, filename, offline=False)
-
-        virsh.dumpxml(session, vm.hostname, xml_dir)
-
-        base_shell.work_on(session, xml_dir)
-        virsh.define(session, vm.hostname)
-        virsh.reset(session, vm.hostname)
-    return func
 
 def find_user_password(vm, username="worker"):
     user_password = None
@@ -533,8 +435,6 @@ def on_vm_post(vm, cloudinit=False):
         if re.search("^ubuntu", vm.platform):
             # > /dev/null is needed in virsh console for term size problem
             base_shell.run(session, "sudo apt remove -y cloud-init > /dev/null 2>&1 ")
-        elif vm.platform in ["centos7"]:
-            base_shell.run(session, "sudo yum remove -y cloud-init")
         elif vm.platform == "arch":
             pass
         else:
@@ -545,11 +445,6 @@ def on_vm_post(vm, cloudinit=False):
             if re.search("^ubuntu", vm.platform):
                 _ = [base_shell.run(session, a) for a in [
                     "sudo hostnamectl set-hostname ubuntu", "sudo apt clean"
-                ]]
-            elif vm.platform in ["centos7"]:
-                _ = [base_shell.run(session, a) for a in [
-                    "sudo hostnamectl set-hostname localhost",
-                    "sudo yum clean all",
                 ]]
             else:
                 _ = [base_shell.run(session, a) for a in [
@@ -604,42 +499,6 @@ def on_kvm_pre_check_files(session, vm):
     check_vdisk_exists(session, hostname)
     check_already_defined(session, hostname)
 
-def on_kvm_pre_check_org_xml(session, init_type):
-    kvm_platform = base_shell.find_platform(session)
-    if init_type == "cloudinit":
-        if kvm_platform == "centos7":
-            org_xml = "rhel7cdrom.xml"
-        elif kvm_platform == "almalinux8":
-            org_xml = "on_alma8.xml"
-        elif kvm_platform == "almalinux9":
-            org_xml = "on_alma9.xml"
-        else:
-            print(red("unknown kvm platform"))
-            sys.exit(1)
-    else:
-        if kvm_platform == "centos7":
-            # init by libguestfs
-            org_xml = "rhel7.xml"
-        elif kvm_platform == "almalinux8":
-            org_xml = "on_alma8.xml"
-        elif kvm_platform == "almalinux9":
-            org_xml = "on_alma9.xml"
-        else:
-            print(red("unknown kvm platform"))
-            sys.exit(1)
-
-    if base_shell.check_file_exists(session, f"{xml_dir}/{org_xml}"):
-        return [True, org_xml]
-    else:
-        return [False, org_xml]
-
-def on_kvm_pre_check(vm, init_type="cloudinit"):
-    @session_wrap.sudo
-    def func(session):
-        on_kvm_pre_check_files(session, vm)
-        return on_kvm_pre_check_org_xml(session, init_type)
-    return func
-
 def check_is_local_kvm(session):
     tmp_local_file = "/tmp/is_local_kvm_" + misc.create_timestamp_str()
     misc.open_write(tmp_local_file, "test")
@@ -648,28 +507,6 @@ def check_is_local_kvm(session):
         result = True
     misc.delete_file_path(tmp_local_file)
     return result
-
-def on_kvm_prepare_resource(vm, init_type="cloudinit"):
-    def func(session):
-        is_local_kvm = check_is_local_kvm(session)
-        [org_xml_exists, org_xml] = on_kvm_pre_check(vm, init_type)(session)
-        dirname, _filename = os.path.split(os.path.abspath(__file__))
-        if is_local_kvm:
-            if not org_xml_exists:
-                base_shell.run(session, f"sudo cp {dirname}/{org_xml} {xml_dir}")
-        else:
-            remote_kvm = session.nodes[-1]
-            if not org_xml_exists:
-                src_path = f"{dirname}/{org_xml}"
-                # scp by user right then mv into xml_dir
-                ssh_ops.scp_from_local(
-                    src_path,
-                    f"{remote_kvm.username}@{remote_kvm.access_ip}:/tmp",
-                    remote_kvm.password,
-                )
-                base_shell.run(session, f"sudo mv /tmp/{org_xml} {xml_dir}")
-        return org_xml
-    return func
 
 def on_kvm_prepare_cloudinit_seed_iso(vm):
     def func(session):
@@ -702,52 +539,6 @@ def create_vm_by_virt_install_cloudinit(vm):
         created_seed_iso_path = on_kvm_prepare_cloudinit_seed_iso(vm)(session)
         created_image_path = prepare_cloudinit_vdisk(session, vm)
         _inner_on_kvm_sudo(created_image_path, created_seed_iso_path)(session)
-    return func
-
-def create_vm_by_cloudinit(vm):
-    def _inner_on_kvm_sudo(created_image_path, org_xml, created_seed_iso_path):
-        @session_wrap.sudo
-        def receive_inner_on_kvm_sudo(session):
-            base_shell.work_on(session, vdisk_dir)
-            base_shell.run(session, f"mv {created_image_path} {vdisk_dir}")
-
-            start_domain_by_define_offline(vm, org_xml)(session)
-            base_shell.run(
-                session,
-                f"virsh change-media {vm.hostname} --path hda --source {created_seed_iso_path} --insert",
-            )
-            on_create_console_with_cloudinit(vm)(session)
-            base_shell.run(session, f"virsh change-media {vm.hostname} --path hda --eject")
-            base_shell.run(session, f"sudo rm -f {created_seed_iso_path}")
-
-            on_kvm_post(vm)(session)
-        return receive_inner_on_kvm_sudo
-
-    def func(session):
-        org_xml = on_kvm_prepare_resource(vm, "cloudinit")(session)
-        created_seed_iso_path = on_kvm_prepare_cloudinit_seed_iso(vm)(session)
-        created_image_path = prepare_cloudinit_vdisk(session, vm)
-        _inner_on_kvm_sudo(created_image_path, org_xml, created_seed_iso_path)(session)
-    return func
-
-def create_vm_by_libguestfs(vm):
-    @session_wrap.sudo
-    def func(session):
-        org_xml = on_kvm_prepare_resource(vm, "libguestfs")(session)
-        prepare_libguestfs_vdisk(session, vm)
-        start_domain_with_reset(vm, org_xml)(session)
-        on_spawn_console(vm)(session)
-        on_kvm_post(vm)(session)
-    return func
-
-def create_vm_by_copy_vdisk(vm):
-    @session_wrap.sudo
-    def func(session):
-        org_xml = on_kvm_prepare_resource(vm, "")(session)
-        prepare_backing_or_copy_vdisk(session, vm)
-        start_domain_with_reset(vm, org_xml)(session)
-        on_spawn_console(vm)(session)
-        on_kvm_post(vm)(session)
     return func
 
 def destroy(vm):

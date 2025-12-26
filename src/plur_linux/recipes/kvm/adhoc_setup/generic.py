@@ -2,6 +2,7 @@ import re
 from mini.ansi_colors import light_blue, light_green
 from mini.menu import get_input, get_y_n, choose_num
 from plur import base_shell
+from plur import session_wrap
 
 
 def has_true(obj, key):
@@ -85,19 +86,6 @@ class BaseApps(SelectMenu):
                 "dotfiles": True,
             }
             exclusive_list = []
-        elif platform == 'centos7':
-            selection = {
-                "vim": True,
-                "vim(src)": False,
-                "tmux": True,
-                "git": False,
-                "git(ius)": True,
-                "dotfiles": False,
-            }
-            exclusive_list = [
-                ["vim(src)", "vim"],
-                ["git(ius)", "git"],
-            ]
         else:
             selection = {
                 "vim": True,
@@ -131,12 +119,6 @@ class BaseApps(SelectMenu):
                 packages += ['tmux']
             if self.selection['git']:
                 packages += ['git']
-            else:
-                from plur_linux.recipes import git
-                if 'git(ius)' in self.selection and self.selection['git(ius)']:
-                    git.dict_git['centos7']['ius'](session)
-                elif 'gi(src)' in self.selection and self.selection['git(src)']:
-                    git.dict_git['centos7']['source'](session)
 
             if len(packages) > 0:
                 if re.search('^ubuntu', platform):
@@ -152,19 +134,7 @@ class BaseApps(SelectMenu):
 
 class Initial(SelectMenu):
     def __init__(self, platform):
-        if platform in ['centos7']:
-            selection = {
-                "mkswap(1GB)": False,
-                "legacy_devname": False,
-                "ttyS0": False,
-                "disable_ipv6": True,
-                "tz Asia/Tokyo": True,
-                "keymap jp106": True,
-                "disable_selinux": True,
-                "permissive_selinux": False,
-                "enforce_selinux": False,
-            }
-        elif re.search('^almalinux', platform):
+        if re.search('^(almalinux|rocky|rhel|centos)', platform):
             selection = {
                 "mkswap(1GB)": False,
                 "legacy_devname": False,
@@ -204,42 +174,45 @@ class Initial(SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from plur_linux.recipes.ops import ops
-            if has_true(self.selection, 'disable_selinux'):
-                ops.disable_selinux(session)
-            elif has_true(self.selection, 'permissive_selinux'):
-                ops.permissive_selinux(session)
-            elif has_true(self.selection, 'enforce_selinux'):
-                ops.enforce_selinux(session)
+            @session_wrap.sudo
+            def inner(session):
+                from plur_linux.recipes.ops import ops
+                if has_true(self.selection, 'disable_selinux'):
+                    ops.disable_selinux(session)
+                elif has_true(self.selection, 'permissive_selinux'):
+                    ops.permissive_selinux(session)
+                elif has_true(self.selection, 'enforce_selinux'):
+                    ops.enforce_selinux(session)
 
-            if has_true(self.selection, 'mkswap(1GB)'):
-                ops.mkswap(1)(session)
-            if has_true(self.selection, 'disable_ipv6'):
-                ops.disable_ipv6(session)
-            if has_true(self.selection, 'tz Asia/Tokyo'):
-                ops.set_timezone()(session)
-            if has_true(self.selection, 'keymap jp106'):
-                ops.set_keymap('jp106')(session)
-            if has_true(self.selection, 'remove cockpit'):
-                ops.remove_cockpit(session)
+                if has_true(self.selection, 'mkswap(1GB)'):
+                    ops.mkswap(1)(session)
+                if has_true(self.selection, 'disable_ipv6'):
+                    ops.disable_ipv6(session)
+                if has_true(self.selection, 'tz Asia/Tokyo'):
+                    ops.set_timezone()(session)
+                if has_true(self.selection, 'keymap jp106'):
+                    ops.set_keymap('jp106')(session)
+                if has_true(self.selection, 'remove cockpit'):
+                    ops.remove_cockpit(session)
 
-            if has_true(self.selection, 'legacy_devname') or has_true(self.selection, 'ttyS0'):
-                from plur_linux.recipes.ops import fs
-                from plur_linux.recipes.ops import grub
-                grub_path = '/etc/default/grub'
-                backed_up_grub_path = fs.backup(grub_path)(session)
-                if re.search('^ubuntu', self.platform):
-                    grub.configure_ubuntu(
-                        backed_up_grub_path,
-                        console=self.selection['ttyS0'],
-                        devname=self.selection['legacy_devname']
-                    )(session)
-                else:
-                    grub.configure(
-                        backed_up_grub_path,
-                        console=self.selection['ttyS0'],
-                        devname=self.selection['legacy_devname']
-                    )(session)
+                if has_true(self.selection, 'legacy_devname') or has_true(self.selection, 'ttyS0'):
+                    from plur_linux.recipes.ops import fs
+                    from plur_linux.recipes.ops import grub
+                    grub_path = '/etc/default/grub'
+                    backed_up_grub_path = fs.backup(grub_path)(session)
+                    if re.search('^ubuntu', self.platform):
+                        grub.configure_ubuntu(
+                            backed_up_grub_path,
+                            console=self.selection['ttyS0'],
+                            devname=self.selection['legacy_devname']
+                        )(session)
+                    else:
+                        grub.configure(
+                            backed_up_grub_path,
+                            console=self.selection['ttyS0'],
+                            devname=self.selection['legacy_devname']
+                        )(session)
+            inner(session)
 
 
 class Languages(SelectMenu):
@@ -259,7 +232,7 @@ class Languages(SelectMenu):
         self.zig_version = '0.14.1'
         self.zig_key = 'zig'
 
-        self.node_version = 'v22'
+        self.node_version = 'v24'
         self.nodesource_version = f'{self.node_version}.x'
         self.nodebrew_key = f'node(nodebrew)'
         self.nodesource_key = f'node(nodesource)'

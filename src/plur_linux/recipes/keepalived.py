@@ -205,35 +205,6 @@ def put_sample_scripts(session):
 
 
 @session_wrap.sudo
-def install_c7(session):
-    from plur_linux.recipes import firewalld
-    firewalld.install_if_not_exists(session)
-    firewalld.add_rich_rule('vrrp')(session)
-
-    put_sample_scripts(session)
-    base_shell.yum_y_install([
-        'keepalived'
-    ])(session)
-
-
-def configure_c7(gd, vi_list, backup_org_conf=False):
-    @session_wrap.sudo
-    def func(session):
-        keepalived_conf_path = '/etc/keepalived/keepalived.conf'
-        if backup_org_conf and not base_shell.check_file_exists(session, keepalived_conf_path + '.org'):
-            base_shell.create_backup(session, keepalived_conf_path)
-
-        keepalived_conf_str = create_keepalived_conf_str(gd, vi_list)
-        base_shell.here_doc(session, keepalived_conf_path, keepalived_conf_str.split('\n'))
-        base_shell.service_on(session, 'keepalived')
-
-        # This is needed to wait keepalived start ONLY ON CONSOLE OF CentOS7
-        # session.child.expect(r'\] IPVS: ipvs loaded.')
-
-    return func
-
-
-@session_wrap.sudo
 def install_a8(session):
     from plur_linux.recipes import firewalld
     firewalld.install_if_not_exists(session)
@@ -301,10 +272,6 @@ def configure_a9(gd, vi_list, backup_org_conf=False):
 
 
 dict_keepalived = {
-    'centos7': {
-        'install': install_c7
-        , 'configure': configure_c7
-    },
     'almalinux8': {
         'install': install_a8
         , 'configure': configure_a8

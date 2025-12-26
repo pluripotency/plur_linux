@@ -91,39 +91,6 @@ def docker_menu():
 
     select_2nd([["deploy git_repository", func]], "Start Docker", vertical=True)
 
-def change_password_by_libguestfs():
-    from plur_linux.recipes.kvm.cloud_image import cloud_image_ops
-    image_dir = "/vm_images"
-
-    @session_wrap.sudo
-    def on_kvm_list_vm(session):
-        base_shell.run(session, f"ls {image_dir}")
-
-    kvm = lib_kvm_module.select_kvm()
-    log_params = log_param_templates.normal_on_tmp()
-    kvm_menu_runner.run_on(kvm, on_kvm_list_vm, log_params)
-
-    image_name = get_input(
-        "[a-z][a-z0-9_]{0,30}",
-        green("\nimage name(need power off):"),
-        "Invalid name",
-    )
-    image_path = f"/vm_images/{image_name}"
-    password = get_input(
-        r"\w+",
-        green("password:"),
-        "Invalid password",
-    )
-
-    @session_wrap.sudo
-    def on_kvm_sudo(session):
-        cloud_image_ops.change_cloud_image_password(image_path, password)(session)
-
-    if get_y_n(f"password: {password} to {image_path}?"):
-        kvm = lib_kvm_module.select_kvm()
-        log_params = log_param_templates.normal_on_tmp()
-        kvm_menu_runner.run_on(kvm, on_kvm_sudo, log_params)
-
 def kvm_menu():
     select_2nd(
         [
@@ -133,7 +100,6 @@ def kvm_menu():
             ["Expand Volume", kvm_expand_volume],
             ["Conf Network for defined nodes", configure_network],
             ["Post Run for defined nodes", post_run],
-            ["Change password by libguestfs", change_password_by_libguestfs],
         ],
         "KVM Menu",
         vertical=True,
