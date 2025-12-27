@@ -1,9 +1,10 @@
 from mini.ansi_colors import blue, green
 from mini.menu import choose_num
-from plur_linux.nodes.guests import dock, a8images, a9images, gluster, kubeadm_a9
+from plur_linux.nodes.guests import dock, a8images, a9images, gluster, kubeadm_a9, images_ubu
 vm_nodes = [
     ['a8images', a8images],
     ['a9images', a9images],
+    # ['ubu_images', images_ubu],
     ['dock', dock],
     ['gluster', gluster],
     ['kubeadm_a9', kubeadm_a9],

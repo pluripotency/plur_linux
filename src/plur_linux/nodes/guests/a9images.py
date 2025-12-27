@@ -25,7 +25,9 @@ def a9_cloudimage(hostname, run_post):
     })
 
 def create_a9base_image():
-    return a9_cloudimage(a9base_image, [])
+    return a9_cloudimage(a9base_image, [
+        a9base_update,
+    ])
 
 def create_a9docker_image():
     from plur_linux.recipes.almalinux9 import docker
@@ -65,5 +67,5 @@ def destroy_nodes():
         a9base_image
         , a9docker_image
         , a9desk_image
-        , a9glusterimage
+        , a9gluster_image
     ]]
