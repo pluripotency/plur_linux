@@ -210,6 +210,20 @@ for VID in ${VID_LIST[@]};do
 done
 """
 
+nmcli_vlan_str = """
+#!/bin/sh
+IFACE=eth1
+VLANID=100
+
+nmcli c add type ethernet con-name $IFACE ifname $IFACE ipv6.method ignore ipv4.method disabled
+nmcli con add type vlan ifname $IFACE.$VLANID dev $IFACE id $VLANID
+nmcli c up $IFACE
+nmcli c up $IFACE.$VLANID
+
+IP=192.168.100.254/24
+nmcli c mod $IFACE.$VLANID ipv4.method manual ipv4.address $IP
+"""
+
 bonding_mode_choice = [
     'balance-rr'
     , 'active-backup'
