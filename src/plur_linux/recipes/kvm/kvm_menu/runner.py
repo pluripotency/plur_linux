@@ -1,3 +1,5 @@
+from mini.ansi_colors import red, cyan
+from mini.menu import get_input, choose_num, select_2nd, get_y_n, Selection
 from plur import base_shell
 from plur import base_node
 from plur import session_wrap
@@ -5,9 +7,6 @@ from plur import log_param_templates
 from plur_linux.recipes.kvm import virsh
 from plur_linux.recipes.kvm.kvm_menu import lib_kvm_module
 from plur_linux.recipes.kvm.kvm_menu import lib_vm_module
-from mini.ansi_colors import red, cyan
-from mini.menu import re, get_input, choose_num, select_2nd, get_y_n, Selection
-from mini import misc
 from plur_linux.recipes.kvm import spawn
 from . import lib
 
@@ -126,6 +125,10 @@ def ad_hoc_setup():
         if get_y_n('Do you want to run '):
             vm = base_node.Node(vm_dict)
             session_wrap.ssh(vm, log_params=log_param_templates.normal())(post_run)()
+    elif login_method == 'bash':
+        if get_y_n('Do you want to run '):
+            vm = base_node.Node(vm_dict)
+            session_wrap.bash(vm, log_params=log_param_templates.normal())(post_run)()
     elif login_method == 'virsh console':
         kvm = lib_kvm_module.select_kvm()
         if get_y_n('Do you want to run '):
