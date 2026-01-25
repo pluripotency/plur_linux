@@ -73,6 +73,48 @@ class SelectMenu:
                                 self.selection[item] = False
 
 
+class Pack(SelectMenu):
+    def __init__(self, platform):
+        self.platform = platform
+        self.dev_key = 'dev'
+        if re.search('^ubuntu', platform):
+            selection = {
+                "dev": True,
+            }
+            exclusive_list = []
+        else:
+            selection = {
+                "dev": True,
+            }
+            exclusive_list = []
+
+        extra_menu = {}
+        super().__init__(selection, exclusive_list, 'Pack', extra_menu=extra_menu)
+
+    def setup(self, session):
+        if self.enable:
+            platform = self.platform
+            if self.selection[self.dev_key]:
+                packages = [
+                    'git',
+                    'tmux',
+                    'vim',
+                ]
+                from plur_linux.recipes import nvim
+                nvim.install_appimage()(session)
+                if re.search('^ubuntu', platform):
+                    from plur_linux.recipes.ubuntu import docker_ce
+                    docker_ce.install(session)
+                    from plur_linux.recipes.ubuntu import ops as ubuntu_ops
+                    ubuntu_ops.sudo_apt_install_y(packages)
+                else:
+                    from plur_linux.recipes.almalinux9 import docker
+                    docker.install(session)
+                    base_shell.yum_y_install(packages)(session)
+                from plur_linux.recipes.source_install import dotfiles
+                dotfiles.setup(session, nvim=True)
+
+
 class BaseApps(SelectMenu):
     def __init__(self, platform):
         self.platform = platform
@@ -220,9 +262,9 @@ class Languages(SelectMenu):
         from plur_linux.recipes.lang import go
         self.python_version = '3.13'
         self.python_venv = 'v3'
-        self.uv_key = f'python(uv)'
-        self.pyenv_key = f'python(pyenv)'
-        self.python3_key = f'python3(pkg)'
+        self.uv_key = 'python(uv)'
+        self.pyenv_key = 'python(pyenv)'
+        self.python3_key = 'python3(pkg)'
 
         self.go_version = go.go_install_version
         self.go_key = f'go({self.go_version})'
@@ -234,8 +276,8 @@ class Languages(SelectMenu):
 
         self.node_version = 'v24'
         self.nodesource_version = f'{self.node_version}.x'
-        self.nodebrew_key = f'node(nodebrew)'
-        self.nodesource_key = f'node(nodesource)'
+        self.nodebrew_key = 'node(nodebrew)'
+        self.nodesource_key = 'node(nodesource)'
 
         selection = {
             f"{self.uv_key}": False,

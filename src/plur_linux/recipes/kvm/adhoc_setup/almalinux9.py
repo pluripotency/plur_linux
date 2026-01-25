@@ -111,5 +111,6 @@ def get_selection():
         Docker(),
         generic.Languages(platform),
         generic.BaseApps(platform),
+        generic.Pack(platform),
     ]
     return [vm, postrun_list]
