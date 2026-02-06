@@ -22,7 +22,7 @@ build-backend = "hatchling.build"
 [tool.uv.sources]
 plur = { git = "https://github.com/pluripotency/plur" }
 
-[tool.pyright]
-include = "."
-venv = ".venv"
-check-str-concat-over-line-jumps = "yes"
+#[tool.pyright]
+#include = "."
+#venv = ".venv"
+#check-str-concat-over-line-jumps = "yes"

@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 from plur import session_wrap
 from plur import base_node
 from plur import base_shell
@@ -6,13 +5,13 @@ from plur import log_param_templates
 from mini.ansi_colors import blue, red, green
 from mini.menu import get_input, choose_num, get_y_n, select_2nd
 from mini import misc
-from .lib import env_ops
-from .recipes.kvm.kvm_menu import runner as kvm_menu_runner
-from .recipes.kvm.kvm_menu import lib_kvm_module
-from .recipes.kvm.kvm_menu import lib_vm_module
+from plur_linux.lib import env_ops
+from plur_linux.recipes.kvm.kvm_menu import runner as kvm_menu_runner
+from plur_linux.recipes.kvm.kvm_menu import lib_kvm_module
+from plur_linux.recipes.kvm.kvm_menu import lib_vm_module
 
 def kvm_expand_volume():
-    from .recipes.kvm import qemu_img
+    from plur_linux.recipes.kvm import qemu_img
 
     default_size = 20
     size = int(
@@ -112,7 +111,7 @@ def main_menu():
         ["Env Menu", env_ops.env_menu]
     ]
     while True:
-        select_2nd(main_menu_list, green("Please select from plur_linux.recipes"), vertical=True)
+        select_2nd(main_menu_list, green("Please select from recipes"), vertical=True)
 
 if __name__ == "__main__":
     main_menu()
