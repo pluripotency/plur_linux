@@ -1,12 +1,12 @@
 import re
 from mini.ansi_colors import light_blue, light_green
-from mini.menu import get_input, get_y_n, choose_num
+from mini.menu import get_y_n, choose_num
 from plur import base_shell
 from plur import session_wrap
 
 
 def has_true(obj, key):
-    if key in obj and obj[key] == True:
+    if key in obj and obj[key] is True:
         return True
     return False
 
@@ -274,23 +274,28 @@ class Languages(SelectMenu):
         self.zig_version = '0.14.1'
         self.zig_key = 'zig'
 
+        self.bun_key = 'bun'
+
         self.node_version = 'v24'
         self.nodesource_version = f'{self.node_version}.x'
+        self.nvm_key = 'node(nvm)'
         self.nodebrew_key = 'node(nodebrew)'
         self.nodesource_key = 'node(nodesource)'
 
         selection = {
             f"{self.uv_key}": False,
-            f"{self.pyenv_key}": False,
-            f"{self.python3_key}": False,
+            # f"{self.pyenv_key}": False,
+            # f"{self.python3_key}": False,
+            f"{self.bun_key}": False,
+            f"{self.nvm_key}": False,
             f"{self.nodebrew_key}": False,
-            f"{self.nodesource_key}": False,
+            # f"{self.nodesource_key}": False,
             f"{self.go_key}": False,
             f"{self.rust_key}": False,
             self.zig_key: False,
         }
         exclusive_list = [
-            [self.nodebrew_key, self.nodesource_key],
+            [self.nvm_key, self.nodebrew_key, self.nodesource_key],
             [self.uv_key, self.pyenv_key, self.python3_key],
         ]
         extra_menu = {}
@@ -300,6 +305,8 @@ class Languages(SelectMenu):
         extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
         from plur_linux.recipes.lang.nodejs import nodebrew
         extra_menu[self.nodebrew_key] = nodebrew.input_node_params
+        from plur_linux.recipes.lang.nodejs import nvm
+        extra_menu[self.nvm_key] = nvm.input_node_params
         from plur_linux.recipes.lang import zig
         extra_menu[self.zig_key] = zig.input_zig_params
 
@@ -316,6 +323,11 @@ class Languages(SelectMenu):
             if has_true(self.selection, self.rust_key):
                 from plur_linux.recipes.lang import rust
                 rust.install(session)
+
+            if has_true(self.selection, self.bun_key):
+                from plur_linux.recipes.lang import bun
+                bun.install_bun(session)
+
             if has_true(self.selection, self.uv_key):
                 from plur_linux.recipes.lang import uv
                 uv.install_python(**self.extra_params[self.uv_key])(session)
@@ -325,9 +337,13 @@ class Languages(SelectMenu):
             elif has_true(self.selection, self.python3_key):
                 from plur_linux.recipes.lang import python3 as python_setup
                 python_setup.install_python3(self.python_venv)(session)
+
             if has_true(self.selection, self.nodebrew_key):
                 from plur_linux.recipes.lang.nodejs import nodebrew
                 nodebrew.install(**self.extra_params[self.nodebrew_key])(session)
+            elif has_true(self.selection, self.nvm_key):
+                from plur_linux.recipes.lang.nodejs import nvm
+                nvm.install(**self.extra_params[self.nvm_key])(session)
             elif has_true(self.selection, self.nodesource_key):
                 from plur_linux.recipes.lang.nodejs import nodesource
                 nodesource.setup(self.nodesource_version)(session)
