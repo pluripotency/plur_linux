@@ -75,7 +75,8 @@ def set_hostname_and_waitprompt(node_dict):
     return node_dict
 
 def create_bash_params(node_dict):
-    node_dict = set_hostname_and_waitprompt(node_dict)
+    me = base_node.Me()
+    node_dict = me.__dict__
     node_dict['login_method'] = 'bash'
     return node_dict
 
