@@ -64,9 +64,12 @@ def install_desktop(pkgs):
     return func
 
 def install_gnome(session, enable_xrdp=False):
+    # pkgs = misc.del_indent_lines("""
+    # ubuntu-desktopminimal
+    # task-gnome-desktop
+    # """)
     pkgs = misc.del_indent_lines("""
-    ubuntu-desktop
-    task-gnome-desktop
+    ubuntu-desktop-minimal
     """)
     install_desktop(pkgs)(session)
     if enable_xrdp:
