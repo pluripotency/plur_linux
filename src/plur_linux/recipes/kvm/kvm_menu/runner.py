@@ -95,6 +95,7 @@ def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup import fedora
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_jammy
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_noble
+    from plur_linux.recipes.kvm.adhoc_setup import ubuntu_questing
     from plur_linux.recipes.kvm.adhoc_setup import debian10
 
     [vm_dict, post_run_list] = select_2nd(
@@ -103,6 +104,7 @@ def select_adhoc(connect_method_list, hostname=None):
             ["AlmaLinux10", almalinux10.get_selection],
             ["Arch", arch.get_selection],
             ["Ubuntu noble", ubuntu_noble.get_selection],
+            ["Ubuntu questing", ubuntu_questing.get_selection],
             ["Fedora", fedora.get_selection],
             ["Debian10", debian10.get_selection],
             ["AlmaLinux8", almalinux8.get_selection],

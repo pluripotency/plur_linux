@@ -139,6 +139,8 @@ def prepare_cloudinit_vdisk(session, vm):
                 cloud_image_func = cloud_image_centos.create_centos_stream("9")
             elif platform == "fedora":
                 cloud_image_func = cloud_image_centos.create_fedora()
+            elif re.search("questing", vm.platform):
+                cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("questing")
             elif re.search("noble", vm.platform):
                 cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("noble")
             elif re.search("ubuntu", vm.platform):
