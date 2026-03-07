@@ -4,7 +4,6 @@ from plur_linux.recipes.kvm.adhoc_setup import generic
 class MinDesk(generic.SelectMenu):
     def __init__(self):
         super().__init__({
-            'xrdp': False,
             'ghostty': True,
         },
             exclusive_list=None,
@@ -16,8 +15,6 @@ class MinDesk(generic.SelectMenu):
             fedora.install_xwindow(session)
             if self.selection['ghostty']:
                 fedora.install_ghostty(session)
-            if self.selection['xrdp']:
-                fedora.install_xrdp(session)
 
 
 def get_selection():
