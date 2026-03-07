@@ -1,5 +1,5 @@
 from plur import base_shell
-from mini.menu import *
+from mini.menu import get_input, red, green
 import re
 
 

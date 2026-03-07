@@ -91,7 +91,7 @@ def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup import almalinux10
     from plur_linux.recipes.kvm.adhoc_setup import almalinux9
     from plur_linux.recipes.kvm.adhoc_setup import almalinux8
-    from plur_linux.recipes.kvm.adhoc_setup import centos8stream
+    from plur_linux.recipes.kvm.adhoc_setup import centos10stream
     from plur_linux.recipes.kvm.adhoc_setup import fedora
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_jammy
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_noble
@@ -109,7 +109,7 @@ def select_adhoc(connect_method_list, hostname=None):
             ["Debian10", debian10.get_selection],
             ["AlmaLinux8", almalinux8.get_selection],
             ["Ubuntu jammy", ubuntu_jammy.get_selection],
-            ["CentOS8Stream", centos8stream.get_selection],
+            ["CentOS10Stream", centos10stream.get_selection],
         ],
         "Ad Hoc Setup: select OS",
     )

@@ -23,7 +23,7 @@ def install_platform_dependancy(session):
     if platform in ['almalinux8', 'centos8stream']:
         base_shell.run(session, 'sudo dnf install -y epel-release')
         base_shell.run(session, 'sudo dnf install -y fuse tar ripgrep fd-find unzip wget gcc')
-    elif platform.startswith('almalinux') or platform in ['almalinux9', 'centos9stream', 'fedora']:
+    elif platform.startswith('almalinux') or platform.startswith('centos') or platform in ['almalinux9', 'centos9stream', 'fedora']:
         base_shell.run(session, 'sudo dnf install -y epel-release')
         base_shell.run(session, 'sudo dnf install -y fuse fuse-libs xclip ripgrep fd-find unzip wget gcc')
     elif re.search('^ubuntu', platform):

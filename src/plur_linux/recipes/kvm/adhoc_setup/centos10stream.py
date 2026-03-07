@@ -75,7 +75,7 @@ class Apps(generic.SelectMenu):
 
 
 def get_selection():
-    platform = 'centos8stream'
+    platform = 'centos10stream'
     vm = {
         'hostname': 'localhost',
         'platform': platform,

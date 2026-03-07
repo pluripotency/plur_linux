@@ -1,8 +1,8 @@
+import re
+from mini.ansi_colors import red
 from plur import base_shell
 from plur.base_shell import create_sequence
 from plur.output_methods import waitprompt, success, send_line, send_pass, get_pass, wait, success_f, send_line_f, send_pass_f
-from mini.menu import *
-import re
 
 
 def console(vm):

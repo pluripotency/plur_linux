@@ -1,4 +1,3 @@
-import os
 import sys
 import re
 import copy
@@ -9,7 +8,6 @@ from plur import session_wrap
 from plur_linux.recipes.kvm import virsh
 from plur_linux.recipes.kvm import qemu_img
 from plur_linux.recipes.net import network
-from plur_linux.recipes.ops import ssh as ssh_ops, ops
 from plur_linux.recipes import setup
 from plur_linux.recipes.kvm import cloudinit_ops
 from plur_linux.recipes.kvm.cloud_image import (
@@ -129,14 +127,14 @@ def prepare_cloudinit_vdisk(session, vm):
                 cloud_image_func = cloud_image_centos.create_almalinux("9")
             elif platform == "almalinux8":
                 cloud_image_func = cloud_image_centos.create_almalinux("8")
+            elif platform == "almalinux10":
+                cloud_image_func = cloud_image_centos.create_almalinux("10")
             elif platform == "arch":
                 cloud_image_func = cloud_image_arch.create_arch
-            elif platform == "almalinux10":
-                cloud_image_func = cloud_image_centos.create_almalinux10
-            elif platform == "centos8stream":
-                cloud_image_func = cloud_image_centos.create_centos_stream("8")
             elif platform == "centos9stream":
                 cloud_image_func = cloud_image_centos.create_centos_stream("9")
+            elif platform == "centos10stream":
+                cloud_image_func = cloud_image_centos.create_centos_stream("10")
             elif platform == "fedora":
                 cloud_image_func = cloud_image_centos.create_fedora()
             elif re.search("questing", vm.platform):

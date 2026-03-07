@@ -295,8 +295,9 @@ class Languages(SelectMenu):
             self.zig_key: False,
         }
         exclusive_list = [
-            [self.nvm_key, self.nodebrew_key, self.nodesource_key],
-            [self.uv_key, self.pyenv_key, self.python3_key],
+            # [self.nvm_key, self.nodebrew_key, self.nodesource_key],
+            # [self.uv_key, self.pyenv_key, self.python3_key],
+            [self.nvm_key, self.nodebrew_key],
         ]
         extra_menu = {}
         from plur_linux.recipes.lang import uv

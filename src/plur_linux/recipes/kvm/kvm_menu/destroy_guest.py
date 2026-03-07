@@ -1,4 +1,4 @@
-from mini.menu import *
+from mini.menu import select_2nd, get_input, yellow
 from plur_linux.recipes.kvm.kvm_menu import lib_vm_module, lib
 from plur_linux.recipes.kvm import spawn
 from plur_linux.nodes import new_node
