@@ -4,8 +4,8 @@ from plur_linux.recipes.kvm.adhoc_setup import generic
 class Desktop(generic.SelectMenu):
     def __init__(self):
         selection = {
-            'ubuntu-desktop': False,
-            'xubuntu-desktop': True,
+            'ubuntu-desktop': True,
+            'xubuntu-desktop': False,
             'mate-desktop': False,
             'cinamon-desktop': False,
             'lubuntu-desktop': False,
@@ -13,7 +13,6 @@ class Desktop(generic.SelectMenu):
             'xrdp': False,
             'graphical.target': True,
             'xfreerdp': False,
-
         }
         exclusive_list = [
             [
@@ -64,11 +63,6 @@ class Docker(generic.SelectMenu):
         if self.enable:
             from plur_linux.recipes.ubuntu import docker_ce
             docker_ce.install(session)
-
-                # [base_shell.run(session, action) for action in [
-                #     'groupadd docker',
-                #     f'usermod -aG docker {first_not_root_user["username"]}'
-                # ]]
 
             def setup_containers(sess):
                 if self.selection['firecracker']:
