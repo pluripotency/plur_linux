@@ -1,8 +1,16 @@
 from plur.base_shell import run, create_sequence, sed_pipe
 from plur.output_methods import waitprompt, success_f, send_line, new_send_line, send_pass, wait
 
+def append_alt_names(ca_openssl_cnf, alt_names):
+    def func(session):
+        dns_altnames = [f'DNS.{i} = {name}' for i, name in enumerate(alt_names)]
+        [run(session, f'echo {line} >> {ca_openssl_cnf}') for line in [
+            '',
+            '[alt_names]'
+        ] + dns_altnames]
+    return func
 
-def create_ca_conf(ca_root, ca_openssl_cnf, alt_names):
+def create_ca_conf(ca_root, ca_openssl_cnf):
     def func(session):
         openssl_cnf = '/etc/pki/tls/openssl.cnf'
         sed_pipe(session, openssl_cnf, ca_openssl_cnf, [
@@ -20,17 +28,10 @@ def create_ca_conf(ca_root, ca_openssl_cnf, alt_names):
                 r'subjectAltName = @alt_names\n\n[ v3_ca ]'
             ]
         ])
-        dns_altnames = [f'DNS.{i} = {name}' for i, name in enumerate(alt_names)]
-        [run(session, f'echo {line} >> {ca_openssl_cnf}') for line in [
-            '',
-            '[alt_names]'
-        ] + dns_altnames]
     return func
-
 
 def generate_private_key(private_key_full_path):
     return lambda session: run(session, f'openssl genrsa -out {private_key_full_path} 2048')
-
 
 def generate_certificate_request(private_key_full_path, csr_full_path, ca_openssl_cnf, params):
     def func(session):
@@ -49,7 +50,6 @@ def generate_certificate_request(private_key_full_path, csr_full_path, ca_openss
         return session.do(create_sequence(action, rows))
     return func
 
-
 def generate_aes256_private_key(private_key_full_path, passphrase):
     def func(session):
         # PRIVATE KEY
@@ -63,10 +63,9 @@ def generate_aes256_private_key(private_key_full_path, passphrase):
         return session.do(create_sequence(action, rows))
     return func
 
-
-def rows_pem(key, passphrase, params):
+def rows_pem(passphrase, params):
     rows = [
-        ['Enter pass phrase for %s:' % key, send_pass, passphrase, ''],
+        ['Enter pass phrase for .+:', send_pass, passphrase, ''],
         [r'Country Name \(2 letter code\).+$', send_line, params['country_name'], ''],
         [r'State or Province Name \(full name\).+$', send_line, params['state'], ''],
         [r'Locality Name \(eg, city\).+$', send_line, params['city'], ''],
@@ -78,19 +77,16 @@ def rows_pem(key, passphrase, params):
     ]
     return rows
 
-
 def generate_x509_pem(private_key_full_path, passphrase, pem_full_path, params, expiration_days=365):
     def func(session):
         # CERTIFICATE
         action = f'openssl req -new -sha256 -x509 -key {private_key_full_path} -out {pem_full_path} -days {expiration_days}'
-        return session.do(create_sequence(action, rows_pem(private_key_full_path, passphrase, params)))
+        return session.do(create_sequence(action, rows_pem(passphrase, params)))
     return func
-
 
 def create_index_serial(session):
     run(session, 'touch index.txt')
     run(session, 'echo "01" > serial')
-
 
 def sign_certificate_request(csr_full_path, cert_full_path, openssl_crt, passphrase):
     def func(session):
@@ -104,7 +100,6 @@ def sign_certificate_request(csr_full_path, cert_full_path, openssl_crt, passphr
         return session.do(create_sequence(action, rows))
     return func
 
-
 def export_pkcs12(cert_path, key_path, ca_cert_path, pfx_path, export_password):
     def func(session):
         action = f'openssl pkcs12 -export -in {cert_path} -inkey {key_path} -certfile {ca_cert_path} -out {pfx_path}'
@@ -116,7 +111,6 @@ def export_pkcs12(cert_path, key_path, ca_cert_path, pfx_path, export_password):
         return session.do(create_sequence(action, rows))
     return func
 
-
 def is_valid_cert(ca_root, server_name):
     def func(session):
         action = f'grep {server_name} {ca_root}/index.txt' + "| awk '{print $1}'"
@@ -127,11 +121,20 @@ def is_valid_cert(ca_root, server_name):
         return session.do(create_sequence(action, rows))
     return func
 
-
 def revoke(ca_root, server_name, cacrl_pem):
     def func(session):
         server_crt = f'{ca_root}/certs/{server_name}/server.crt'
         action = f'openssl ca -gencrl -revoke {server_crt} -out {cacrl_pem}'
         run(session, action)
+    return func
+
+def verify_p12(p12_path):
+    def func(session):
+        run(session, f'openssl pkcs12 -in {p12_path} -nodes')
+    return func
+
+def text_pem(pem_path):
+    def func(session):
+        run(session, f'openssl x509 -text -noout -in {pem_path}')
     return func
 

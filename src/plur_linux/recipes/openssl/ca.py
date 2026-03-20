@@ -1,6 +1,13 @@
 from plur import base_shell
 from . import ca_commands as cmd
 
+def resolve_path_on_session(org_path='$HOME/Downloads/ca'):
+    def func(session):
+        if org_path.startswith('$HOME') or org_path.startswith('~'):
+            capt_list = base_shell.run(session, f'echo {org_path}').splitlines()
+            return capt_list[0]
+        return org_path
+    return func
 
 def create_ca_path_params(ca_root_dir='/etc/pki/CA'):
     return {
@@ -13,10 +20,9 @@ def create_ca_path_params(ca_root_dir='/etc/pki/CA'):
         'newcerts_dir': ca_root_dir + '/newcerts'
     }
 
-
-def create_ca(ca_root_dir, ca_params, alt_names):
+def create_ca(ca_files, ca_params):
     def func(session):
-        ca_files = create_ca_path_params(ca_root_dir)
+        ca_root_dir = ca_files['ca_root_dir']
         cakey_pem = ca_files['cakey_pem']
         cacert_pem = ca_files['cacert_pem']
         ca_passphrase = ca_params['passphrase']
@@ -28,13 +34,12 @@ def create_ca(ca_root_dir, ca_params, alt_names):
             base_shell.create_dir(session, cakey_pem, is_file_path=True)
             base_shell.create_dir(session, ca_files['newcerts_dir'])
 
-            cmd.create_ca_conf(ca_root_dir, ca_files['openssl_cnf'], alt_names)(session)
+            cmd.create_ca_conf(ca_root_dir, ca_files['openssl_cnf'])(session)
             base_shell.work_on(session, ca_root_dir)
             cmd.generate_aes256_private_key(cakey_pem, ca_passphrase)(session)
             cmd.generate_x509_pem(cakey_pem, ca_passphrase, cacert_pem, ca_params, ca_expiration_days)(session)
             cmd.create_index_serial(session)
     return func
-
 
 def create_server_cert(ca_root_dir, server_cert_params):
     def func(session):
@@ -51,7 +56,6 @@ def create_server_cert(ca_root_dir, server_cert_params):
         cmd.generate_certificate_request(server_key, server_csr, openssl_cnf, server_cert_params)(session)
     return func
 
-
 def sign_csr(ca_root_dir, server_name, ca_passphrase):
     def func(session):
         ca_files = create_ca_path_params(ca_root_dir)
@@ -65,7 +69,6 @@ def sign_csr(ca_root_dir, server_name, ca_passphrase):
         base_shell.work_on(session, server_dir)
         cmd.sign_certificate_request(server_csr, server_crt, openssl_cnf, ca_passphrase)(session)
     return func
-
 
 def create_p12(ca_root_dir, server_name, export_password):
     def func(session):
@@ -81,53 +84,4 @@ def create_p12(ca_root_dir, server_name, export_password):
         base_shell.work_on(session, server_dir)
         cmd.export_pkcs12(server_crt, server_key, cacert_pem, server_pfx, export_password)(session)
     return func
-
-
-if __name__ == "__main__":
-    import getpass
-    from plur import base_node
-    from plur import session_wrap
-    def setup_example(session):
-
-        ca_passphrase = 'c@p@sw0rd'
-        ex_ca_params = {
-            'country_name': 'JP',
-            'state': 'Tokyo',
-            'city': 'FakeCity',
-            'organization': 'FakeOrg',
-            'org_unit': 'FakeOrgUnit',
-            'common_name': 'FakeCA',
-            'passphrase': ca_passphrase,
-            'expiration_days': 365,
-        }
-
-        server_name = 'test.local'
-        ex_server_cert_params = {
-            'country_name': 'JP',
-            'state': 'Tokyo',
-            'city': 'FakeCity',
-            'organization': 'FakeOrg',
-            'org_unit': 'FakeOrgUnit',
-            'common_name': server_name,
-            'passphrase': '',
-            'p12_password': 'password',
-        }
-
-        ca_root_dir = '/etc/pki/CA'
-
-        create_ca(ca_root_dir, ex_ca_params, alt_names=[server_name])(session)
-        create_server_cert(ca_root_dir, ex_server_cert_params)(session)
-        sign_csr(ca_root_dir, server_name, ca_passphrase)(session)
-
-        p12_password = ex_server_cert_params['p12_password']
-        create_p12(ca_root_dir, server_name, p12_password)
-
-    hostname = 'a8desk'
-    username = 'worker'
-    access_ip = '192.168.10.192'
-    password = getpass.getpass("Password: ")
-    node = base_node.Linux(hostname, username, password, platform='almalinux8')
-    node.access_ip = access_ip
-
-    session_wrap.ssh(node)(setup_example)()
 
