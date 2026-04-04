@@ -1,9 +1,9 @@
 from plur import session_wrap
 from plur import base_shell
-go_install_version = 'latest'
+GO_VERSION='latest'
 
 
-def install(version=go_install_version):
+def install(version=GO_VERSION):
     @session_wrap.sudo
     def as_root(session):
         work_dir = '/tmp'

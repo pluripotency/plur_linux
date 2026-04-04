@@ -69,14 +69,18 @@ def install_gui_a8a9(session):
 
 
 dict_desktop = {
-    'almalinux8': {
+    'almalinux10': {
         'desktop': install_gui_a8a9,
-        'xrdp': install_xrdp_a8,
+        'xrdp': install_xrdp,
         'vbox': install_vbox_additions_libs
     },
     'almalinux9': {
         'desktop': install_gui_a8a9,
         'xrdp': install_xrdp,
+        'vbox': install_vbox_additions_libs
+    },
+    'almalinux8': {
+        'desktop': install_gui_a8a9,
         'vbox': install_vbox_additions_libs
     },
 }
