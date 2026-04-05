@@ -29,7 +29,7 @@ def check_key(_dict, key):
 
 
 class SelectMenu:
-    def __init__(self, selection, exclusive_list=None, menu_title=None, select_title=None, extra_menu=None):
+    def __init__(self, selection, exclusive_list=None, menu_title='', select_title=None, extra_menu=None):
         self.enable = False
         self.selection = selection
         self.exclusive_list = exclusive_list
@@ -37,7 +37,7 @@ class SelectMenu:
         if select_title:
             self.select_title = select_title
         else:
-            self.select_title = 'Setup ' + self.menu_title
+            self.select_title = f'Setup {self.menu_title}'
         self.extra_menu = extra_menu
         self.extra_params = {}
 
@@ -266,7 +266,7 @@ class Languages(SelectMenu):
         from plur_linux.recipes.lang import uv
         self.python_version = uv.PYTHON_VERSION
         self.uv_key = 'python(uv)'
-        self.pyenv_key = 'python(pyenv)'
+        # self.pyenv_key = 'python(pyenv)'
 
         from plur_linux.recipes.lang import go
         self.go_version = go.GO_VERSION
@@ -299,14 +299,14 @@ class Languages(SelectMenu):
         }
         exclusive_list = [
             [self.nvm_key, self.nodebrew_key],
-            [self.uv_key, self.pyenv_key],
+            # [self.uv_key, self.pyenv_key],
             [self.nvm_key, self.nodebrew_key],
         ]
         extra_menu = {}
         from plur_linux.recipes.lang import uv
         extra_menu[self.uv_key] = uv.input_uv_params
-        from plur_linux.recipes.lang import pyenv
-        extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
+        # from plur_linux.recipes.lang import pyenv
+        # extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
         from plur_linux.recipes.lang.nodejs import nodebrew
         extra_menu[self.nodebrew_key] = nodebrew.input_node_params
         from plur_linux.recipes.lang.nodejs import nvm
@@ -335,9 +335,9 @@ class Languages(SelectMenu):
             if has_true(self.selection, self.uv_key):
                 from plur_linux.recipes.lang import uv
                 uv.install_python(**self.extra_params[self.uv_key])(session)
-            elif has_true(self.selection, self.pyenv_key):
-                from plur_linux.recipes.lang import pyenv
-                pyenv.install(**self.extra_params[self.pyenv_key])(session)
+            # elif has_true(self.selection, self.pyenv_key):
+            #     from plur_linux.recipes.lang import pyenv
+            #     pyenv.install(**self.extra_params[self.pyenv_key])(session)
 
             if has_true(self.selection, self.nodebrew_key):
                 from plur_linux.recipes.lang.nodejs import nodebrew
