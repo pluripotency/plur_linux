@@ -1,6 +1,4 @@
-from mini import misc
 from plur_linux.nodes import new_node
-
 a8base_image = 'a8base_image'
 a8docker_image = 'a8docker_image'
 a8desk_image = 'a8desk_image'

@@ -1,5 +1,3 @@
-import os
-from plur import base_shell
 from plur_linux.recipes.kvm.cloud_image import cloud_image_ops
 
 

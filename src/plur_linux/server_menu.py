@@ -1,10 +1,8 @@
 from plur import session_wrap
 from plur import base_node
-from plur import base_shell
 from plur import log_param_templates
 from mini.ansi_colors import blue, red, green
-from mini.menu import get_input, choose_num, get_y_n, select_2nd
-from mini import misc
+from mini.menu import get_input, choose_num, select_2nd
 from plur_linux.lib import env_ops
 from plur_linux.recipes.kvm.kvm_menu import runner as kvm_menu_runner
 from plur_linux.recipes.kvm.kvm_menu import lib_kvm_module

@@ -128,6 +128,14 @@ class BaseApps(SelectMenu):
                 "dotfiles": True,
             }
             exclusive_list = []
+        elif platform == 'almalinux10':
+            selection = {
+                "vim": True,
+                "tmux": False,
+                "git": True,
+                "dotfiles": False,
+            }
+            exclusive_list = []
         else:
             selection = {
                 "vim": True,

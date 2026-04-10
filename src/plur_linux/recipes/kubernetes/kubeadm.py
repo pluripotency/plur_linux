@@ -45,7 +45,6 @@ from . import common
 #
 @session_wrap.sudo
 def enable_epel_iptables(session):
-    from plur.output_methods import success_f, send_line_f, waitprompt
     base_shell.run(session, misc.del_indent(r"""
     dnf install -y epel-release
     sed -i -e "s/enabled=1/enabled=0/g" /etc/yum.repos.d/epel.repo

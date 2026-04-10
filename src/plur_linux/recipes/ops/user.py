@@ -40,8 +40,10 @@ def del_user_from_group(session, groupname, username):
 def is_user_in_group(groupname, username):
     action = 'cat /etc/group | egrep "%s:x:[0-9]+:.*%s.*"' % (groupname, username)
     true_case = '%s:x:[0-9]+:.*%s.*' % (groupname, username)
-    rows = [[true_case, success, True, true_case]]
-    rows += ['', waitprompt, False, 'no output.']
+    rows = [
+        [true_case, success, True, true_case],
+        ['', waitprompt, False, 'no output.'],
+    ]
     return create_sequence(action, rows)
 
 
@@ -131,7 +133,6 @@ def add_users(session, users):
         }
     ]
     """
-    import json
     # if session.platform == 'centos7':
     #     session.child.delaybeforesend = 1
     if session.username != 'root':
@@ -182,5 +183,5 @@ def enable_wheel(session):
     create_backup(session, su_file)
     sed_replace(session, s_exp, d_exp, su_file + '.org', su_file)
 
-    captured = run(session, 'cat /etc/pam.d/su')
+    run(session, 'cat /etc/pam.d/su')
 

@@ -13,4 +13,10 @@ def install_tmux_appimage(version='3.5a'):
         base_shell.idempotent_append(session, '~/.bashrc', alias_str, alias_str)
     return inner
 
+def setup_tmux(session):
+    if not base_shell.check_dir_exists(session, '~/.tmux'):
+        _ = [base_shell.run(session, a) for a in [
+            'cd && mkdir .tmux && cd .tmux',
+            'git clone https://github.com/tmux-plugins/tmux-logging.git',
+        ]]
 

@@ -325,7 +325,7 @@ def select_path_for_qemu_img(session):
 
 def select_partition(session, raw_disk_path):
     qemu_img_info = info(session, raw_disk_path)
-    vdisk_format, vdisk_size = extract_format_and_size(qemu_img_info)
+    vdisk_format, _vdisk_size = extract_format_and_size(qemu_img_info)
     # session.child.expect(session.nodes[-1].waitprompt)
 
     if vdisk_format == 'raw':
@@ -348,10 +348,9 @@ def show_partition(session, raw_disk_path, partition, partition_number):
     if partition is False:
         return False, False
     else:
-        re_linux_lvm = re.compile('Id=8e')
         loop_device = find_unused_loop_dev(session)
         loop = loop_device.split('/')[2]
-        loop_partition = '/dev/mapper/%sp%s' % (loop, partition_number)
+        '/dev/mapper/%sp%s' % (loop, partition_number)
         set_loop_device(session, raw_disk_path, loop_device)
 
         while True:

@@ -144,8 +144,7 @@ def init_db(bind_dn, olc_suffix, bind_dn_credential):
             'dn: olcDatabase={2}%s,cn=config' % db,
             'changetype: modify',
             'replace: olcRootPW',
-            'olcRootPW: ${MGRPW}'
-            '',
+            'olcRootPW: ${MGRPW}',
             '',
             # olcAccess
             'dn: olcDatabase={2}%s,cn=config' % db,
@@ -307,7 +306,6 @@ def delete_user():
     """
     ldapdelete -x -D "cn=manager,dc=example,dc=org" -w managerpass "uid=user001,ou=People,dc=example,dc=org"
     """
-    pass
 
 
 olc_suffix_example = 'dc=example,dc=org'

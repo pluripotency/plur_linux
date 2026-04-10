@@ -7,7 +7,6 @@
 
 import sys
 import libvirt
-import os
 import commands
 from xml.dom import minidom
 

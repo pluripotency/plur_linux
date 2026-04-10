@@ -1,6 +1,5 @@
 import re
 from mini import misc
-from mini.ansi_colors import yellow
 from plur import base_shell
 from plur import session_wrap
 

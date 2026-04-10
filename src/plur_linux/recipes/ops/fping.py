@@ -44,9 +44,9 @@ def get_fping_ip_segment_result(ipv4_with_prefix):
     def func(session):
         capt = run(session, f'fping -r 1 -g {ipv4_with_prefix} 2>&1 | grep -v nreacha ')
         success_ip_list = []
-        for line in re.split('\r?\n'):
+        for line in re.split('\r?\n', capt):
             if re.search(' is alive', line):
-                ip = re.split(' is')[0]
+                ip = re.split(' is', line)[0]
                 if misc.is_ipv4(ip):
                     success_ip_list += [ip]
         return success_ip_list
