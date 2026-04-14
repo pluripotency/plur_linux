@@ -89,9 +89,9 @@ def create_ssh_params(node_dict):
     node_dict = set_hostname_and_waitprompt(node_dict)
     node_dict['login_method'] = 'ssh'
     if 'access_ip' in node_dict:
-        access_ip = node_dict['access_ip']
+        node_dict['access_ip']
     else:
-        access_ip = '127.0.0.1'
+        pass
     tmp_access_ip = get_input('^(|' + misc.IPV4_EXP_STR + ')$', f'IP (blank to set hostname): ', 'Invalid IP', '')
     if tmp_access_ip == '':
         node_dict['access_ip'] = node_dict['hostname']

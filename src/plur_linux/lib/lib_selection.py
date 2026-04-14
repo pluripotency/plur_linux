@@ -1,9 +1,6 @@
 import json
-import sys
-import re
-from termios import tcflush, TCIFLUSH
 import toml
-from mini.ansi_colors import red, green, brown, blue, purple, cyan, white, light_red, light_green, yellow, light_blue, pink, light_cyan
+from mini.ansi_colors import cyan
 from mini.menu import get_input, get_y_n
 from mini import misc
 

@@ -1,15 +1,6 @@
-import os
-import sys
-sys.path.append(os.pardir)
 from plur import base_shell as shell
 from plur import session_wrap
 from string import Template
-
-
-def runnable():
-    return [
-        setup
-    ]
 
 
 def setup(nfs_exports):
@@ -20,18 +11,18 @@ def setup(nfs_exports):
     @session_wrap.sudo
     def func(session):
         nfs_exports_path = '/etc/exports'
-        for l in nfs_exports:
-            if not shell.check_dir_exists(session, l['path']):
-                shell.create_dir(session, l['path'])
-            if not 'options' in l:
-                l['options'] = '(rw,no_root_squash,sync)'
+        for line in nfs_exports:
+            if not shell.check_dir_exists(session, line['path']):
+                shell.create_dir(session, line['path'])
+            if 'options' not in line:
+                line['options'] = '(rw,no_root_squash,sync)'
 
         shell.here_doc(session, nfs_exports_path, create_exports_contents(nfs_exports))
         shell.yum_install(session, {'packages': ['nfs-utils']})
         edit_idmapd_conf(session)
         shell.run(session, 'service rpcbind restart')
         shell.run(session, 'service nfslock restart')
-        capture = shell.run(session, 'service nfs restart')
+        shell.run(session, 'service nfs restart')
     return func
 
 

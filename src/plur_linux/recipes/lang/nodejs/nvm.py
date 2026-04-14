@@ -1,14 +1,14 @@
-import re
-from plur import session_wrap
 from plur import base_shell
+NVM_VERSION='v0.40.4'
+NODE_VERSION='v24'
 
 def setup_nvm(session):
-    base_shell.run(session, 'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash')
+    base_shell.run(session, f'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{NVM_VERSION}/install.sh | bash')
 
 def install_node(session, version):
     base_shell.run(session, f'nvm install {version}')
 
-def install(version):
+def install(version=NODE_VERSION):
     def func(session):
         if not base_shell.check_command_exists(session, 'nvm'):
             setup_nvm(session)

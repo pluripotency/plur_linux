@@ -29,7 +29,7 @@ def check_key(_dict, key):
 
 
 class SelectMenu:
-    def __init__(self, selection, exclusive_list=None, menu_title=None, select_title=None, extra_menu=None):
+    def __init__(self, selection, exclusive_list=None, menu_title='', select_title=None, extra_menu=None):
         self.enable = False
         self.selection = selection
         self.exclusive_list = exclusive_list
@@ -37,7 +37,7 @@ class SelectMenu:
         if select_title:
             self.select_title = select_title
         else:
-            self.select_title = 'Setup ' + self.menu_title
+            self.select_title = f'Setup {self.menu_title}'
         self.extra_menu = extra_menu
         self.extra_params = {}
 
@@ -100,7 +100,7 @@ class Pack(SelectMenu):
                     'tmux',
                     'vim',
                 ]
-                from plur_linux.recipes import nvim
+                from plur_linux.recipes.clitools import nvim
                 nvim.install_appimage()(session)
                 if re.search('^ubuntu', platform):
                     from plur_linux.recipes.ubuntu import docker_ce
@@ -128,6 +128,14 @@ class BaseApps(SelectMenu):
                 "dotfiles": True,
             }
             exclusive_list = []
+        elif platform == 'almalinux10':
+            selection = {
+                "vim": True,
+                "tmux": False,
+                "git": True,
+                "dotfiles": False,
+            }
+            exclusive_list = []
         else:
             selection = {
                 "vim": True,
@@ -139,7 +147,7 @@ class BaseApps(SelectMenu):
 
         selection[self.nvim_key] = False
         extra_menu = {}
-        from plur_linux.recipes import nvim
+        from plur_linux.recipes.clitools import nvim
         extra_menu[self.nvim_key] = nvim.input_nvim_params
         super().__init__(selection, exclusive_list, 'Base Apps', extra_menu=extra_menu)
 
@@ -150,7 +158,7 @@ class BaseApps(SelectMenu):
             dot_nvim = False
             if self.selection[self.nvim_key]:
                 dot_nvim = True
-                from plur_linux.recipes import nvim
+                from plur_linux.recipes.clitools import nvim
                 nvim.install_appimage(**self.extra_params[self.nvim_key])(session)
             if self.selection['vim']:
                 packages += ['vim']
@@ -158,7 +166,11 @@ class BaseApps(SelectMenu):
                 from plur_linux.recipes.source_install import vim
                 vim.install(session)
             if self.selection['tmux']:
-                packages += ['tmux']
+                if platform == 'almalinux10':
+                    from plur_linux.recipes.clitools import tmux
+                    tmux.install_tmux_appimage()(session)
+                else:
+                    packages += ['tmux']
             if self.selection['git']:
                 packages += ['git']
 
@@ -259,24 +271,25 @@ class Initial(SelectMenu):
 
 class Languages(SelectMenu):
     def __init__(self, platform):
-        from plur_linux.recipes.lang import go
-        self.python_version = '3.13'
-        self.python_venv = 'v3'
+        from plur_linux.recipes.lang import uv
+        self.python_version = uv.PYTHON_VERSION
         self.uv_key = 'python(uv)'
-        self.pyenv_key = 'python(pyenv)'
-        self.python3_key = 'python3(pkg)'
+        # self.pyenv_key = 'python(pyenv)'
 
-        self.go_version = go.go_install_version
+        from plur_linux.recipes.lang import go
+        self.go_version = go.GO_VERSION
         self.go_key = f'go({self.go_version})'
 
         self.rust_key = 'rust(latest)'
         
-        self.zig_version = '0.14.1'
+        from plur_linux.recipes.lang import zig
+        self.zig_version = zig.ZIG_VERSION
         self.zig_key = 'zig'
 
         self.bun_key = 'bun'
 
-        self.node_version = 'v24'
+        from plur_linux.recipes.lang.nodejs import nvm
+        self.node_version = nvm.NODE_VERSION
         self.nodesource_version = f'{self.node_version}.x'
         self.nvm_key = 'node(nvm)'
         self.nodebrew_key = 'node(nodebrew)'
@@ -284,8 +297,6 @@ class Languages(SelectMenu):
 
         selection = {
             f"{self.uv_key}": False,
-            # f"{self.pyenv_key}": False,
-            # f"{self.python3_key}": False,
             f"{self.bun_key}": False,
             f"{self.nvm_key}": False,
             f"{self.nodebrew_key}": False,
@@ -295,15 +306,15 @@ class Languages(SelectMenu):
             self.zig_key: False,
         }
         exclusive_list = [
-            # [self.nvm_key, self.nodebrew_key, self.nodesource_key],
-            # [self.uv_key, self.pyenv_key, self.python3_key],
+            [self.nvm_key, self.nodebrew_key],
+            # [self.uv_key, self.pyenv_key],
             [self.nvm_key, self.nodebrew_key],
         ]
         extra_menu = {}
         from plur_linux.recipes.lang import uv
         extra_menu[self.uv_key] = uv.input_uv_params
-        from plur_linux.recipes.lang import pyenv
-        extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
+        # from plur_linux.recipes.lang import pyenv
+        # extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
         from plur_linux.recipes.lang.nodejs import nodebrew
         extra_menu[self.nodebrew_key] = nodebrew.input_node_params
         from plur_linux.recipes.lang.nodejs import nvm
@@ -332,12 +343,9 @@ class Languages(SelectMenu):
             if has_true(self.selection, self.uv_key):
                 from plur_linux.recipes.lang import uv
                 uv.install_python(**self.extra_params[self.uv_key])(session)
-            elif has_true(self.selection, self.pyenv_key):
-                from plur_linux.recipes.lang import pyenv
-                pyenv.install(**self.extra_params[self.pyenv_key])(session)
-            elif has_true(self.selection, self.python3_key):
-                from plur_linux.recipes.lang import python3 as python_setup
-                python_setup.install_python3(self.python_venv)(session)
+            # elif has_true(self.selection, self.pyenv_key):
+            #     from plur_linux.recipes.lang import pyenv
+            #     pyenv.install(**self.extra_params[self.pyenv_key])(session)
 
             if has_true(self.selection, self.nodebrew_key):
                 from plur_linux.recipes.lang.nodejs import nodebrew

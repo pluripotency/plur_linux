@@ -1,17 +1,12 @@
-#! /usr/bin/env python
-import os
-import sys
-sys.path.append(os.pardir)
-from plur import base_shell as shell
+from plur.base_shell import run, work_on, here_doc, patch
 
 
 def ntp_patch(session, node):
     if hasattr(node, 'ntpservers') and session.username == 'root':
         ntpservers = node.ntpservers
+        work_on(session, '/etc/')
 
-        shell.work_on(session, '/etc/')
-
-        patch = [
+        patch_list = [
             '*** ntp.conf',
             '--- ntp.conf',
             '***************',
@@ -33,28 +28,27 @@ def ntp_patch(session, node):
                 '! server %s iburst' % srv
             ]
 
-        patch += [
+        patch_list += [
             '--- 20,%d ----' % line_count,
             '  # Use public servers from the pool.ntp.org project.',
             '  # Please consider joining the pool (http://www.pool.ntp.org/join.html).'
         ]
-        patch += servers
-        patch += [
+        patch_list += servers
+        patch_list += [
             '  ',
             '  #broadcast 192.168.1.255 autokey\t# broadcast server'
         ]
 
         patch_file = '/root/ntp_patch'
-        shell.here_doc(session, patch_file, patch)
-        shell.patch(patch_file)
-        shell.run('rm -rf ' + patch_file)
+        here_doc(session, patch_file, patch_list)
+        patch(session, patch_file)
+        run(session,'rm -rf ' + patch_file)
 
 
 def configure(session, node):
     if hasattr(node, 'ntpservers'):
         ntp_patch(session, node)
 
-    capture = shell.run(session, 'service ntpd start')
-
-    capture = shell.run(session, 'chkconfig ntpd on')
+    run(session, 'service ntpd start')
+    run(session, 'chkconfig ntpd on')
 

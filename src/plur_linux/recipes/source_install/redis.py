@@ -30,7 +30,7 @@ def install(version='2.8.19', test=False):
             work_dir = build_env['work_dir']
             src_parent_dir = build_env['src_parent_dir']
             download_dir = build_env['download_dir']
-            bin_dir = build_env['bin_dir']
+            build_env['bin_dir']
 
             prepare_packages(session)
 

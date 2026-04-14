@@ -1,4 +1,5 @@
 from plur import base_shell
+PYTHON_VERSION='3.14'
 
 def setup_uv(session):
     if not base_shell.check_command_exists(session, 'uv'):
@@ -32,10 +33,8 @@ def install_python(version):
 def input_uv_params(self):
     from mini.menu import get_input
     # self.python_venv_dir = '$HOME/.virtualenv'
-    self.python_version = get_input(expression=r'^3(\.\d{1,2})?$', message='python ver[3.13, 3, etc.]' + f'({self.python_version}): ', default_value=self.python_version)
+    self.python_version = get_input(expression=r'^3(\.\d{1,2})?$', message=f'python ver[{PYTHON_VERSION}, 3, etc.]' + f'({self.python_version}): ', default_value=self.python_version)
     # self.python_venv = get_input(expression=r'^v\w+$', message=f'venv({self.python_venv}): ', default_value=self.python_venv)
     return {
         'version': self.python_version,
-        # 'venv_name': self.python_venv,
-        # 'venv_dir': self.python_venv_dir,
     }

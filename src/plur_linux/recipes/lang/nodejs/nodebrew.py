@@ -1,5 +1,4 @@
 import re
-from plur import session_wrap
 from plur import base_shell
 
 def setup_nodebrew(session):

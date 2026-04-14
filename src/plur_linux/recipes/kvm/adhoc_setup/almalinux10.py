@@ -29,7 +29,6 @@ class Docker(generic.SelectMenu):
 class MinDesk(generic.SelectMenu):
     def __init__(self):
         super().__init__({
-            'xrdp': False,
             'vbox libs': False,
         },
             exclusive_list=None,
@@ -37,12 +36,10 @@ class MinDesk(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from plur_linux.recipes.almalinux9 import desktop
-            desktop.install_gui(session)
+            from plur_linux.recipes.desktop import redhat
+            redhat.dict_desktop['almalinux10']['desktop'](session)
             if self.selection['vbox libs']:
-                desktop.install_vbox_additions_libs(session)
-            if self.selection['xrdp']:
-                desktop.install_xrdp(session)
+                redhat.dict_desktop['almalinux10']['vbox'](session)
 
 
 class Apps(generic.SelectMenu):

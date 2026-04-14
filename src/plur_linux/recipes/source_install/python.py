@@ -33,7 +33,7 @@ def install(session, version):
         shell.wget(session, src_url)
         shell.run(session, 'tar xvzf ' + package_file)
 
-    build_env = src_base.prepare_build_env(session, download_dir + package_dir)
+    src_base.prepare_build_env(session, download_dir + package_dir)
     prepare_packages(session)
 
     # Configure and make

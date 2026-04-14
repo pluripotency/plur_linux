@@ -72,9 +72,8 @@ class BaseApps(generic.SelectMenu):
 class Languages(generic.SelectMenu):
     def __init__(self):
         from plur_linux.recipes.lang import go
-        self.python_version = '3.13'
         self.uv_key = 'python(uv)'
-        self.go_version = go.go_install_version
+        self.go_version = go.GO_VERSION
         self.go_key = f'go({self.go_version})'
         self.rust_key = 'rust(latest)'
         self.zig_key = 'zig'

@@ -1,5 +1,4 @@
 from plur import base_shell
-import re
 
 
 def install(version="latest", install_dir_path = "/usr/local/lib/docker/cli-plugins"):

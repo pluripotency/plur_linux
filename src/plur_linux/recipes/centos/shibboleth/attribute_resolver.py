@@ -95,7 +95,6 @@ def configure(sp_server_name, file_path='$SHIB_HOME/conf/attribute-resolver.xml'
 
 def test():
     from plur import session_wrap
-    from plur import base_node
     sp_server_name = 'c7sp.r'
 
     @session_wrap.bash()

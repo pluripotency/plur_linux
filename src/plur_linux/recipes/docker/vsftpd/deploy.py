@@ -1,5 +1,4 @@
 import os
-import re
 from mini import misc
 from plur import session_wrap
 from plur import base_shell
@@ -17,7 +16,7 @@ def create_start_sh(pasv_ip, username='ftpclient', password='ftpclient'):
     """
     >>> create_start_sh('192.168.0.1')
     """
-    current_dirname, filename = os.path.split(os.path.abspath(__file__))
+    current_dirname, _filename = os.path.split(os.path.abspath(__file__))
     start_sh_name = 'start_vsftpd.sh'
     src_path = f'{current_dirname}/{start_sh_name}'
     dst_path = f'/tmp/{start_sh_name}'
