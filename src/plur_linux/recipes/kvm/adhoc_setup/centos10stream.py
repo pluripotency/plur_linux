@@ -12,7 +12,7 @@ class Docker(generic.SelectMenu):
 
     def setup(self, session):
         if self.enable:
-            from plur_linux.recipes.almalinux8 import docker
+            from plur_linux.recipes.almalinux9 import docker
             docker.install(session)
 
             def setup_containers(sess):

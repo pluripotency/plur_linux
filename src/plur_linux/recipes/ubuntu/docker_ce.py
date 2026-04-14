@@ -1,6 +1,7 @@
 from mini import misc
 from plur import base_shell
 from plur_linux.recipes.ubuntu import ops
+from plur_linux.recipes.docker import common
 
 
 def uninstall_old(session):
@@ -46,10 +47,5 @@ def install(session):
     """), update=True)(session)
     base_shell.run(session, 'reset')
 
-    if session.nodes[-1].username != 'root':
-        [base_shell.run(session, a) for a in [
-            'sudo groupadd docker',
-            'sudo usermod -aG docker $(whoami)'
-        ]]
-    base_shell.run(session, r"echo {\"bip\": \"10.192.192.254/26\"} | sudo tee /etc/docker/daemon.json > /dev/null")
-    base_shell.run(session, "sudo systemctl restart docker")
+    common.configure_docker()(session)
+    common.join_group(session)

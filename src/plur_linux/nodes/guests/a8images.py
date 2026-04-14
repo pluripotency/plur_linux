@@ -33,7 +33,7 @@ def create_a8base_image():
 
 
 def create_a8docker_image():
-    from plur_linux.recipes.almalinux8 import docker
+    from plur_linux.recipes.almalinux9 import docker
     return a8_cloudimage(a8docker_image, [
         a8base_update,
         docker.install,
