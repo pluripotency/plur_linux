@@ -86,6 +86,7 @@ class Apps(generic.SelectMenu):
         super().__init__({
             "gns3": False,
             "openvswitch": False,
+            "kvm": False,
         },
             exclusive_list=None,
             menu_title='Apps')
@@ -97,6 +98,9 @@ class Apps(generic.SelectMenu):
         if self.selection['openvswitch']:
             from plur_linux.recipes.ubuntu import openvswitch
             openvswitch.install_openvswitch(session)
+        if self.selection['kvm']:
+            from plur_linux.recipes.ubuntu import kvm
+            kvm.install(session)
 
 def get_selection():
     platform = 'ubuntu noble'

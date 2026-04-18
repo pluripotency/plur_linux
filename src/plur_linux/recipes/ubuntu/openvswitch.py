@@ -1,5 +1,5 @@
-from plur import base_shell
+from plur_linux.recipes.ubuntu import ops
 
 
 def install_openvswitch(session):
-    base_shell.run(session, 'sudo apt install -y openvswitch-switch')
+    ops.sudo_apt_get_install_y(['openvswitch-switch'])(session)

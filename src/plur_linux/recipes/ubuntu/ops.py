@@ -24,7 +24,7 @@ def sudo_apt_install_y(pkgs, update=True):
 def sudo_apt_upgrade(session):
     return base_shell.run(session, sudo_apt_y_str(['upgrade']))
 
-def sudo_apt_get_install_y(pkgs, update=True, nr_auto=False):
+def sudo_apt_get_install_y(pkgs:list[str], update:bool=True, nr_auto:bool=False):
     return lambda session: base_shell.run(session, sudo_apt_y_str(['install'] + pkgs, update, apt='apt-get', nr_auto=nr_auto))
 
 def sudo_apt_get_upgrade(session):
