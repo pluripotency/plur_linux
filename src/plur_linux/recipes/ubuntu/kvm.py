@@ -4,7 +4,7 @@ from mini import misc
 
 def install(session):
     ops.sudo_apt_get_install_y([
-        'sudo apt -y install qemu-kvm libvirt-daemon-system libvirt-daemon virtinst bridge-utils libosinfo-bin virt-manager'
+        'sudo apt -y install qemu-kvm libvirt-daemon-system libvirt-daemon virtinst bridge-utils libosinfo-bin virt-manager openvswitch-switch'
     ])(session)
     _ = [base_shell.run(session, action) for action in misc.del_indent_lines("""
     sudo usermod -aG libvirt $(whoami)
@@ -13,7 +13,7 @@ def install(session):
     """)]
 
 netplan_str = """
-# 50-cloud-init.yaml
+# replace /etc/netplan/50-cloud-init.yaml
 network:
   version: 2
   renderer: networkd
