@@ -3,13 +3,13 @@ name = "plur-linux"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+license = "MIT"
 authors = [
     { name = "Masayoshi Kokuryo", email = "masakoku@gmail.com" }
 ]
 requires-python = ">=3.11"
 dependencies = [
-  "mini>=0.1.0",
-  "plur",
+  "plur>=0.2.0",
 ]
 [project.scripts]
 server_menu = "plur_linux.server_menu:main_menu"
