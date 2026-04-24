@@ -18,7 +18,7 @@ def sudo_apt_y_str(args, update=True, apt='apt', nr_auto=False):
     command += ' && reset'
     return command
 
-def eudo_apt_install_y(pkgs, update=True):
+def sudo_apt_install_y(pkgs, update=True):
     return lambda session: base_shell.run(session, sudo_apt_y_str(['install'] + pkgs, update))
 
 def sudo_apt_upgrade(session):
