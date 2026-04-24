@@ -138,7 +138,8 @@ def set_selinux(mode='disabled'):
             if mode == item[0]:
                 mode_num = item[1]
         if mode_num is None:
-            misc.err_exit('err in set_selinux: no such mode:' + mode)
+            misc.print_flush(misc.ansi_colors.red('err in set_selinux: no such mode:' + mode))
+            misc.sys.exit(1)
         file_path = '/etc/selinux/config'
         base_shell.run(session, f'setenforce {mode_num}')
         base_shell.run(session, f'sed -i -E "s/^SELINUX=.*$/SELINUX={mode}/g" {file_path}')

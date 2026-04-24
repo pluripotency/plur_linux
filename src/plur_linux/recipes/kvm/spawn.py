@@ -9,6 +9,7 @@ from plur_linux.recipes.kvm import virsh
 from plur_linux.recipes.kvm import qemu_img
 from plur_linux.recipes.net import network
 from plur_linux.recipes import setup
+from plur_linux.recipes.ops import ops
 from plur_linux.recipes.kvm import cloudinit_ops
 from plur_linux.recipes.kvm.cloud_image import (
     cloud_image_ops,
@@ -137,6 +138,8 @@ def prepare_cloudinit_vdisk(session, vm):
                 cloud_image_func = cloud_image_centos.create_centos_stream("10")
             elif platform == "fedora":
                 cloud_image_func = cloud_image_centos.create_fedora()
+            elif re.search("resolute", vm.platform):
+                cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("resolute", arch="amd64v3")
             elif re.search("questing", vm.platform):
                 cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("questing")
             elif re.search("noble", vm.platform):

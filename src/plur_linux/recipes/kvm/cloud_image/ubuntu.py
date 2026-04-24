@@ -17,10 +17,10 @@ def create(
     return func
 
 
-def create_ubuntu_cloudinit(dev_code='jammy'):
+def create_ubuntu_cloudinit(dev_code='jammy', arch='amd64'):
     def receive_func(image_name):
         def func(session):
-            org_image_file_name = f'{dev_code}-server-cloudimg-amd64.img'
+            org_image_file_name = f'{dev_code}-server-cloudimg-{arch}.img'
             url = f'http://cloud-images.ubuntu.com/{dev_code}/current/{org_image_file_name}'
             return cloud_image_ops.copy_image(session, org_image_file_name, url, f'{image_name}.qcow2')
         return func
