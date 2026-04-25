@@ -9,7 +9,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-  "plur>=0.2.0",
+  "plur>=0.2.1",
 ]
 [project.scripts]
 server_menu = "plur_linux.server_menu:main_menu"
