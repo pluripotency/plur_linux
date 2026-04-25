@@ -13,8 +13,8 @@ wheels = [
 
 [[package]]
 name = "mini"
-version = "0.1.0"
-source = { git = "https://github.com/pluripotency/mini#02ce11cc4e56c1a222a7d77fbb21ca55027903cc" }
+version = "0.2.1"
+source = { git = "https://github.com/pluripotency/mini#bd4269b47ad456478cb54a4bde9c14459073f409" }
 dependencies = [
     { name = "toml" },
 ]
@@ -33,8 +33,8 @@ wheels = [
 
 [[package]]
 name = "plur"
-version = "0.21"
-source = { git = "https://github.com/pluripotency/plur#c5d6bd9e32ac879890a1c8a81258d3c31d7c85fa" }
+version = "0.21.1"
+source = { git = "https://github.com/pluripotency/plur#8e12758956075a4837e5d9102f93b466a722ac22" }
 dependencies = [
     { name = "mini" },
     { name = "pexpect" },
@@ -46,11 +46,15 @@ name = "plur-linux"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "mini" },
     { name = "plur" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "plur", git = "https://github.com/pluripotency/plur" }]
+requires-dist = [
+    { name = "mini", git = "https://github.com/pluripotency/mini" },
+    { name = "plur", git = "https://github.com/pluripotency/plur" },
+]
 
 [[package]]
 name = "ptyprocess"

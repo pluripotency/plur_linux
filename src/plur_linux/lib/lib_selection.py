@@ -1,8 +1,7 @@
-import json
-import toml
 from mini.ansi_colors import cyan
 from mini.menu import get_input, get_y_n
 from mini import misc
+from mini.misc import dump_json, dump_toml
 
 ex_user_definition = {
     'username': {
@@ -72,7 +71,7 @@ def get_obj_by_definition(input_definition, default_values, color=cyan):
                     obj[k] = get_y_n(f'{message}(default={default_value}):', default=default_value)
                 else:
                     obj[k] = get_y_n(f'{message}:')
-    print(color(toml.dumps(obj)))
+    print(color(dump_toml(obj)))
     if get_y_n('OK?'):
         return obj
     else:
@@ -115,7 +114,7 @@ class Selection:
     def save(self):
         if not self.title:
             self.input_title()
-        misc.open_write(self.create_file_path(), json.dumps(self.selected_list, indent=2), 'w')
+        misc.open_write(self.create_file_path(), dump_json(self.selected_list, indent=2), 'w')
 
     def load(self, title):
         self.set_title(title)

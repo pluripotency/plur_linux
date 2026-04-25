@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 import os
-import json
 from mini.ansi_colors import red, yellow, green, cyan, dummy_color
 from mini import menu
-from mini.misc import is_file, read_json, read_toml, write_toml, toml, prepare_dir_if_not_exists
+from mini.misc import is_file, read_json, dump_json, read_toml, write_toml, load_toml, dump_toml, prepare_dir_if_not_exists
 from plur_linux.lib.lib_selection import get_obj_by_definition
+TEMP_BADPASS = 'p@ssw0rd!'
 ACCOUNT_SET_LIST_KEY = 'account_set'
 SELECTED_ACCOUNT_SET_INDEX_KEY = 'selected_account_set_index'
 ACCOUNT_SET_DEFINITION_TOML_STR = r"""
@@ -23,9 +23,9 @@ message = 'Input Root Password'
 """
 default_account_set = {
     'username': 'worker',
-    'password': 'p@ssw0rd!',
+    'password': TEMP_BADPASS,
     'sudoers': True,
-    'root_password': 'p@ssw0rd!',
+    'root_password': TEMP_BADPASS,
 }
 
 SEGMENTS_KEY = 'segments'
@@ -92,45 +92,16 @@ exp = '\d{1,3}(\.\d{1,3}){3}'
 default_kvm = {
     'hostname': 'myhost',
     'username': 'worker',
-    'password': 'p@ssw0rd!',
+    'password': TEMP_BADPASS,
     'platform': 'almalinux9',
     'access_ip': '127.0.0.1',
 }
-# USER_LIST_GROUP_KEY = 'user_list_group'
-# SELECTED_USER_LIST_GROUP_INDEX_KEY = 'selected_user_list_group_index'
-#
-# USER_DEFINITION_TOML_STR = r"""
-# [username]
-# type = 'string'
-# message = 'Input Username'
-# exp = '\w.'
-# [password]
-# message = 'Input Password'
-# type = 'string'
-# [sudoers]
-# type = 'bool'
-# [sudoers.skip_on]
-# username = 'root'
-# """
-# default_user = {
-#     'username': 'worker',
-#     'password': 'p@ssw0rd!',
-#     'sudoers': True
-# }
-# default_user_list = [
-#     default_user,
-#     {
-#         'username': 'root',
-#         'password': 'p@ssw0rd!'
-#     }
-# ]
-def show_json(data, color=dummy_color):
-    print(color(json.dumps(data, indent=2)))
 
+def show_json(data, color=dummy_color):
+    print(color(dump_json(data, indent=2)))
 
 def show_toml(data, color=dummy_color):
-    print(color(toml.dumps(data)))
-
+    print(color(dump_toml(data)))
 
 class EnvOpsBase:
     def __init__(self):
@@ -201,7 +172,6 @@ class EnvOpsBase:
         self.write()
         return True
 
-
 class EnvAccountSet():
     def __init__(self, env_ops=None):
         if isinstance(env_ops, EnvOpsBase):
@@ -214,12 +184,12 @@ class EnvAccountSet():
         self.set = self.env_ops.set
         self.set_default()
         self.env_ops.write()
-        self.account_set_definition = toml.loads(ACCOUNT_SET_DEFINITION_TOML_STR)
+        self.account_set_definition = load_toml(ACCOUNT_SET_DEFINITION_TOML_STR)
 
     def set_default(self):
-        if not ACCOUNT_SET_LIST_KEY in self.env_dict:
+        if ACCOUNT_SET_LIST_KEY not in self.env_dict:
             self.env_dict[ACCOUNT_SET_LIST_KEY] = [default_account_set]
-        if not SELECTED_ACCOUNT_SET_INDEX_KEY in self.env_dict:
+        if SELECTED_ACCOUNT_SET_INDEX_KEY not in self.env_dict:
             self.env_dict[SELECTED_ACCOUNT_SET_INDEX_KEY] = 0
 
     def format_account_set(self, account_set):
@@ -324,135 +294,6 @@ class EnvAccountSet():
             else:
                 self.set_account_set(num)
 
-
-# class EnvUserList():
-#     def __init__(self, env_ops=None):
-#         if isinstance(env_ops, EnvOpsBase):
-#             self.env_ops = env_ops
-#         else:
-#             self.env_ops = EnvOpsBase()
-#         self.env_dict = self.env_ops.env_dict
-#         self.get = self.env_ops.get
-#         self.set = self.env_ops.set
-#         self.set_default()
-#         self.env_ops.write()
-#         self.user_input_definition = toml.loads(USER_DEFINITION_TOML_STR)
-#
-#     def set_default(self):
-#         if not USER_LIST_GROUP_KEY in self.env_dict:
-#             self.env_dict[USER_LIST_GROUP_KEY] = [default_user_list]
-#         if not SELECTED_ACCOUNT_SET_INDEX_KEY in self.env_dict:
-#             self.env_dict[SELECTED_USER_LIST_GROUP_INDEX_KEY] = 0
-#
-#     def format_user(self, user):
-#         if user['username'] == 'root':
-#             return f'{user["username"]}: {user["password"]}  '
-#         sudoers = False
-#         if 'sudoers' in user and user['sudoers']:
-#             sudoers = True
-#         return f'{user["username"]}(sudoers: {sudoers}): {user["password"]}  '
-#
-#     def format_user_list(self, user_list):
-#         msg = ''
-#         for user in user_list:
-#             msg += self.format_user(user)
-#         return msg
-#
-#     def show_user(self, user):
-#         show_json(user, cyan)
-#
-#     def show_user_list(self, user_list):
-#         for user in user_list:
-#             self.show_user(user)
-#
-#     def show_current_user_list(self):
-#         self.show_user_list(self.get_current_index_user_list())
-#
-#     def get_user_list_group(self):
-#         return self.get(USER_LIST_GROUP_KEY)
-#
-#     def get_current_index(self):
-#         return self.get(SELECTED_USER_LIST_GROUP_INDEX_KEY)
-#
-#     def get_current_index_user_list(self):
-#         return self.get_user_list_group()[self.get_current_index()]
-#
-#     def add_user(self, group_index):
-#         user = get_obj_by_definition(self.user_input_definition, default_user)
-#         if user:
-#             self.set_user_list(user, group_index)
-#
-#     def set_user(self, index, group_index):
-#         cur_user = self.get_user_list_group()[group_index][index]
-#         user = get_obj_by_definition(self.user_input_definition, cur_user)
-#         if user:
-#             self.set_user_list(user, group_index, index)
-#
-#     def set_user_list(self, user, group_index, set_index=False):
-#         if user:
-#             current_user_list_group = self.get_user_list_group()
-#             if isinstance(set_index, int):
-#                 current_user_list_group[group_index][set_index] = user
-#             else:
-#                 current_user_list_group[group_index] += [user]
-#             self.set(USER_LIST_GROUP_KEY, current_user_list_group)
-#
-#     def set_users_menu(self, user_list, group_index):
-#         current_user_list_group = self.get_user_list_group()
-#         if group_index == len(current_user_list_group):
-#             current_user_list_group += [user_list]
-#             self.set(USER_LIST_GROUP_KEY, current_user_list_group)
-#
-#         while True:
-#             print(self.format_user_list(user_list))
-#             menu_list = [f'{user["username"]}: {user["password"]}' for user in user_list] + \
-#                         ['Add user', 'Back']
-#             num = menu.choose_num(menu_list)
-#             if num == len(menu_list)-2:
-#                 self.add_user(group_index)
-#             elif num == len(menu_list)-1:
-#                 break
-#             else:
-#                 self.set_user(num, group_index)
-#
-#     def select_user_list_group_index(self, user_list_group):
-#         menu_list = [self.format_user_list(user_list) for user_list in user_list_group] + ['Back']
-#         num = menu.choose_num(menu_list, 'select default user list group')
-#         if num < len(menu_list):
-#             self.set(SELECTED_USER_LIST_GROUP_INDEX_KEY, num)
-#
-#     def delete_user_list_group(self, user_list_group):
-#         menu_list = [self.format_user_list(user_list) for user_list in user_list_group] + ['Back']
-#         num = menu.choose_num(menu_list, red('Delete user list group index'))
-#         if num < len(menu_list):
-#             current_user_list_group = self.get_user_list_group()
-#             self.show_user_list(current_user_list_group[num])
-#             if menu.get_y_n(red('Do you really want to DELETE?')):
-#                 del current_user_list_group[num]
-#                 self.set(USER_LIST_GROUP_KEY, current_user_list_group)
-#
-#     def user_list_group_menu(self):
-#         user_list_group = self.get_user_list_group()
-#         _ = [print(self.format_user_list(user_list)) for user_list in user_list_group]
-#         while True:
-#             current_index = self.get_current_index()
-#             menu_list = [self.format_user_list(user_list) for user_list in user_list_group] + \
-#                         ['Add user list group', red('Delete user list group'),
-#                             f'Select default index(current: {current_index + 1})', 'Back']
-#             num = menu.choose_num(menu_list)
-#             if num == len(menu_list)-4:
-#                 self.set_users_menu(default_user_list, len(user_list_group))
-#             elif num == len(menu_list) - 3:
-#                 self.delete_user_list_group(user_list_group)
-#             elif num == len(menu_list)-2:
-#                 self.select_user_list_group_index(user_list_group)
-#             elif num == len(menu_list)-1:
-#                 break
-#             else:
-#                 user_list = user_list_group[num]
-#                 self.set_users_menu(user_list, num)
-
-
 class EnvKVM():
     def __init__(self, env_ops=None):
         if isinstance(env_ops, EnvOpsBase):
@@ -465,7 +306,7 @@ class EnvKVM():
         self.set = self.env_ops.set
         self.set_default()
         self.env_ops.write()
-        self.kvm_definition = toml.loads(KVM_DEFINITION_TOML_STR)
+        self.kvm_definition = load_toml(KVM_DEFINITION_TOML_STR)
 
     def set_default(self):
         if not KVM_LIST_KEY in self.env_dict:
@@ -530,7 +371,6 @@ class EnvKVM():
             else:
                 self.set_kvm(num)
 
-
 class EnvSegments():
     def __init__(self, env_ops=None):
         if isinstance(env_ops, EnvOpsBase):
@@ -543,7 +383,7 @@ class EnvSegments():
         self.set = self.env_ops.set
         self.set_default()
         self.env_ops.write()
-        self.segment_definition = toml.loads(SEGMENT_DEFINITION_TOML_STR)
+        self.segment_definition = load_toml(SEGMENT_DEFINITION_TOML_STR)
 
     def set_default(self):
         if not SEGMENTS_KEY in self.env_dict:
