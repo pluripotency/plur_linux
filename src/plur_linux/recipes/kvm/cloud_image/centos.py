@@ -26,10 +26,12 @@ def create_almalinux(version='10'):
     return receive_func
 
 
-def create_fedora(major='43', miner='1.6'):
+def create_fedora(major='44', miner='1.7'):
     def receive_func(image_name):
         def func(session):
             repo_org = 'http://ftp.riken.jp/Linux'
+            # repo_org = "https://download.fedoraproject.org/pub"
+            # org_image_uki_file_name = f'Fedora-Cloud-Base-UEFI-UKI-{major}-{minor.x86_64.qcow2'
             org_image_file_name = f'Fedora-Cloud-Base-Generic-{major}-{miner}.x86_64.qcow2'
             url = f'{repo_org}/fedora/releases/{major}/Cloud/x86_64/images/{org_image_file_name}'
             return cloud_image_ops.copy_image(session, org_image_file_name, url, f'{image_name}.qcow2')
