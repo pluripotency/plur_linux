@@ -288,37 +288,22 @@ class Languages(SelectMenu):
 
         self.bun_key = 'bun'
 
-        from plur_linux.recipes.lang.nodejs import nvm
-        self.node_version = nvm.NODE_VERSION
-        self.nodesource_version = f'{self.node_version}.x'
-        self.nvm_key = 'node(nvm)'
-        self.nodebrew_key = 'node(nodebrew)'
-        self.nodesource_key = 'node(nodesource)'
+        self.node_key = 'node'
 
         selection = {
             f"{self.uv_key}": False,
             f"{self.bun_key}": False,
-            f"{self.nvm_key}": False,
-            f"{self.nodebrew_key}": False,
-            # f"{self.nodesource_key}": False,
+            f"{self.node_key}": False,
             f"{self.go_key}": False,
             f"{self.rust_key}": False,
             self.zig_key: False,
         }
-        exclusive_list = [
-            [self.nvm_key, self.nodebrew_key],
-            # [self.uv_key, self.pyenv_key],
-            [self.nvm_key, self.nodebrew_key],
-        ]
+        exclusive_list = []
         extra_menu = {}
         from plur_linux.recipes.lang import uv
         extra_menu[self.uv_key] = uv.input_uv_params
-        # from plur_linux.recipes.lang import pyenv
-        # extra_menu[self.pyenv_key] = pyenv.input_pyenv_params
-        from plur_linux.recipes.lang.nodejs import nodebrew
-        extra_menu[self.nodebrew_key] = nodebrew.input_node_params
-        from plur_linux.recipes.lang.nodejs import nvm
-        extra_menu[self.nvm_key] = nvm.input_node_params
+        from plur_linux.recipes.lang.nodejs import nodejs
+        extra_menu[self.node_key] = nodejs.input_node_params
         from plur_linux.recipes.lang import zig
         extra_menu[self.zig_key] = zig.input_zig_params
 
@@ -347,12 +332,6 @@ class Languages(SelectMenu):
             #     from plur_linux.recipes.lang import pyenv
             #     pyenv.install(**self.extra_params[self.pyenv_key])(session)
 
-            if has_true(self.selection, self.nodebrew_key):
-                from plur_linux.recipes.lang.nodejs import nodebrew
-                nodebrew.install(**self.extra_params[self.nodebrew_key])(session)
-            elif has_true(self.selection, self.nvm_key):
-                from plur_linux.recipes.lang.nodejs import nvm
-                nvm.install(**self.extra_params[self.nvm_key])(session)
-            elif has_true(self.selection, self.nodesource_key):
-                from plur_linux.recipes.lang.nodejs import nodesource
-                nodesource.setup(self.nodesource_version)(session)
+            if has_true(self.selection, self.node_key):
+                from plur_linux.recipes.lang.nodejs import nodejs
+                nodejs.install(self)(session)

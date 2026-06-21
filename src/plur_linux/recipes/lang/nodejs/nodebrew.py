@@ -1,10 +1,17 @@
 import re
 from plur import base_shell
+from plur import base_node
+NODE_VERSION='stable'
 
 def setup_nodebrew(session):
-    base_shell.run(session, 'curl -L git.io/nodebrew | perl - setup')
-    line = 'export PATH=$HOME/.nodebrew/current/bin:$PATH'
-    base_shell.append_bashrc(session, line)
+    if not base_shell.check_command_exists(session, 'nodebrew'):
+        if not base_shell.check_command_exists(session, 'perl'):
+            platform = session.nodes[-1].platform
+            if base_node.is_platform_rhel(platform):
+                base_shell.yum_install(session, {'packages': ['perl']})
+        base_shell.run(session, 'curl -L git.io/nodebrew | perl - setup')
+        line = 'export PATH=$HOME/.nodebrew/current/bin:$PATH'
+        base_shell.append_bashrc(session, line)
 
 def nodebrew(session, *args):
     command = 'nodebrew ' + ' '.join(args)
@@ -17,17 +24,18 @@ def install_binary(session, version):
     nodebrew(session, 'use', version)
     nodebrew(session, 'list')
 
-def uninstall_old(session):
+def uninstall_all_old(session):
     capture = nodebrew(session, 'list')
     lines = re.split('(\r\n|\n)', capture)
     current = ''
     for line in lines:
         if re.match('(current: )(.+|^[none])', line):
-            current = re.split('current: ', line)[1]
+            current = re.split('current: ', line)[1].strip()
     for line in lines:
-        if re.match('.*' + current, line):
-            if re.match('(v0|io@).+', line):
-                nodebrew(session, 'uninstall', line)
+        if line.startswith(current):
+            continue
+        if re.match('(v|io@).+', line):
+            nodebrew(session, 'uninstall', line)
 
 def node_unstable_install(session, version='v0.11.15', harmony=True):
     options = ''
@@ -35,27 +43,14 @@ def node_unstable_install(session, version='v0.11.15', harmony=True):
         options = '--v8-options=--harmony'
     nodebrew(session, ['install', version, options])
 
-def setup_nodejs(version):
-    def func(session):
-        if not base_shell.check_command_exists(session, 'node'):
-            if not base_shell.check_command_exists(session, 'nodebrew'):
-                setup_nodebrew(session)
-            # uninstall_old(session)
-            install_binary(session, version)
-    return func
-
 def install(version):
     def func(session):
-        if not base_shell.check_command_exists(session, 'nodebrew'):
-            if not base_shell.check_command_exists(session, 'perl'):
-                base_shell.yum_install(session, {'packages': ['perl']})
-            setup_nodebrew(session)
-            install_binary(session, version)
+        setup_nodebrew(session)
+        install_binary(session, version)
     return func
 
 def input_node_params(self):
     from mini.menu import get_input
-    self.node_version = get_input(expression=r'^v\d{2}(\.\d{1,2})?$', message='node ver[v24, v20.16, etc.]' + f'({self.node_version}): ', default_value=self.node_version)
-    return {
-        'version': self.node_version,
-    }
+    if not hasattr(self, 'node_version'):
+        self.node_version = NODE_VERSION
+    self.node_version = get_input(expression=r'^(v\d{2}(\.\d{1,2})?|stable|latest)$', message='node ver[stable, v26, v26.3.1, etc.]' + f'({self.node_version}): ', default_value=self.node_version)
