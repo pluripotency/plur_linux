@@ -20,7 +20,7 @@ def prepare_repository(session):
     ops.sudo_apt_get_install_y(misc.del_indent_lines("""
     ca-certificates
     curl
-    """), update=True)(session)
+    """))(session)
     [base_shell.run(session, a) for a in [
         'sudo install -m 0755 -d /etc/apt/keyrings',
         'sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc',
@@ -44,7 +44,7 @@ def install(session):
     containerd.io
     docker-buildx-plugin
     docker-compose-plugin
-    """), update=True)(session)
+    """))(session)
     base_shell.run(session, 'reset')
 
     common.configure_docker()(session)

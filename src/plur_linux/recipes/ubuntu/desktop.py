@@ -45,7 +45,7 @@ def install_desktop_ja_support(session):
     fonts-noto-cjk-extra gnome-user-docs-ja
     """)
     # ja_pkgs += ' libreoffice-help-ja libreoffice-l10n-ja thunderbird-locale-ja'
-    ops.sudo_apt_install_y(ja_pkgs_lines, update=False)(session)
+    ops.sudo_apt_install_y(ja_pkgs_lines)(session)
 
 
 def install_desktop(session, no_recommends=True, ja_support=True, desktop_pkg='ubuntu-desktop'):
@@ -56,7 +56,7 @@ def install_desktop(session, no_recommends=True, ja_support=True, desktop_pkg='u
     if ja_support:
         install_desktop_ja_support(session)
     # base_shell.run(session, 'sudo snap install firefox')
-    ops.sudo_apt_install_y(['firefox'], update=False)(session)
+    ops.sudo_apt_install_y(['firefox'])(session)
     session.set_timeout()
 
 

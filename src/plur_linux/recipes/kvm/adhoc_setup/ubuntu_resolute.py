@@ -80,6 +80,7 @@ class Apps(generic.SelectMenu):
         super().__init__({
             "gns3": False,
             "kvm": False,
+            "NetworkManager": False,
             "openvswitch": False,
         },
             exclusive_list=None,
@@ -92,7 +93,9 @@ class Apps(generic.SelectMenu):
         if self.selection['kvm']:
             from plur_linux.recipes.ubuntu import kvm
             kvm.install_resolute(session)
-
+        if self.selection['NetworkManager']:
+            from plur_linux.recipes.ubuntu import networkmanager
+            networkmanager.change_netplan_to_networkmanager(session)
         if self.selection['openvswitch']:
             from plur_linux.recipes.ubuntu import openvswitch
             openvswitch.install_openvswitch(session)

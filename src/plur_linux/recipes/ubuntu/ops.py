@@ -7,28 +7,32 @@ def disable_ipv6(session):
     base_shell.run(session, 'echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf')
     base_shell.run(session, 'sysctl -p')
 
-def sudo_apt_y_str(args, update=True, apt='apt', nr_auto=False):
-    command = ''
-    if update:
-        command = f'sudo {apt} update && '
-    if nr_auto:
-        command += f'sudo NEEDRESTART_MODE=a {apt} -y ' + ' '.join(args)
-    else:
-        command += f'sudo {apt} -y ' + ' '.join(args)
-    command += ' && reset'
-    return command
+def sudo_apt_update(apt='apt'):
+    return f'sudo {apt} update'
 
-def sudo_apt_install_y(pkgs, update=True):
-    return lambda session: base_shell.run(session, sudo_apt_y_str(['install'] + pkgs, update))
+def sudo_apt_args_str(args:list[str], nr_auto:bool=False):
+    command = 'sudo '
+    if nr_auto:
+        command = 'sudo NEEDRESTART_MODE=a '
+    return command + ' '.join(args) + ' && reset'
+
+def sudo_apt_install_y(pkgs):
+    command = sudo_apt_update() + ' && '
+    command += sudo_apt_args_str(['DEBIAN_FRONTEND=noninteractive', 'apt', 'install', '-y'] + pkgs)
+    return lambda session: base_shell.run(session, command)
 
 def sudo_apt_upgrade(session):
-    return base_shell.run(session, sudo_apt_y_str(['upgrade']))
+    return base_shell.run(session, sudo_apt_args_str(['apt', 'upgrade', '-y']))
 
-def sudo_apt_get_install_y(pkgs:list[str], update:bool=True, nr_auto:bool=False):
-    return lambda session: base_shell.run(session, sudo_apt_y_str(['install'] + pkgs, update, apt='apt-get', nr_auto=nr_auto))
+def sudo_apt_get_install_y(pkgs:list[str], nr_auto:bool=False):
+    command = sudo_apt_update('apt-get') + ' && '
+    command += sudo_apt_args_str(['apt-get', 'install', '-y'] + pkgs, nr_auto=nr_auto)
+    return lambda session: base_shell.run(session, command)
 
 def sudo_apt_get_upgrade(session):
-    return base_shell.run(session, sudo_apt_y_str(['upgrade'], apt='apt-get'))
+    command = sudo_apt_update('apt-get') + ' && '
+    command += sudo_apt_args_str(['apt-get', 'upgrade', '-y'])
+    return base_shell.run(session, command)
 
 def configure_systemd_timesyncd(session):
     timesyncd_conf = '/etc/systemd/timesyncd.conf'
