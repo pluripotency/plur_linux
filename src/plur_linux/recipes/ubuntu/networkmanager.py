@@ -3,7 +3,8 @@ from plur_linux.recipes.ubuntu import ops
 
 def change_netplan_to_networkmanager(session):
     ops.sudo_apt_install_y(['network-manager'])(session)
-    oneliner = "sudo sed -i.bak 's/renderer:\s*networkd/renderer: NetworkManager/g' /etc/netplan/*.yaml && sudo netplan apply"
+    oneliner = "sudo sed -i 's/renderer:\s*networkd/renderer: NetworkManager/g' /etc/netplan/*.yaml && sudo netplan apply"
+    # oneliner = "sudo sed -i.bak 's/renderer:\s*networkd/renderer: NetworkManager/g' /etc/netplan/*.yaml && sudo netplan apply"
     base_shell.run(session, oneliner)
     # dir_path = '/etc/netplan'
     # base_shell.run(session, 'cd ' + dir_path)
