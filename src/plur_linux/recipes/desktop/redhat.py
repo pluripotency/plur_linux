@@ -81,6 +81,7 @@ dict_desktop = {
     },
     'almalinux8': {
         'desktop': install_gui_a8a9,
+        'xrdp': install_xrdp,
         'vbox': install_vbox_additions_libs
     },
 }
