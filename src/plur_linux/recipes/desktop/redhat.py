@@ -13,7 +13,7 @@ def search_not_root(session):
 def install_xrdp(session):
     _ = [base_shell.run(session, a) for a in [
         'dnf -y install epel-release',
-        'dnf -y install xrdp tigervnc-server',
+        'dnf -y install xrdp xorgxrdp tigervnc-server',
         'systemctl enable xrdp --now'
     ]]
     firewalld.configure(ports=['3389/tcp'], add=True)(session)
