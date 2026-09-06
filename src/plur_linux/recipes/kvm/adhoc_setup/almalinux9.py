@@ -52,6 +52,7 @@ class Apps(generic.SelectMenu):
             "openvswitch": False,
             "pxe": False,
             "pxe_uefi": False,
+            "pxe_uefi_a10": False,
             "ca": False,
             "qemu-kvm": False,
             "google-auth": False,
@@ -61,7 +62,7 @@ class Apps(generic.SelectMenu):
             # "rad_mysql": False,
             "glusterfs_server": False,
         },
-            exclusive_list=['pxe', 'pxe_uefi'],
+            exclusive_list=['pxe', 'pxe_uefi', 'pxe_uefi_a10'],
             menu_title='Apps',
             extra_menu={'ca': ca_menu.input_params})
 
@@ -91,6 +92,9 @@ class Apps(generic.SelectMenu):
         elif self.selection['pxe_uefi']:
             from plur_linux.recipes.pxe import pxe
             pxe.setup_a9_pxe_uefi(session)
+        elif self.selection['pxe_uefi_a10']:
+            from plur_linux.recipes.pxe import pxe
+            pxe.setup_a10_pxe_uefi(session)
 
         if self.selection['glusterfs_server']:
             from plur_linux.recipes.almalinux9 import glusterfs

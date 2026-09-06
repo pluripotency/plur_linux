@@ -274,7 +274,7 @@ def setup_a10_pxe_uefi(session):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
         grub_cfg_str = create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
@@ -292,7 +292,7 @@ def setup_a10_pxe(session):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
 
