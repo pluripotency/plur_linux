@@ -92,7 +92,7 @@ def create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list):
     for ks in ks_filename_list:
         value += pxe_menu_entry_str(dist_name, pxe_ip, dist_dir, ks)
     value += pxe_menu_entry_no_ks_str(dist_name, pxe_ip, dist_dir)
-    value += misc.del_indent(f"""
+    value += misc.del_indent("""
     label local
       menu label Boot from ^local drive
       localboot 0xffff
@@ -263,4 +263,39 @@ def setup_a9_pxe(session):
         prepare_pxe_files(session, pxe_menu_str)
 
     sudo_func(session)
+
+
+def setup_a10_pxe_uefi(session):
+    dist_name = 'AlmaLinux 10'
+    pxe_ip = get_primary_ip(session)
+    dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+
+    @session_wrap.sudo
+    def sudo_func(session):
+        prepare_pxe_vmlinuz(session, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
+        prepare_pxe_files(session, pxe_menu_str)
+        grub_cfg_str = create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
+        prepare_pxe_uefi_files(session, grub_cfg_str)
+
+    sudo_func(session)
+
+
+def setup_a10_pxe(session):
+    dist_name = 'AlmaLinux 10'
+    pxe_ip = get_primary_ip(session)
+    dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+
+    @session_wrap.sudo
+    def sudo_func(session):
+        prepare_pxe_vmlinuz(session, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
+        prepare_pxe_files(session, pxe_menu_str)
+
+    sudo_func(session)
+
 

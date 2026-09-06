@@ -138,7 +138,7 @@ def create_nginx_default_conf_str():
 
 
 def setup_nginx(session):
-    [base_shell.run(session, a) for a in misc.del_indent_lines(f"""
+    [base_shell.run(session, a) for a in misc.del_indent_lines("""
     mkdir /var/www/autoinstall /var/www/iso
     unlink /etc/nginx/sites-enabled/default
     """)]

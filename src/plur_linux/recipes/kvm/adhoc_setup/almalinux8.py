@@ -72,14 +72,14 @@ class Apps(generic.SelectMenu):
             from plur_linux.recipes import vsftpd
             vsftpd.vsftpd_server_setup(session)
         if self.selection['pxe']:
-            from plur_linux.recipes.almalinux8 import pxe
-            pxe.setup_pxe(session)
+            from plur_linux.recipes.pxe import pxe
+            pxe.setup_a8_pxe(session)
         elif self.selection['pxe_uefi']:
-            from plur_linux.recipes.almalinux8 import pxe
-            pxe.setup_pxe_uefi(session)
+            from plur_linux.recipes.pxe import pxe
+            pxe.setup_a8_pxe_uefi(session)
         if self.selection['keepalived']:
             from plur_linux.recipes import keepalived
-            keepalived.dict_keepalived['almalinux8']['install'](session)
+            keepalived.install_a8(session)
 
 
 def get_selection():

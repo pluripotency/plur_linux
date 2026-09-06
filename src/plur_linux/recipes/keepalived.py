@@ -217,7 +217,7 @@ def install_a8(session):
 def semanage_smtp(session, gd):
     if 'smtp_server' in gd:
         smtp_server = gd['smtp_server']
-        if re.search('^' + misc.ipv4_exp_str + r'\s+\d{1,6}$' , smtp_server):
+        if re.search('^' + misc.IPV4_EXP_STR + r'\s+\d{1,6}$' , smtp_server):
             smtp_server_port = re.split(r'\s+', smtp_server)[1].strip()
             if smtp_server_port != '25' and re.search(r'\d{1,6}', smtp_server_port):
                 if not base_shell.check_command_exists(session, 'semanage'):

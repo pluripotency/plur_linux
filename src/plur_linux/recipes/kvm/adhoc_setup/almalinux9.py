@@ -86,11 +86,11 @@ class Apps(generic.SelectMenu):
             ca_menu.run_params(**self.extra_params['ca'])(session)
 
         if self.selection['pxe']:
-            from plur_linux.recipes.almalinux9 import pxe
-            pxe.setup_pxe(session)
+            from plur_linux.recipes.pxe import pxe
+            pxe.setup_a9_pxe(session)
         elif self.selection['pxe_uefi']:
-            from plur_linux.recipes.almalinux9 import pxe
-            pxe.setup_pxe_uefi(session)
+            from plur_linux.recipes.pxe import pxe
+            pxe.setup_a9_pxe_uefi(session)
 
         if self.selection['glusterfs_server']:
             from plur_linux.recipes.almalinux9 import glusterfs
