@@ -150,27 +150,9 @@ def create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list):
     return value
 
 
-def setup_pxe_base(pxe_ip, dist_dir, www_iso_dir):
-    if re.search(r'^192\.168\.0\.', pxe_ip):
-        subnet_params = {
-            'subnet': '192.168.0.0',
-            'netmask': '255.255.255.0',
-            'gateway': '192.168.0.1',
-            'nameservers': '8.8.8.8',
-            'dh_range': '192.168.0.200 192.168.0.250',
-            'broadcast': '192.168.0.255',
-        }
-        allowed_net = '192.168.0.0/24'
-    else:
-        subnet_params = {
-            'subnet': '192.168.10.0',
-            'netmask': '255.255.255.0',
-            'gateway': '192.168.10.62',
-            'nameservers': '192.168.10.1',
-            'dh_range': '192.168.10.200 192.168.10.250',
-            'broadcast': '192.168.10.255',
-        }
-        allowed_net = '192.168.10.0/24'
+def setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=None):
+    subnet_params = dhcpd.get_subnet_params(pxe_ip=pxe_ip, segment=segment)
+    allowed_net = subnet_params.get('allowed_net', f"{subnet_params['subnet']}/24")
     http_params = {
         'file_name': 'pxeboot.conf',
         'alias': f'/{dist_dir}',
@@ -199,11 +181,11 @@ def get_primary_ip(session):
     return primary_ip
 
 
-def setup_a8_pxe_uefi(session):
+def setup_a8_pxe_uefi(session, segment=None):
     dist_name = 'AlmaLinux 8'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a8_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
@@ -217,10 +199,10 @@ def setup_a8_pxe_uefi(session):
     sudo_func(session)
 
 
-def setup_a8_pxe(session):
+def setup_a8_pxe(session, segment=None):
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a8_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
@@ -232,11 +214,11 @@ def setup_a8_pxe(session):
     sudo_func(session)
 
 
-def setup_a9_pxe_uefi(session):
+def setup_a9_pxe_uefi(session, segment=None):
     dist_name = 'AlmaLinux 9'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a9_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
@@ -250,10 +232,10 @@ def setup_a9_pxe_uefi(session):
     sudo_func(session)
 
 
-def setup_a9_pxe(session):
+def setup_a9_pxe(session, segment=None):
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a9_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
@@ -265,11 +247,11 @@ def setup_a9_pxe(session):
     sudo_func(session)
 
 
-def setup_a10_pxe_uefi(session):
+def setup_a10_pxe_uefi(session, segment=None):
     dist_name = 'AlmaLinux 10'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
@@ -283,11 +265,11 @@ def setup_a10_pxe_uefi(session):
     sudo_func(session)
 
 
-def setup_a10_pxe(session):
+def setup_a10_pxe(session, segment=None):
     dist_name = 'AlmaLinux 10'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir)(session)
+    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
