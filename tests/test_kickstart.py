@@ -71,6 +71,65 @@ class TestKickstart(unittest.TestCase):
         self.assertEqual(files_no_lvm, ['phy.ks', 'vda.ks', 'sda.ks'])
         self.assertEqual(mock_base_shell.here_doc.call_count, 3)
 
+    def test_encrypt_password(self):
+        # Plaintext password
+        hashed = kickstart.encrypt_password('testpass', rounds=5000)
+        self.assertTrue(hashed.startswith('$6$'))
+        from passlib.hash import sha512_crypt
+        self.assertTrue(sha512_crypt.verify('testpass', hashed))
+
+        # Already hashed password
+        already_hashed = '$1$v4y/Tz8G$mq2hT5nsuafCpIB7KlQTQ/'
+        self.assertEqual(kickstart.encrypt_password(already_hashed), already_hashed)
+
+    def test_create_account_str_default(self):
+        account_set = {
+            'username': 'testuser',
+            'password': 'usersecret',
+            'sudoers': True,
+            'root_password': 'rootsecret',
+        }
+        account_str = kickstart.create_account_str(account_set)
+        self.assertIn('rootpw --iscrypted $6$', account_str)
+        self.assertIn('user --name=testuser', account_str)
+        self.assertIn('--password=$6$', account_str)
+        self.assertIn('--iscrypted', account_str)
+        self.assertIn('--groups=wheel', account_str)
+
+    def test_create_account_str_no_sudo(self):
+        account_set = {
+            'username': 'limiteduser',
+            'password': 'usersecret',
+            'sudoers': False,
+            'root_password': 'rootsecret',
+        }
+        account_str = kickstart.create_account_str(account_set)
+        self.assertIn('user --name=limiteduser', account_str)
+        self.assertNotIn('--groups=wheel', account_str)
+
+    def test_create_account_str_root_only(self):
+        account_set = {
+            'username': 'root',
+            'password': 'rootsecret',
+            'sudoers': True,
+            'root_password': 'rootsecret',
+        }
+        account_str = kickstart.create_account_str(account_set)
+        self.assertIn('rootpw --iscrypted $6$', account_str)
+        self.assertNotIn('user --name=root', account_str)
+
+    def test_create_ks_str_with_custom_account(self):
+        custom_account = {
+            'username': 'myadmin',
+            'password': 'mypassword',
+            'sudoers': True,
+            'root_password': 'myrootpassword',
+        }
+        ks = kickstart.create_ks_str('url --url=http://10.0.0.1/a9/', 'sda', account_set=custom_account)
+        self.assertIn('user --name=myadmin', ks)
+        self.assertIn('--groups=wheel', ks)
+        self.assertIn('rootpw --iscrypted $6$', ks)
+
 
 if __name__ == '__main__':
     unittest.main()

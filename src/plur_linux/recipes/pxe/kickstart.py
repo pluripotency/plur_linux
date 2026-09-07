@@ -49,6 +49,54 @@ logvol swap --fstype="swap" --size={swap_size_mb} --name=lv_swap --vgname={vg_na
 logvol /data --fstype="xfs" --size=1 --grow --name=lv_data --vgname={vg_name}"""
 
 
+def encrypt_password(password: str, rounds: int = None) -> str:
+    """Hash password using SHA-512 crypt format ($6$) for Kickstart --iscrypted.
+    If password already appears to be crypted (starts with $), return as-is.
+    """
+    if password.startswith('$'):
+        return password
+    try:
+        from passlib.hash import sha512_crypt
+        if rounds:
+            return sha512_crypt.using(rounds=rounds).hash(password)
+        return sha512_crypt.hash(password)
+    except ImportError:
+        import crypt
+        return crypt.crypt(password, crypt.mksalt(crypt.METHOD_SHA512))
+
+
+def create_account_str(account_set=None):
+    """Generate rootpw and user configuration lines for Kickstart from account_set."""
+    if account_set is None:
+        try:
+            from plur_linux.lib.env_ops import EnvAccountSet
+            account_set = EnvAccountSet().get_current_index_account_set()
+        except Exception:
+            from plur_linux.lib.env_ops import default_account_set
+            account_set = default_account_set
+
+    root_password = account_set.get('root_password') or account_set.get('password') or 'p@ssw0rd!'
+    crypted_rootpw = encrypt_password(root_password)
+    lines = [
+        "# 生成した root パスワード",
+        f"rootpw --iscrypted {crypted_rootpw}",
+    ]
+
+    username = account_set.get('username')
+    if username and username != 'root':
+        user_password = account_set.get('password', 'p@ssw0rd!')
+        crypted_userpw = encrypt_password(user_password)
+        sudoers = account_set.get('sudoers', True)
+        user_line = f"user --name={username} --password={crypted_userpw} --iscrypted"
+        if sudoers:
+            user_line += " --groups=wheel"
+        lines.append("")
+        lines.append("# 一般ユーザー設定")
+        lines.append(user_line)
+
+    return "\n".join(lines)
+
+
 def create_ks_str(
     dist_url='',
     disk_dev='sda',
@@ -59,6 +107,7 @@ def create_ks_str(
     root_size_mb=51200,
     swap_size_mb=8192,
     vg_name='vg_system',
+    account_set=None,
 ):
     """Unified Kickstart configuration string generator.
 
@@ -68,8 +117,9 @@ def create_ks_str(
     - volume_type='standard': full disk single root partition
     - volume_type='lvm' / 'lvm_data': LVM with 50GB root, 8GB swap, rest to /data
     - volume_str: custom partitioning string
+    - account_set: dict with username, password, sudoers, root_password
     """
-    rootpw = 'rootpw  --iscrypted $1$v4y/Tz8G$mq2hT5nsuafCpIB7KlQTQ/'
+    account_part = create_account_str(account_set=account_set)
     bootloader = f'bootloader --location=mbr --boot-drive={disk_dev}'
     if with_console:
         bootloader += ' --append=" rhgb crashkernel=auto quiet vconsole.keymap=jp106 net.ifnames=0 biosdevname=0 console=ttyS0,115200n8r"'
@@ -104,8 +154,7 @@ lang en_US.UTF-8
 # ネットワーク設定
 network  --bootproto=dhcp --noipv6 --activate --hostname=localhost
 
-# 生成した root パスワード
-{rootpw}
+{account_part}
 
 {timezone_part}
 
@@ -133,19 +182,19 @@ def create_a10_ks_str(dist_url='', disk_dev='sda', with_console=True, volume_typ
     )
 
 
-def prepare_ks(session, pxe_ip, dist_dir, a10=False, include_lvm=True):
+def prepare_ks(session, pxe_ip, dist_dir, a10=False, include_lvm=True, account_set=None):
     """Prepare and deploy kickstart files on the PXE server."""
     dist_url = f'url --url=http://{pxe_ip}/{dist_dir}/'
     ks_meta_list = [
-        ['phy.ks', create_ks_str(dist_url, 'sda', with_console=False, a10=a10, volume_type='standard')],
-        ['vda.ks', create_ks_str(dist_url, 'vda', with_console=True, a10=a10, volume_type='standard')],
-        ['sda.ks', create_ks_str(dist_url, 'sda', with_console=True, a10=a10, volume_type='standard')],
+        ['phy.ks', create_ks_str(dist_url, 'sda', with_console=False, a10=a10, volume_type='standard', account_set=account_set)],
+        ['vda.ks', create_ks_str(dist_url, 'vda', with_console=True, a10=a10, volume_type='standard', account_set=account_set)],
+        ['sda.ks', create_ks_str(dist_url, 'sda', with_console=True, a10=a10, volume_type='standard', account_set=account_set)],
     ]
     if include_lvm:
         ks_meta_list += [
-            ['phy_lvm.ks', create_ks_str(dist_url, 'sda', with_console=False, a10=a10, volume_type='lvm_data')],
-            ['vda_lvm.ks', create_ks_str(dist_url, 'vda', with_console=True, a10=a10, volume_type='lvm_data')],
-            ['sda_lvm.ks', create_ks_str(dist_url, 'sda', with_console=True, a10=a10, volume_type='lvm_data')],
+            ['phy_lvm.ks', create_ks_str(dist_url, 'sda', with_console=False, a10=a10, volume_type='lvm_data', account_set=account_set)],
+            ['vda_lvm.ks', create_ks_str(dist_url, 'vda', with_console=True, a10=a10, volume_type='lvm_data', account_set=account_set)],
+            ['sda_lvm.ks', create_ks_str(dist_url, 'sda', with_console=True, a10=a10, volume_type='lvm_data', account_set=account_set)],
         ]
 
     ks_dir = '/var/www/html/ks'

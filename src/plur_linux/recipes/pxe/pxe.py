@@ -181,7 +181,7 @@ def get_primary_ip(session):
     return primary_ip
 
 
-def setup_a8_pxe_uefi(session, segment=None):
+def setup_a8_pxe_uefi(session, segment=None, account_set=None):
     dist_name = 'AlmaLinux 8'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a8_iso(session)
@@ -190,7 +190,7 @@ def setup_a8_pxe_uefi(session, segment=None):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
         grub_cfg_str = create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
@@ -199,7 +199,7 @@ def setup_a8_pxe_uefi(session, segment=None):
     sudo_func(session)
 
 
-def setup_a8_pxe(session, segment=None):
+def setup_a8_pxe(session, segment=None, account_set=None):
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a8_iso(session)
     setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
@@ -207,14 +207,14 @@ def setup_a8_pxe(session, segment=None):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str('AlmaLinux 8', pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
 
     sudo_func(session)
 
 
-def setup_a9_pxe_uefi(session, segment=None):
+def setup_a9_pxe_uefi(session, segment=None, account_set=None):
     dist_name = 'AlmaLinux 9'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a9_iso(session)
@@ -223,7 +223,7 @@ def setup_a9_pxe_uefi(session, segment=None):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
         grub_cfg_str = create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
@@ -232,7 +232,7 @@ def setup_a9_pxe_uefi(session, segment=None):
     sudo_func(session)
 
 
-def setup_a9_pxe(session, segment=None):
+def setup_a9_pxe(session, segment=None, account_set=None):
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a9_iso(session)
     setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
@@ -240,14 +240,14 @@ def setup_a9_pxe(session, segment=None):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str('AlmaLinux 9', pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
 
     sudo_func(session)
 
 
-def setup_a10_pxe_uefi(session, segment=None):
+def setup_a10_pxe_uefi(session, segment=None, account_set=None):
     dist_name = 'AlmaLinux 10'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
@@ -256,7 +256,7 @@ def setup_a10_pxe_uefi(session, segment=None):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
         grub_cfg_str = create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
@@ -265,7 +265,7 @@ def setup_a10_pxe_uefi(session, segment=None):
     sudo_func(session)
 
 
-def setup_a10_pxe(session, segment=None):
+def setup_a10_pxe(session, segment=None, account_set=None):
     dist_name = 'AlmaLinux 10'
     pxe_ip = get_primary_ip(session)
     dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
@@ -274,7 +274,7 @@ def setup_a10_pxe(session, segment=None):
     @session_wrap.sudo
     def sudo_func(session):
         prepare_pxe_vmlinuz(session, dist_dir)
-        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True)
+        ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
 

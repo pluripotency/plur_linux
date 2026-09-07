@@ -7,10 +7,11 @@ license = "MIT"
 authors = [
     { name = "Masayoshi Kokuryo", email = "masakoku@gmail.com" }
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
   "plur>=0.2.1",
   "mini>=0.2.1",
+  "passlib>=1.7.4",
 ]
 [project.scripts]
 server_menu = "plur_linux.server_menu:main_menu"
