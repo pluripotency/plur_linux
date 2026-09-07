@@ -41,7 +41,7 @@ def create_gluster_dict(hv='kvm'):
 
     node_dict = new_node.create_single_iface_node_dict(hostname, ip_seed, options)
     segment = node_dict['ifaces'][0]['segment']
-    hosts = [[segment['ip_base_prefix'] + f'.{host[1]}', host[0]] for host in host_list]
+    hosts = [[new_node.env_ops.get_ip_from_segment(segment, host[1]), host[0]] for host in host_list]
     if hv == 'kvm':
         run_post = [
             ops.create_hosts(hosts),

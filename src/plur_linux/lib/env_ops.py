@@ -4,6 +4,7 @@ from mini.ansi_colors import red, yellow, green, cyan, dummy_color
 from mini import menu
 from mini.misc import is_file, read_json, dump_json, read_toml, write_toml, load_toml, dump_toml, prepare_dir_if_not_exists
 from plur_linux.lib.lib_selection import get_obj_by_definition
+from plur_linux.lib.ip_calc import calc_ip, get_segment_network, get_ip_from_segment, IPRangeError
 TEMP_BADPASS = 'p@ssw0rd!'
 ACCOUNT_SET_LIST_KEY = 'account_set'
 SELECTED_ACCOUNT_SET_INDEX_KEY = 'selected_account_set_index'
@@ -37,18 +38,14 @@ exp = 'openvswitch|default|direct|bridge|macvtap'
 [net_source]
 type = 'string'
 message = 'net_source(ex. br0|default)'
-[ip_base_prefix]
+[network_with_prefix]
 type = 'string'
-message = 'Input ip segment(ex. 192.168.0)'
-exp = '\d{1,3}(\.\d{1,3}){0,2}'
-[prefix]
-type = 'string'
-message = 'Input prefix(ex. 24)'
-exp = '\d{1,2}'
+message = 'Input network with prefix(ex. 192.168.122.0/24 or 172.16.0.0/22)'
+exp = '^\d{1,3}(\.\d{1,3}){3}/\d{1,2}$'
 [gateway_seed]
 type = 'string'
-message = 'Input gateway seed(ex. 254)'
-exp = '\d{1,3}'
+message = 'Input gateway seed or IP(ex. 1 or 0.1 or 192.168.122.1)'
+exp = '^\d+(\.\d+)*$'
 [search]
 type = 'string'
 message = 'Input Search Domain(ex. dom.local)'
@@ -59,8 +56,7 @@ message = 'Input nameservers seperate by comma'
 default_segment = {
     'type': 'default',
     'net_source': 'default',
-    'ip_base_prefix': '192.168.122',
-    'prefix': '24',
+    'network_with_prefix': '192.168.122.0/24',
     'gateway_seed': '1',
     'search': 'local',
     'nameservers': '192.168.122.1',
@@ -398,6 +394,14 @@ class EnvSegments():
     def get_segment_list(self):
         return self.get(SEGMENTS_KEY)
 
+    @staticmethod
+    def calc_ip(network_with_prefix, seed, with_prefix=False, raise_on_error=False):
+        return calc_ip(network_with_prefix, seed, with_prefix=with_prefix, raise_on_error=raise_on_error)
+
+    @staticmethod
+    def get_ip_from_segment(segment, seed, with_prefix=False, raise_on_error=False):
+        return get_ip_from_segment(segment, seed, with_prefix=with_prefix, raise_on_error=raise_on_error)
+
     def set_segment(self, index):
         segments = []
         cur_segment = default_segment
@@ -405,6 +409,9 @@ class EnvSegments():
             segments = self.env_dict['segments']
             if index < len(segments):
                 cur_segment = segments[index]
+                if 'network_with_prefix' not in cur_segment and 'ip_base_prefix' in cur_segment and 'prefix' in cur_segment:
+                    cur_segment = dict(cur_segment)
+                    cur_segment['network_with_prefix'] = f"{cur_segment['ip_base_prefix']}.0/{cur_segment['prefix']}"
         tmp_segment = get_obj_by_definition(self.segment_definition, cur_segment)
         if tmp_segment:
             current_segments = self.get(SEGMENTS_KEY)
@@ -415,7 +422,7 @@ class EnvSegments():
             self.set(SEGMENTS_KEY, current_segments)
 
     def format_segment_list(self, segments):
-        return [f"{s['ip_base_prefix']}.0/{s['prefix']} {s['net_source']}(type: {s['type']})" for s in segments]
+        return [f"{get_segment_network(s)} {s['net_source']}(type: {s['type']})" for s in segments]
 
     def segments_menu(self):
         while True:
@@ -458,12 +465,11 @@ class EnvSegments():
                     if 'ip_seed' in iface:
                         menu_item = []
                         for s in self.env_dict['segments']:
-                            ip_base_prefix = s['ip_base_prefix']
-                            prefix = s['prefix']
+                            net = get_segment_network(s)
                             net_source = s['net_source']
                             net_type = s['type']
                             menu_item += [
-                                ip_base_prefix + '.{0}/' + f'{prefix} {net_source}(type: {net_type})'
+                                f'{net} {net_source}(type: {net_type})'
                             ]
 
                         num = menu.choose_num(menu_item)
@@ -471,8 +477,16 @@ class EnvSegments():
                         if iface['ip_seed'] == 'dhcp':
                             iface['ip'] = 'dhcp'
                         else:
-                            iface['ip'] = segment['ip_base_prefix'] + f".{iface['ip_seed']}/{segment['prefix']}"
-                            iface['gateway'] = segment['ip_base_prefix'] + '.' + segment['gateway_seed']
+                            ip_res = get_ip_from_segment(segment, iface['ip_seed'], with_prefix=True)
+                            if ip_res == 'IP Range Error':
+                                print(red(f"IP Range Error: ip_seed '{iface['ip_seed']}' is out of range for {get_segment_network(segment)}"))
+                                raise IPRangeError(f"IP Range Error: ip_seed '{iface['ip_seed']}' is out of range for {get_segment_network(segment)}")
+                            iface['ip'] = ip_res
+                            gateway_res = get_ip_from_segment(segment, segment.get('gateway_seed', '1'))
+                            if gateway_res == 'IP Range Error':
+                                print(red(f"IP Range Error: gateway_seed '{segment.get('gateway_seed')}' is out of range for {get_segment_network(segment)}"))
+                                raise IPRangeError(f"IP Range Error: gateway_seed '{segment.get('gateway_seed')}' is out of range for {get_segment_network(segment)}")
+                            iface['gateway'] = gateway_res
                             iface['search'] = segment['search']
                             iface['nameservers'] = segment['nameservers'].split(',')
                             iface['segment'] = segment

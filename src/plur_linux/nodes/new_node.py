@@ -73,7 +73,7 @@ def create_node_dict_env_bound(hostname, ifaces, vnets, overwrite_dict={}, login
 
 def create_single_iface_node_dict(hostname, ip_seed=None, option={}, login_user='worker'):
     if ip_seed is None:
-        ip_seed = menu.get_input(r'(dhcp|\d+)', 'IP seed(Default: dhcp): ', 'invalid format', 'dhcp')
+        ip_seed = menu.get_input(r'^(dhcp|\d+(\.\d+)*)$', 'IP seed(Default: dhcp): ', 'invalid format', 'dhcp')
     vnets = [{
         'ifname': 'eth0',
         'mac': random_mac()

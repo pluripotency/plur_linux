@@ -35,9 +35,9 @@ def choose_host(host):
         iface = bound_env['ifaces'][0]
         access_ip = iface['ip'].split('/')[0]
         segment = iface['segment']
-        host_lines = [f'{segment["ip_base_prefix"]}.{host[1]} {host[0]}' for host in host_list]
-        mgr_ip = f'{segment["ip_base_prefix"]}.{host_list[0][1]}'
-        ctl_ip = f'{segment["ip_base_prefix"]}.{host_list[1][1]}'
+        host_lines = [f'{new_node.env_ops.get_ip_from_segment(segment, host[1])} {host[0]}' for host in host_list]
+        mgr_ip = new_node.env_ops.get_ip_from_segment(segment, host_list[0][1])
+        ctl_ip = new_node.env_ops.get_ip_from_segment(segment, host_list[1][1])
 
         user_list = new_node.env_ops.get_current_index_user_list()
         login_password = ''
