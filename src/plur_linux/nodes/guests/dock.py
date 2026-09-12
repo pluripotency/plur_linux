@@ -47,7 +47,7 @@ def install_dock(dock):
         'prepare_vdisk': {
             'type': 'copy',
             'cloudinit': True,
-            'org_path': f'/vm_images/{docker_image}.comp.qcow2',
+            'org_file': f'{docker_image}.comp.qcow2',
             'size': 16,
         },
         'setups': {

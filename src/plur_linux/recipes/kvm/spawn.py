@@ -95,7 +95,7 @@ def attach_vdisk(session, vm, offline=True):
 
 def prepare_backing_or_copy_vdisk(session, vm):
     hostname = vm.hostname
-    vdisk_org_path = vm.prepare_vdisk["org_path"]
+    vdisk_org_path = f'{vdisk_dir}/' + vm.prepare_vdisk["org_file"]
     vdisk_type = vm.prepare_vdisk["type"]
 
     vdisk_path = f"{vdisk_dir}/{vm.hostname}.{diskformat}"

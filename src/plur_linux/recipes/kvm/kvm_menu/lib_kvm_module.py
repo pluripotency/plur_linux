@@ -11,7 +11,7 @@ kvm_module_list = [
 len_mod = len(kvm_module_list)
 
 
-def create_kvm_dict(hostname, access_ip, username, password, platform):
+def create_kvm_dict(hostname, access_ip, username, password, platform, **_kwargs):
     login_waitprompt = base_node.get_linux_waitprompt(platform, hostname, username)
     return {
         'platform': platform,
@@ -66,6 +66,13 @@ def select_kvm():
         else:
             kvm = select_2nd(kvm_module_list[num][1].create_nodes())
             return kvm
+
+
+def select_env_kvm():
+    env_kvm_entry_list = env_ops.get_kvm_entry_list()
+    menu_list = [item[0] for item in env_kvm_entry_list]
+    num = choose_num(menu_list)
+    return env_kvm_entry_list[num]
 
 
 def select_kvm_history(selection):

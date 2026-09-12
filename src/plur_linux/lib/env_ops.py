@@ -84,6 +84,10 @@ exp = '\w+'
 type = 'string'
 message = 'access_ip'
 exp = '\d{1,3}(\.\d{1,3}){3}'
+[vdisk_dir]
+type = 'string'
+message = 'vdisk_dir'
+exp = '^\/.+(\/.+){0,20}'
 """
 default_kvm = {
     'hostname': 'myhost',
@@ -91,6 +95,7 @@ default_kvm = {
     'password': TEMP_BADPASS,
     'platform': 'almalinux9',
     'access_ip': '127.0.0.1',
+    'vdisk_dir': '/vm_images'
 }
 
 def show_json(data, color=dummy_color):

@@ -27,7 +27,7 @@ def create_gluster_dict(hv='kvm'):
             'prepare_vdisk': {
                 'type': 'copy',
                 'cloudinit': True,
-                'org_path': f'/vm_images/{gluster_image_comp}',
+                'org_file': gluster_image_comp,
                 'size': 10,
             },
             'additional_vdisks': [{

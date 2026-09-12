@@ -158,8 +158,8 @@ def ad_hoc_setup():
             'run_post': post_run
         }
         vm_dict['prepare_vdisk'] = {
-                'type': 'copy',
-            'org_path': f'{spawn.vdisk_dir}/{vm_image_list[num]}',
+            'type': 'copy',
+            'org_file': vm_image_list[num],
         }
         create_vm_dict_on(kvm, vm_dict)
 
@@ -172,19 +172,3 @@ def list_vm_images_on_kvm(kvm):
 
     return run_on(kvm, on_kvm, log_params=log_param_templates.silent())
 
-# def destroy_guest(by_input=False):
-#     def func():
-#         if by_input:
-#             hostname = get_input('\\w+', message='input hostname: ')
-#             vm = new_node.destroy_node(hostname)
-#         else:
-#             node_module = select_2nd(lib_vm_module.vm_nodes, red("Please select from vm to Destroy"))
-#             vm = select_2nd(node_module.destroy_nodes())
-#         kvm = lib_kvm_module.select_kvm()
-#         log_params = log_param_templates.append()
-#         if kvm:
-#             session_wrap.ssh(kvm, log_params=log_params)(spawn.destroy_with_check(vm))()
-#         else:
-#             session_wrap.bash(log_params=log_params)(spawn.destroy_with_check(vm))()
-#
-#     return func
