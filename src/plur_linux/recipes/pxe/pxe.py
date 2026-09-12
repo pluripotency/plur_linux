@@ -108,26 +108,26 @@ def prepare_pxe_files(session, pxe_menu_contets_str, tftpboot_dir='/var/lib/tftp
         , r'\cp -f /usr/share/syslinux/{menu.c32,vesamenu.c32,ldlinux.c32,libcom32.c32,libutil.c32} ' + f'{tftpboot_dir}/'
         , f'mkdir {tftpboot_dir}/pxelinux.cfg'
     ]]
-    base_shell.here_doc(session, '/var/lib/tftpboot/pxelinux.cfg/default', pxe_menu_contets_str.split('\n'))
+    base_shell.here_doc(session, f'{tftpboot_dir}/pxelinux.cfg/default', pxe_menu_contets_str.split('\n'))
 
 
-def prepare_pxe_vmlinuz(session, dist_dir, tftpboot_dir='/var/lib/tftpboot'):
+def prepare_pxe_vmlinuz(session, dist_dir, www_iso_dir, tftpboot_dir='/var/lib/tftpboot'):
     base_shell.run(session, f'mkdir {tftpboot_dir}/{dist_dir}')
-    base_shell.run(session, rf'\cp -f /var/pxe/{dist_dir}/images/pxeboot/' + '{vmlinuz,initrd.img}' + f' {tftpboot_dir}/{dist_dir}/')
+    base_shell.run(session, rf'\cp -f {www_iso_dir}/images/pxeboot/' + '{vmlinuz,initrd.img}' + f' {tftpboot_dir}/{dist_dir}/')
 
 
-def prepare_pxe_uefi_files(session, grub_cfg_str):
+def prepare_pxe_uefi_files(session, grub_cfg_str, tftpboot_dir='/var/lib/tftpboot'):
     base_shell.work_on(session, '/root/rpm')
     # base_shell.run(session, 'dnf -y install --downloadonly --downloaddir=/root/rpm shim grub2-efi-x64')
     base_shell.run(session, 'dnf download shim grub2-efi-x64')
-    [base_shell.run(session, a) for a in misc.del_indent_lines(r"""
+    [base_shell.run(session, a) for a in misc.del_indent_lines(rf"""
     rpm2cpio shim-x64-*.rpm | cpio -dimv
     rpm2cpio grub2-efi-x64-*.rpm | cpio -dimv
-    \cp -f ./boot/efi/EFI/BOOT/BOOTX64.EFI /var/lib/tftpboot/
-    \cp -f ./boot/efi/EFI/almalinux/grubx64.efi /var/lib/tftpboot/
-    chmod 644 /var/lib/tftpboot/{BOOTX64.EFI,grubx64.efi}
+    \cp -f ./boot/efi/EFI/BOOT/BOOTX64.EFI {tftpboot_dir}/
+    \cp -f ./boot/efi/EFI/almalinux/grubx64.efi {tftpboot_dir}/
     """)]
-    base_shell.here_doc(session, '/var/lib/tftpboot/grub.cfg', grub_cfg_str.split('\n'))
+    base_shell.run(session, f"chmod 644 {tftpboot_dir}/" + r"{BOOTX64.EFI,grubx64.efi}")
+    base_shell.here_doc(session, f'{tftpboot_dir}/grub.cfg', grub_cfg_str.split('\n'))
 
 
 def create_grub_cfg_str(dist_name, pxe_ip, dist_dir, ks_filename_list):
@@ -170,6 +170,19 @@ def setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=None):
     return func
 
 
+def setup_pxe_base_by_docker(pxe_ip, dist_dir, www_iso_dir, segment=None, compose_dir='/etc/pxe-docker'):
+    """Set up PXE base services (Nginx, Kea DHCP, TFTP) using Docker Compose."""
+    from plur_linux.recipes.pxe import compose
+    return compose.setup_pxe_compose(
+        pxe_ip=pxe_ip,
+        dist_dir=dist_dir,
+        www_iso_dir=www_iso_dir,
+        segment=segment,
+        compose_dir=compose_dir,
+        set_fw=True,
+    )
+
+
 def get_primary_ip(session):
     primary_ip = None
     for line in base_shell.run(session, 'ip -4 -br a | cat').splitlines():
@@ -181,15 +194,19 @@ def get_primary_ip(session):
     return primary_ip
 
 
-def setup_a8_pxe_uefi(session, segment=None, account_set=None):
+def setup_a8_pxe_uefi(session, segment=None, account_set=None, use_docker=False):
     dist_name = 'AlmaLinux 8'
+    dist_dir = 'almalinux8'
     pxe_ip = get_primary_ip(session)
-    dist_dir, www_iso_dir = prepare_iso.prepare_a8_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    www_iso_dir = prepare_iso.prepare_a8_iso(session, dist_dir)
+    if use_docker:
+        setup_pxe_base_by_docker(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    else:
+        setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
-        prepare_pxe_vmlinuz(session, dist_dir)
+        prepare_pxe_vmlinuz(session, dist_dir, www_iso_dir)
         ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
@@ -199,30 +216,39 @@ def setup_a8_pxe_uefi(session, segment=None, account_set=None):
     sudo_func(session)
 
 
-def setup_a8_pxe(session, segment=None, account_set=None):
+def setup_a8_pxe(session, segment=None, account_set=None, use_docker=False):
+    dist_name = 'AlmaLinux 8'
+    dist_dir = 'almalinux8'
     pxe_ip = get_primary_ip(session)
-    dist_dir, www_iso_dir = prepare_iso.prepare_a8_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    www_iso_dir = prepare_iso.prepare_a8_iso(session, dist_dir)
+    if use_docker:
+        setup_pxe_base_by_docker(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    else:
+        setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
-        prepare_pxe_vmlinuz(session, dist_dir)
+        prepare_pxe_vmlinuz(session, dist_dir, www_iso_dir)
         ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
-        pxe_menu_str = create_pxe_menu_str('AlmaLinux 8', pxe_ip, dist_dir, ks_filename_list)
+        pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
 
     sudo_func(session)
 
 
-def setup_a9_pxe_uefi(session, segment=None, account_set=None):
+def setup_a9_pxe_uefi(session, segment=None, account_set=None, use_docker=False):
     dist_name = 'AlmaLinux 9'
+    dist_dir = 'almalinux9'
     pxe_ip = get_primary_ip(session)
-    dist_dir, www_iso_dir = prepare_iso.prepare_a9_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    www_iso_dir = prepare_iso.prepare_a9_iso(session, dist_dir)
+    if use_docker:
+        setup_pxe_base_by_docker(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    else:
+        setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
-        prepare_pxe_vmlinuz(session, dist_dir)
+        prepare_pxe_vmlinuz(session, dist_dir, www_iso_dir)
         ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
@@ -232,30 +258,39 @@ def setup_a9_pxe_uefi(session, segment=None, account_set=None):
     sudo_func(session)
 
 
-def setup_a9_pxe(session, segment=None, account_set=None):
+def setup_a9_pxe(session, segment=None, account_set=None, use_docker=False):
+    dist_name = 'AlmaLinux 9'
+    dist_dir = 'almalinux9'
     pxe_ip = get_primary_ip(session)
-    dist_dir, www_iso_dir = prepare_iso.prepare_a9_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    www_iso_dir = prepare_iso.prepare_a9_iso(session, dist_dir)
+    if use_docker:
+        setup_pxe_base_by_docker(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    else:
+        setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
-        prepare_pxe_vmlinuz(session, dist_dir)
+        prepare_pxe_vmlinuz(session, dist_dir, www_iso_dir)
         ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, account_set=account_set)
-        pxe_menu_str = create_pxe_menu_str('AlmaLinux 9', pxe_ip, dist_dir, ks_filename_list)
+        pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
 
     sudo_func(session)
 
 
-def setup_a10_pxe_uefi(session, segment=None, account_set=None):
+def setup_a10_pxe_uefi(session, segment=None, account_set=None, use_docker=False):
     dist_name = 'AlmaLinux 10'
+    dist_dir = 'almalinux10'
     pxe_ip = get_primary_ip(session)
-    dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    www_iso_dir = prepare_iso.prepare_a10_iso(session, dist_dir)
+    if use_docker:
+        setup_pxe_base_by_docker(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    else:
+        setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
-        prepare_pxe_vmlinuz(session, dist_dir)
+        prepare_pxe_vmlinuz(session, dist_dir, www_iso_dir)
         ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)
@@ -265,15 +300,19 @@ def setup_a10_pxe_uefi(session, segment=None, account_set=None):
     sudo_func(session)
 
 
-def setup_a10_pxe(session, segment=None, account_set=None):
+def setup_a10_pxe(session, segment=None, account_set=None, use_docker=False):
     dist_name = 'AlmaLinux 10'
+    dist_dir = 'almalinux10'
     pxe_ip = get_primary_ip(session)
-    dist_dir, www_iso_dir = prepare_iso.prepare_a10_iso(session)
-    setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    www_iso_dir = prepare_iso.prepare_a10_iso(session, dist_dir)
+    if use_docker:
+        setup_pxe_base_by_docker(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
+    else:
+        setup_pxe_base(pxe_ip, dist_dir, www_iso_dir, segment=segment)(session)
 
     @session_wrap.sudo
     def sudo_func(session):
-        prepare_pxe_vmlinuz(session, dist_dir)
+        prepare_pxe_vmlinuz(session, dist_dir, www_iso_dir)
         ks_filename_list = kickstart.prepare_ks(session, pxe_ip, dist_dir, a10=True, account_set=account_set)
         pxe_menu_str = create_pxe_menu_str(dist_name, pxe_ip, dist_dir, ks_filename_list)
         prepare_pxe_files(session, pxe_menu_str)

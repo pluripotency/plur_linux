@@ -149,7 +149,7 @@ def setup_nginx(session):
 def prepare_jammy_iso(session):
     iso_url = "https://ftp.riken.jp/Linux/ubuntu-releases/jammy/ubuntu-22.04.4-live-server-amd64.iso"
     iso_name = "ubuntu-22.04.4-live-server-amd64.iso"
-    mount_dir = f'/mnt'
+    mount_dir = '/mnt'
     iso_dir = '/var/www/iso'
 
     base_shell.work_on(session, iso_dir)
@@ -294,7 +294,7 @@ def setup_pxe(session):
         'nginx',
         'pxelinux',
         'syslinux',
-    ], True)(session)
+    ])(session)
     setup_bootloader(session)
     base_shell.run(session, 'reset')
     iso_name = prepare_jammy_iso(session)

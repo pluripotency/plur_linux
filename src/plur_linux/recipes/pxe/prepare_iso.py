@@ -2,7 +2,8 @@ from plur import session_wrap
 from plur import base_shell
 
 
-def prepare_iso(iso_name, iso_url, www_iso_dir):
+def prepare_iso(iso_name, iso_url, dist_dir):
+    www_iso_dir = f'/var/pxe/{dist_dir}'
     local_dir = '/home/worker/Downloads'
     iso_path = f'{local_dir}/{iso_name}'
 
@@ -17,35 +18,27 @@ def prepare_iso(iso_name, iso_url, www_iso_dir):
         if not base_shell.check_file_exists(session, iso_path):
             base_shell.run(session, f'curl -O {iso_url}')
         mount_iso(session)
+        return www_iso_dir
 
     return as_worker
 
 
-def prepare_a8_iso(session):
+def prepare_a8_iso(session, dist_dir):
     iso_name = 'AlmaLinux-8-latest-x86_64-minimal.iso'
     iso_url = f'http://ftp.riken.jp/Linux/almalinux/8/isos/x86_64/{iso_name}'
-    dist_dir = 'almalinux8'
-    www_iso_dir = f'/var/pxe/{dist_dir}'
-    prepare_iso(iso_name, iso_url, www_iso_dir)(session)
-    return dist_dir, www_iso_dir
+    return prepare_iso(iso_name, iso_url, dist_dir)(session)
 
 
-def prepare_a9_iso(session):
+def prepare_a9_iso(session, dist_dir):
     iso_name = 'AlmaLinux-9-latest-x86_64-minimal.iso'
     iso_url = f'http://ftp.riken.jp/Linux/almalinux/9/isos/x86_64/{iso_name}'
-    dist_dir = 'almalinux9'
-    www_iso_dir = f'/var/pxe/{dist_dir}'
-    prepare_iso(iso_name, iso_url, www_iso_dir)(session)
-    return dist_dir, www_iso_dir
+    return prepare_iso(iso_name, iso_url, dist_dir)(session)
 
 
-def prepare_a10_iso(session):
+def prepare_a10_iso(session, dist_dir):
     iso_name = 'AlmaLinux-10.2-x86_64_v2-minimal.iso'
     iso_url = f'http://ftp.riken.jp/Linux/almalinux/10/isos/x86_64_v2/{iso_name}'
-    dist_dir = 'almalinux10'
-    www_iso_dir = f'/var/pxe/{dist_dir}'
-    prepare_iso(iso_name, iso_url, www_iso_dir)(session)
-    return dist_dir, www_iso_dir
+    return prepare_iso(iso_name, iso_url, dist_dir)(session)
 
 
 def prepare_jammy_iso(session):

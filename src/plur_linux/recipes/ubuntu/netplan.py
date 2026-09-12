@@ -15,7 +15,7 @@ def create_ipv6_lines():
           accept-ra: false
           link-local: []
     """
-    return misc.del_indent_lines(f"""
+    return misc.del_indent_lines("""
           dhcp6: false
           accept-ra: false
           link-local: []

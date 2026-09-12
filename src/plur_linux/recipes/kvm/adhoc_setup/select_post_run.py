@@ -70,7 +70,7 @@ def set_hostname_and_waitprompt(node_dict):
         hostname = node_dict['hostname']
     else:
         hostname = 'localhost'
-    hostname = get_input('^[a-z][a-z0-9_]{2,30}$', f'Hostname (Default: {hostname}): ', 'Invalid Hostname', hostname)
+    hostname = get_input(r'^[a-z][a-z0-9_.-]{2,100}$', f'Hostname (Default: {hostname}): ', 'Invalid Hostname', hostname)
     node_dict['hostname'] = hostname
     return node_dict
 

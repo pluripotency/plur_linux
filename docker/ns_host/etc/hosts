@@ -1,0 +1,202 @@
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+
+# In lab
+192.168.99.253   s-es-x450
+192.168.99.254   s-cs-x440
+
+10.30.0.10	lab010
+10.30.0.11	lab011
+10.30.0.14	dev14	dev14.r
+10.30.0.15	dev15	dev15.r
+10.30.0.16	dev16	dev16.r
+
+10.30.0.18 oauth2-proxy.oauth2-proxy.local
+10.30.0.18 oauth2-proxy
+10.30.0.18 httpbin.oauth2-proxy.local
+10.30.0.18 oauth2-proxy.local
+
+10.30.0.41	c7gl041
+10.30.0.42	c7gl042
+10.30.0.43	c7gl043
+10.30.0.64  labdock064
+10.30.0.65  labdock065 registry
+10.30.0.97  vpn97
+10.30.0.98  vpn98
+10.30.0.196	devmail
+10.30.0.197	postman.riken.jp
+10.30.0.254 forti forti.example.com
+
+192.168.10.63   2930f    2930f.r
+192.168.10.131	dockcertreg
+
+# Resolve Internal
+192.168.10.1	r21kavip
+172.18.65.165    certregister.intra.riken.jp
+#192.168.10.5  nginx_creg_ted certregister.intra.riken.jp
+192.168.10.5  nginx_creg_ted
+192.168.10.6  nginx_creg
+192.168.10.7  ipam-r
+192.168.10.10   onestop     onestop.r
+192.168.10.11   fpwako      fpwako.r
+192.168.10.17   resp1       resp1.r
+192.168.10.18   resp2       resp2.r
+192.168.10.19   jsworker1   jsworker1.r
+192.168.10.23   ns1         ns1.r
+192.168.10.29   redis_w1    redis_w1.r
+192.168.10.30   redis_w2    redis_w2.r
+192.168.10.33   mongo033    mongo033.r
+192.168.10.34   mongo034    mongo034.r
+192.168.10.35   mongo035    mongo035.r
+192.168.10.61   nfs61       nfs61.local
+192.168.10.62   gw          gw.r
+192.168.10.71   redis071 redis071.r
+192.168.10.72   redis072 redis072.r
+192.168.10.73   mongo073 mongo073.r
+192.168.10.74   mongo074 mongo074.r
+192.168.10.75   mongo075 mongo075.r
+192.168.10.76   dockredis076 dockredis076.r
+192.168.10.77   dockredis077 dockredis077.r
+192.168.10.78   dockmongo078 dockmongo078.r
+192.168.10.79   dockmongo079 dockmongo079.r
+192.168.10.80   dockmongo080 dockmongo080.r
+192.168.10.101  dock101     dockgl101   dock101.r   dockgl101.r
+192.168.10.102  dock102     dockgl102   dock102.r   dockgl102.r
+192.168.10.103  dock103     dockgl103   dock103.r   dockgl103.r
+192.168.10.104  dock104     dockgl104   dock104.r   dockgl104.r
+192.168.10.105  dock105 a8dock105ka
+192.168.10.106  dock106 a8dock106ka
+192.168.10.107  a8dockvip
+192.168.10.143  r21kacreg143   r21kacreg143.r
+192.168.10.144  r21kacreg144   r21kacreg144.r
+192.168.10.145	selenium    selenium.r
+192.168.10.146  waa1        waa1.r
+192.168.10.147  waa2        waa2.r
+192.168.10.148  wedu1       wedu1.r
+192.168.10.149  wedu2       wedu2.r
+192.168.10.151  ldap151     ldap151.r
+192.168.10.152  ldap152     ldap152.r
+192.168.10.153  cobbler     cobbler.r
+192.168.10.154  esxpxe      esxpxe.r
+192.168.10.157	r21ka157    r21ka157.r
+192.168.10.158	r21ka158    r21ka158.r
+192.168.10.196  mydesk     mydesk.r
+# 192.168.10.200-250 dhcp by cobbler
+
+172.25.2.136    wd136
+172.25.2.137    wd1
+172.25.2.138    wd2
+10.64.244.136   yd136
+10.64.244.137   yd1
+172.21.244.136  kd136
+172.21.244.137  kd1
+10.3.96.136     td136
+10.3.96.137     td1
+10.5.76.136     od136
+10.5.76.137     od1
+172.25.2.159    resp_w159
+172.25.2.160    resp_w160
+10.64.244.159   resp_y159
+10.3.96.159     resp_t159
+172.21.244.159  resp_k159
+10.5.76.159     resp_o159
+
+# syslog servers
+172.25.3.213     wl1 r21syslog_w1
+172.25.3.214     wl2 r21syslog_w2
+172.25.3.215     wl3 r21syslog_w3
+172.25.3.216     wl4 r21syslog_w4
+10.64.250.213    yl1 r21syslog_y1
+10.64.250.214    yl2 r21syslog_y2
+172.21.250.213   kl1 r21syslog_k1
+172.21.250.214   kl2 r21syslog_k2
+10.3.5.213       tl1 r21syslog_t1
+10.3.5.214       tl2 r21syslog_t2
+10.5.99.213      ol1 r21syslog_o1
+10.5.99.214      ol2 r21syslog_o2
+
+# Maintenance Cloud
+# Wako only
+
+172.25.3.181     workflow_w1      workflow_w1.r
+172.25.3.181     cert_reg         cert_reg.r
+172.25.3.182     workflow_w2      workflow_w2.r
+172.25.3.188     edu_proxy1       edu_proxy1.r
+172.25.3.189     edu_proxy2       edu_proxy2.r
+172.25.3.197     vpn_checker_w1   vpn_checker_w1.r
+172.25.3.198     vpn_checker_w2   vpn_checker_w2.r
+# Wako
+172.25.3.180     nginx_jou_w      nginx_jou_w.r
+172.25.3.183     c6wlan_w         c6wlan_w.r
+172.25.3.190     zab_w            zab_w.r
+172.25.3.191     dhguest_desk_w   dhguest_desk_w.r
+172.25.3.192     dhguest_w        dhguest_w.r
+172.25.3.193     resp_w1          resp_w1.r
+172.25.3.194     resp_w2          resp_w2.r
+172.25.3.195     jsworker_w1      jsworker_w1.r
+172.25.3.196     mydesk           mydesk.r
+172.25.3.199     dhguest_wlan_w   dhguest_wlan_w.r
+172.25.3.213     repo_w           repo_w.r
+172.25.3.217     w_nf1            w_nf1.r
+172.25.3.218     w_nf2            w_nf2.r
+172.25.3.219     gw_w             gw_w.r
+# Yokohama
+10.64.250.180    nginx_jou_y      nginx_jou_y.r
+10.64.250.183    c6wlan_y         c6wlan_y.r
+10.64.250.190    zab_y            zab_y.r
+10.64.250.191    dhguest_desk_y   dhguest_desk_y.r
+10.64.250.192    dhguest_y        dhguest_y.r
+10.64.250.193    resp_y1          resp_y1.r
+10.64.250.194    resp_y2          resp_y2.r
+10.64.250.195    jsworker_y1      jsworker_y1.r
+10.64.250.196    jsworker_y2      jsworker_y2.r
+10.64.250.199    dhguest_wlan_y   dhguest_wlan_y.r
+10.64.250.213    repo_y           repo_y.r
+10.64.250.217    y_nf1            y_nf1.r
+10.64.250.218    y_nf2            y_nf2.r
+10.64.250.219    gw_y             gw_y.r
+# Kobe
+172.21.250.180   nginx_jou_k      nginx_jou_k.r
+172.21.250.183   c6wlan_k         c6wlan_k.r
+172.21.250.190   zab_k            zab_k.r
+172.21.250.191   dhguest_desk_k   dhguest_desk_k.r
+172.21.250.192   dhguest_k        dhguest_k.r
+172.21.250.193   resp_k1          resp_k1.r
+172.21.250.194   resp_k2          resp_k2.r
+172.21.250.195   jsworker_k1      jsworker_k1.r
+172.21.250.196   jsworker_k2      jsworker_k2.r
+172.21.250.199   dhguest_wlan_k   dhguest_wlan_k.r
+172.21.250.213   repo_k           repo_k.r
+172.21.250.217   k_nf1            k_nf1.r
+172.21.250.218   k_nf2            k_nf2.r
+172.21.250.219   gw_k             gw_k.r
+# Tsukuba
+10.3.5.180       nginx_jou_t      nginx_jou_t.r
+10.3.5.183       c6wlan_t         c6wlan_t.r
+10.3.5.190       zab_t            zab_t.r
+10.3.5.191       dhguest_desk_t   dhguest_desk_t.r
+10.3.5.192       dhguest_t        dhguest_t.r
+10.3.5.193       resp_t1          resp_t1.r
+10.3.5.194       resp_t2          resp_t2.r
+10.3.5.195       jsworker_t1      jsworker_t1.r
+10.3.5.196       jsworker_t2      jsworker_t2.r
+10.3.5.199       dhguest_wlan_t   dhguest_wlan_t.r
+10.3.5.213       repo_t           repo_t.r
+10.3.5.217       t_nf1            t_nf1.r
+10.3.5.218       t_nf2            t_nf2.r
+10.3.5.219       gw_t             gw_t.r
+# Osaka
+10.5.99.180      nginx_jou_o      nginx_jou_o.r
+10.5.99.183      c6wlan_o         c6wlan_o.r
+10.5.99.190      zab_o            zab_o.r
+10.5.99.191      dhguest_desk_o   dhguest_desk_o.r
+10.5.99.192      dhguest_o        dhguest_o.r
+10.5.99.193      resp_o1          resp_o1.r
+10.5.99.194      resp_o2          resp_o2.r
+10.5.99.195      jsworker_o1      jsworker_o1.r
+10.5.99.196      jsworker_o2      jsworker_o2.r
+10.5.99.199      dhguest_wlan_o   dhguest_wlan_o.r
+10.5.99.213      repo_o           repo_o.r
+10.5.99.217      o_nf1            o_nf1.r
+10.5.99.218      o_nf2            o_nf2.r
+10.5.99.219      gw_o             gw_o.r

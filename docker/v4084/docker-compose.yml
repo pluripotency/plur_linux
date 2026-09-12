@@ -1,0 +1,18 @@
+version: '3'
+services:
+  dhcpd_v4084:
+    image: alpine-dhcpd
+    build: .
+    restart: always
+    volumes:
+      - ./conf/dhcpd.conf:/etc/dhcp/dhcpd.conf
+      - ./leases:/var/lib/dhcpd
+    ports:
+      - "67:67"
+    networks:
+      v4084:
+        ipv4_address: 192.168.10.251
+networks:
+  v4084:
+    external:
+      name: v4084
