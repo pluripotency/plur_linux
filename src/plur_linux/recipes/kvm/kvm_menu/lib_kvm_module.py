@@ -24,18 +24,18 @@ def create_kvm_dict(hostname, access_ip, username, password, platform, **_kwargs
     }
 
 
-def input_kvm_dict():
-    hostname = 'localhost'
-    access_ip = '127.0.0.1'
-    username = 'worker'
-    password = 'password'
-    platform = 'almalinux9'
-    hostname = get_input('[a-z][a-z0-9_]{0,30}', f'kvm(default={hostname}):', 'Invalid name', hostname)
-    access_ip = get_input(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', f'kvm ip(default: {access_ip}): ', 'Invalid IP', access_ip)
-    username = get_input(r'\w.', f'kvm username(default={username}):', default_value=username)
-    password = get_input(r'\w.', f'kvm password(default={password}):', default_value=password)
-    platform = get_input(r'\w.', f'kvm os platform(default={platform}):', default_value=platform)
-    return create_kvm_dict(hostname, access_ip, username, password, platform)
+# def input_kvm_dict():
+#     hostname = 'localhost'
+#     access_ip = '127.0.0.1'
+#     username = 'worker'
+#     password = 'password'
+#     platform = 'almalinux9'
+#     hostname = get_input('[a-z][a-z0-9_]{0,30}', f'kvm(default={hostname}):', 'Invalid name', hostname)
+#     access_ip = get_input(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', f'kvm ip(default: {access_ip}): ', 'Invalid IP', access_ip)
+#     username = get_input(r'\w.', f'kvm username(default={username}):', default_value=username)
+#     password = get_input(r'\w.', f'kvm password(default={password}):', default_value=password)
+#     platform = get_input(r'\w.', f'kvm os platform(default={platform}):', default_value=platform)
+#     return create_kvm_dict(hostname, access_ip, username, password, platform)
 
 
 def select_kvm():
@@ -62,7 +62,9 @@ def select_kvm():
         if num == len_mod - 1:
             return False
         elif num == len_mod - 2:
-            return base_node.Node(input_kvm_dict())
+            # return base_node.Node(input_kvm_dict())
+            kvm_item = env_ops.get_kvm_dict()
+            return base_node.Node(create_kvm_dict(**kvm_item))
         else:
             kvm = select_2nd(kvm_module_list[num][1].create_nodes())
             return kvm
@@ -81,7 +83,9 @@ def select_kvm_history(selection):
         selection.append({'key': 'kvm_module', 'index': [num]})
         return False
     elif num == len_mod - 2:
-        kvm_params_dict = input_kvm_dict()
+        # kvm_params_dict = input_kvm_dict()
+        kvm_item = env_ops.get_kvm_dict()
+        kvm_params_dict = create_kvm_dict(**kvm_item)
         selection.append({'key': 'kvm_module', 'index': [num, kvm_params_dict]})
         return base_node.Node(kvm_params_dict)
     else:

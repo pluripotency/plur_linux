@@ -295,6 +295,12 @@ class EnvAccountSet():
             else:
                 self.set_account_set(num)
 
+def get_kvm_dict():
+    while True:
+        kvm_dict = get_obj_by_definition(load_toml(KVM_DEFINITION_TOML_STR), default_kvm)
+        if kvm_dict:
+            return kvm_dict
+
 class EnvKVM():
     def __init__(self, env_ops=None):
         if isinstance(env_ops, EnvOpsBase):
