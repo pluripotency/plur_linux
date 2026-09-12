@@ -124,6 +124,14 @@ def create_create_vm_params(node_dict):
     node_dict['login_method'] = 'create vm'
     return node_dict
 
+def create_create_vm_by_copy_params(node_dict):
+    node_dict = set_hostname_and_waitprompt(node_dict)
+    username = node_dict['username']
+    hostname = node_dict['hostname']
+    node_dict = new_node.create_single_iface_node_dict(hostname, None, node_dict, login_user=username)
+    node_dict['login_method'] = 'create vm by copy'
+    return node_dict
+
 class VmConnect:
     def __init__(self, initial_node_dict, connect_method_list):
         self.initial_node_dict = initial_node_dict
@@ -135,6 +143,7 @@ class VmConnect:
                 , 'bash'
                 , 'virsh console'
                 , 'create vm'
+                , 'create vm by copy'
             ]
         self.node_dict = None
         self.selected_con = None
@@ -142,16 +151,17 @@ class VmConnect:
     def get_format_con(self):
         if not self.selected_con:
             return light_red('not selected yet.')
-        hostname = self.node_dict['hostname']
-        if self.selected_con == 'ssh':
-            access_ip = self.node_dict['access_ip']
-            return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip})'
-        if self.selected_con in ['bash', 'virsh console']:
-            return f'{self.selected_con}(hostname:{hostname})'
-        if self.selected_con == 'create vm':
-            size = self.node_dict['size']
-            access_ip = self.node_dict['access_ip']
-            return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip}  size:{size}G)'
+        if self.node_dict and 'hostname' in self.node_dict:
+            hostname = self.node_dict['hostname']
+            if self.selected_con == 'ssh':
+                access_ip = self.node_dict['access_ip']
+                return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip})'
+            if self.selected_con in ['bash', 'virsh console', 'create vm by copy']:
+                return f'{self.selected_con}(hostname:{hostname})'
+            if self.selected_con == 'create vm':
+                size = self.node_dict['size']
+                access_ip = self.node_dict['access_ip']
+                return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip}  size:{size}G)'
         return red('something wrong in VmConnect')
 
     def select_con_menu(self):
@@ -169,6 +179,8 @@ class VmConnect:
             self.node_dict = create_virsh_console_params(self.initial_node_dict)
         elif selected == 'create vm':
             self.node_dict = create_create_vm_params(self.initial_node_dict)
+        elif selected == 'create vm by copy':
+            self.node_dict = create_create_vm_by_copy_params(self.initial_node_dict)
         else:
             print(red(f'no such connect_method: {selected}'))
 

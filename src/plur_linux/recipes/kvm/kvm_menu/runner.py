@@ -15,9 +15,9 @@ def run_on(kvm, func, log_params=None):
     if log_params is None:
         log_params = log_param_templates.normal_on_tmp()
     if kvm:
-        session_wrap.ssh(kvm, log_params=log_params)(func)()
+        return session_wrap.ssh(kvm, log_params=log_params)(func)()
     else:
-        session_wrap.bash(log_params=log_params)(func)()
+        return session_wrap.bash(log_params=log_params)(func)()
 
 
 def create_vm_dict(vm_dict):
@@ -146,7 +146,31 @@ def ad_hoc_setup():
                 'run_post': post_run
             }
             create_vm_dict_on(kvm, vm_dict)
+    elif login_method == 'create vm by copy':
+        kvm = lib_kvm_module.select_kvm()
+        vm_image_list = list_vm_images_on_kvm(kvm)
+        while True:
+            num = choose_num(menu_list=vm_image_list, message='Select vm copy from')
+            if get_y_n('Do you want to copy from ' + vm_image_list[num]):
+                break
 
+        vm_dict['setups'] = {
+            'run_post': post_run
+        }
+        vm_dict['prepare_vdisk'] = {
+                'type': 'copy',
+            'org_path': f'{spawn.vdisk_dir}/{vm_image_list[num]}',
+        }
+        create_vm_dict_on(kvm, vm_dict)
+
+
+def list_vm_images_on_kvm(kvm):
+    @session_wrap.sudo
+    def on_kvm(session):
+        capt = base_shell.run(session, f'cd {spawn.vdisk_dir} && ls > /tmp/vm_image_list && cat /tmp/vm_image_list')
+        return lib.parse_vm_image_list(capt)
+
+    return run_on(kvm, on_kvm, log_params=log_param_templates.silent())
 
 # def destroy_guest(by_input=False):
 #     def func():

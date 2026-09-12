@@ -2,6 +2,28 @@ from plur import base_shell
 from mini.menu import get_input, red, green
 import re
 
+ex_vm_image_list = """
+a10desk.qcow2
+a10tmux.qcow2
+a9a10.qcow2
+a9a10docker.qcow2
+a9dev.qcow2
+a9pxea10.qcow2
+fedora.qcow2
+resclaw.qcow2
+resdev.qcow2
+resolute.comp.qcow2
+resolute.qcow2
+"""
+
+
+def parse_vm_image_list(capture):
+    vm_image_list = []
+    for line in capture.splitlines():
+        if re.search('^[a-z].+\.qcow2$', line.strip()):
+            vm_image_list.append(line.strip())
+    return sorted(vm_image_list, key=lambda mem: mem[0])
+
 
 ex_virsh_list_all_egrep_19 = """
  3     gl41042        running
