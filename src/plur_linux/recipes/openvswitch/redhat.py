@@ -43,11 +43,17 @@ def install_from_centos_release_nfv(session):
     systemctl enable --now openvswitch
     """)]
 
+def install_openvswitch_for_almalinux9(session): 
+    return install_from_centos_release_nfv(session)
+
+
+def install_openvswitch_for_almalinux10(session): 
+    return install_from_centos_release_nfv(session)
+
 
 dict_ovs = {
     'almalinux8': {
         # this doesn't work by EOL 2024/6
         'yoga': install_from_rdo_archived
     },
-    'almalinux9': install_from_centos_release_nfv,
 }

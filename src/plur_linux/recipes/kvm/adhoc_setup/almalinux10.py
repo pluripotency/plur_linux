@@ -71,7 +71,7 @@ class Apps(generic.SelectMenu):
             from plur_linux.recipes.kvm import virt_builder
             virt_builder.install_kvm(session)
         if self.selection['openvswitch']:
-            from plur_linux.recipes.almalinux9 import openvswitch
+            from plur_linux.recipes.almalinux10 import openvswitch
             openvswitch.install(session)
         if self.selection['ca']:
             from plur_linux.recipes.openssl import ca_menu

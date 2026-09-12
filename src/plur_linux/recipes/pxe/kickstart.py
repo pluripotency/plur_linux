@@ -35,7 +35,7 @@ clearpart --all --initlabel
 part /boot/efi --fstype="efi" --size=600 --ondisk={disk_dev}
 
 # 2. ブートパーティション (/boot)
-part /boot --fstype="xfs" --size=1024 --ondisk={disk_dev}
+part /boot --fstype="xfs" --size=2048 --ondisk={disk_dev}
 
 # 3. LVM 物理ボリューム (PV) の作成 (残りを全割り当て)
 part pv.01 --fstype="lvmpv" --size=1 --grow --ondisk={disk_dev}
@@ -185,17 +185,18 @@ def create_a10_ks_str(dist_url='', disk_dev='sda', with_console=True, volume_typ
 def prepare_ks(session, pxe_ip, dist_dir, a10=False, include_lvm=True, account_set=None):
     """Prepare and deploy kickstart files on the PXE server."""
     dist_url = f'url --url=http://{pxe_ip}/{dist_dir}/'
-    ks_meta_list = [
-        ['phy.ks', create_ks_str(dist_url, 'sda', with_console=False, a10=a10, volume_type='standard', account_set=account_set)],
-        ['vda.ks', create_ks_str(dist_url, 'vda', with_console=True, a10=a10, volume_type='standard', account_set=account_set)],
-        ['sda.ks', create_ks_str(dist_url, 'sda', with_console=True, a10=a10, volume_type='standard', account_set=account_set)],
-    ]
+    ks_meta_list = []
     if include_lvm:
         ks_meta_list += [
             ['phy_lvm.ks', create_ks_str(dist_url, 'sda', with_console=False, a10=a10, volume_type='lvm_data', account_set=account_set)],
             ['vda_lvm.ks', create_ks_str(dist_url, 'vda', with_console=True, a10=a10, volume_type='lvm_data', account_set=account_set)],
             ['sda_lvm.ks', create_ks_str(dist_url, 'sda', with_console=True, a10=a10, volume_type='lvm_data', account_set=account_set)],
         ]
+    ks_meta_list += [
+        ['phy.ks', create_ks_str(dist_url, 'sda', with_console=False, a10=a10, volume_type='standard', account_set=account_set)],
+        ['vda.ks', create_ks_str(dist_url, 'vda', with_console=True, a10=a10, volume_type='standard', account_set=account_set)],
+        ['sda.ks', create_ks_str(dist_url, 'sda', with_console=True, a10=a10, volume_type='standard', account_set=account_set)],
+    ]
 
     ks_dir = '/var/www/html/ks'
     base_shell.work_on(session, ks_dir)
