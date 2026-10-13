@@ -1,0 +1,14 @@
+dn: cn=vpn,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: vpn
+olcAttributeTypes: {0}( 1.3.6.1.4.1.3318.4.3.1.100 NAME 'vpnName' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {1}( 1.3.6.1.4.1.3318.4.3.1.1 NAME 'vpnLeasePoolName' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {2}( 1.3.6.1.4.1.3318.4.3.1.2 NAME 'vpnSnatType' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {9}( 1.3.6.1.4.1.3318.4.3.1.9 NAME 'vpnAddressSpaceIncludeDnsName' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {10}( 1.3.6.1.4.1.3318.4.3.1.10 NAME 'vpnAddressSpaceIncludeSubnet' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {11}( 1.3.6.1.4.1.3318.4.3.1.11 NAME 'vpnAddressSpaceExcludeSubnet' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {15}( 1.3.6.1.4.1.3318.4.3.1.15 NAME 'vpnSplitTunneling' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {16}( 1.3.6.1.4.1.3318.4.3.1.16 NAME 'vpnDns' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {17}( 1.3.6.1.4.1.3318.4.3.1.17 NAME 'vpnDnsSuffix' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {50}( 1.3.6.1.4.1.3318.4.3.1.50 NAME 'vpnRouteDomain' DESC '' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcObjectClasses: {0}( 1.3.6.1.4.1.3317.4.3.2.1 NAME 'vpnprofile' DESC '' SUP top AUXILIARY MUST cn MAY ( vpnName $ vpnLeasePoolName $ vpnSnatType $ vpnAddressSpaceIncludeDnsName $ vpnAddressSpaceIncludeSubnet $ vpnAddressSpaceExcludeSubnet $ vpnSplitTunneling $ vpnDns $ vpnDnsSuffix $ vpnRouteDomain ) )
