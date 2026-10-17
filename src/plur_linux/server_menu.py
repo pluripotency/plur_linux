@@ -89,18 +89,22 @@ def docker_menu():
     select_2nd([["deploy git_repository", func]], "Start Docker", vertical=True)
 
 def kvm_menu():
-    select_2nd(
-        [
+    menu_func_list = [
             ["On KVM", kvm_menu_runner.menu_on_kvm],
             ["Create defined guest", kvm_menu_runner.create_defined_guest],
             #["Create defined guest from history", kvm_menu_runner.create_defined_guest_from_history],
             ["Expand Volume", kvm_expand_volume],
             ["Conf Network for defined nodes", configure_network],
             ["Post Run for defined nodes", post_run],
-        ],
-        "KVM Menu",
-        vertical=True,
-    )
+            ['Back']
+
+    ]
+    while True:
+        num = choose_num([item[0] for item in menu_func_list])
+        if num == len(menu_func_list)-1:
+            return
+        else:
+            menu_func_list[num][1]()
 
 def main_menu():
     main_menu_list = [

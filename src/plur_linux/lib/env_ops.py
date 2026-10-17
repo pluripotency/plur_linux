@@ -526,13 +526,19 @@ class EnvMenu:
                 print(line)
 
     def run_menu(self):
-        while True:
-            _ = menu.select_2nd([
+        menu_func_list = [
                 ['Show Current Env', self.show],
                 ['Set Account', self.env_account_set.account_set_list_menu],
                 ['Set KVM segments', self.env_segments.segments_menu],
                 ['Set KVM', self.env_kvm.kvm_list_menu],
-            ])
+                ['Back'],
+        ]
+        while True:
+            num = menu.choose_num([item[0] for item in menu_func_list])
+            if num == len(menu_func_list)-1:
+                return
+            else:
+                menu_func_list[num][1]()
 
 def get_current_index_user_list():
     return EnvAccountSet().get_current_index_account_set_as_user_list()
@@ -555,4 +561,4 @@ def get_env_password(username):
     return env_password
 
 def env_menu():
-    EnvMenu().run_menu()
+    return EnvMenu().run_menu()
