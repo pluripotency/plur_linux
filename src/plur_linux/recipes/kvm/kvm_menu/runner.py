@@ -47,7 +47,7 @@ def interact(session):
 
 
 def menu_on_kvm():
-    from plur_linux.recipes.kvm.kvm_menu import ops_guest, create_guest, destroy_guest, snapshot
+    from plur_linux.recipes.kvm.kvm_menu import ops_guest, edit_guest, create_guest, destroy_guest, snapshot
 
     selection = Selection("create_defined_guest")
     selection.set_title("last")
@@ -59,6 +59,7 @@ def menu_on_kvm():
             menu_list = [
                 ["interact", interact],
                 ["Ops", ops_guest.menu_on_kvm],
+                ["Edit VM", edit_guest.menu_on_kvm],
                 ["Create", create_guest.menu_on_kvm],
                 [red("Destroy"), destroy_guest.menu_on_kvm],
                 ["Snapshot", snapshot.menu_on_kvm],
