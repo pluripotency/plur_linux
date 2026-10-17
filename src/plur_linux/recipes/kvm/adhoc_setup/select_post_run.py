@@ -102,7 +102,7 @@ def create_ssh_params(node_dict):
 
 def create_vm_params(node_dict):
     node_dict = set_hostname(node_dict)
-    size = int(get_input(r'\d+', 'Disk Size (Default: %d(G)): ' % node_dict['size'], 'invalid format', node_dict['size']))
+    size = int(get_input(r'^\d+$', 'Disk Size (Default: %d(G)): ' % node_dict['size'], 'invalid format', node_dict['size']))
     node_dict['size'] = size
     username = node_dict['username']
     hostname = node_dict['hostname']

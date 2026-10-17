@@ -14,7 +14,7 @@ def kvm_expand_volume():
     default_size = 20
     size = int(
         get_input(
-            r"\d+",
+            r"^\d+$",
             f"Disk Size (Default: {default_size}(G)): ",
             "invalid format",
             default_size,
