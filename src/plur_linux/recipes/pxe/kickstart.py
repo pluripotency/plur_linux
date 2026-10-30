@@ -23,7 +23,7 @@ part / --fstype xfs --grow --size=1"""
 
 def create_lvm_data_volume_str(
     disk_dev='sda',
-    root_size_mb=51200,
+    root_size_mb=102400,
     swap_size_mb=8192,
     vg_name='vg_system',
 ):
