@@ -6,7 +6,7 @@ tmp_image_dir = '/tmp'
 
 def curl_if_not_exist(session, local_file_path, url):
     if not base_shell.check_file_exists(session, local_file_path):
-        base_shell.run(session, f'curl -O {url}')
+        base_shell.run(session, f'curl -LO {url}')
 
 
 def copy_image(session, org_image_file_name, url, dst_image_file_name):

@@ -4,12 +4,10 @@ from mini.menu import get_y_n, choose_num
 from plur import base_shell
 from plur import session_wrap
 
-
 def has_true(obj, key):
     if key in obj and obj[key] is True:
         return True
     return False
-
 
 def display_current(instance, title):
     if instance.enable:
@@ -20,13 +18,6 @@ def display_current(instance, title):
         [(light_green(key) if instance.selection[key] is True else light_blue(key)) for key in list(instance.selection)])
     title_str += ')'
     return title_str
-
-
-def check_key(_dict, key):
-    if key in _dict and _dict[key]:
-        return True
-    return False
-
 
 class SelectMenu:
     def __init__(self, selection, exclusive_list=None, menu_title='', select_title=None, extra_menu=None):

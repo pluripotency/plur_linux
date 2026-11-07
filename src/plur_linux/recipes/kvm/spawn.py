@@ -13,12 +13,9 @@ from plur_linux.recipes.ops import ops
 from plur_linux.recipes.kvm import cloudinit_ops
 from plur_linux.recipes.kvm.cloud_image import (
     cloud_image_ops,
-    centos as cloud_image_centos,
-    ubuntu as cloud_image_ubuntu,
     arch as cloud_image_arch,
 )
 xml_dir = "/etc/libvirt/qemu"
-# vdisk_dir = "/vm_images"
 diskformat = "qcow2"
 
 def prepare_additional_vdisk(session, vm, kvm_vdisk_dir):
@@ -58,41 +55,6 @@ def prepare_additional_vdisk(session, vm, kvm_vdisk_dir):
         ]
     return vdisk_list
 
-# def attach_additional_vdisk(session, vm, offline=False):
-#     if hasattr(vm, "additional_vdisks"):
-#         vdisk_list = prepare_additional_vdisk(session, vm)
-#         for vdisk in vdisk_list:
-#             vdisk_path = vdisk["vdisk_path"]
-#             add_diskformat = vdisk["add_diskformat"]
-#             dev_name = vdisk["dev_name"]
-#             virsh.attach_vdisk(
-#                 session,
-#                 vm.hostname,
-#                 vdisk_path,
-#                 add_diskformat,
-#                 dev_name,
-#                 offline=offline,
-#             )
-#
-# def attach_vdisk(session, vm, offline=True):
-#     if hasattr(vm, "hostname"):
-#         hostname = vm.hostname
-#
-#         vdisk_path = f"{vdisk_dir}/{hostname}.{diskformat}"
-#         virsh.attach_vdisk(
-#             session, hostname, vdisk_path, diskformat, "vda", offline=offline
-#         )
-#
-#         attach_additional_vdisk(session, vm, offline=offline)
-#         if hasattr(vm, "cdrom"):
-#             virsh.attach_cdrom(session, hostname, vm.cdrom, offline=offline)
-#             update_disk_action = (
-#                 f"virsh update-disk {hostname} {vm.cdrom} hdb --type cdrom"
-#             )
-#             if offline:
-#                 update_disk_action += " --config"
-#             base_shell.run(session, update_disk_action)
-
 def prepare_backing_or_copy_vdisk(session, vm, kvm_vdisk_dir):
     hostname = vm.hostname
     vdisk_org_path = f'{kvm_vdisk_dir}/' + vm.prepare_vdisk["org_file"]
@@ -118,40 +80,35 @@ def prepare_backing_or_copy_vdisk(session, vm, kvm_vdisk_dir):
     return created_image_path
 
 def prepare_cloudinit_vdisk(session, vm, kvm_vdisk_dir):
+    from plur_linux.recipes.kvm.cloud_image import from_config
     hostname = vm.hostname
     platform = vm.platform
     if hasattr(vm, "prepare_vdisk") and "type" in vm.prepare_vdisk:
         vdisk_type = vm.prepare_vdisk["type"]
         if vdisk_type == "cloud_image":
             cloud_image_func = None
-            if platform == "almalinux9":
-                cloud_image_func = cloud_image_centos.create_almalinux("9")
-            elif platform == "almalinux8":
-                cloud_image_func = cloud_image_centos.create_almalinux("8")
-            elif platform == "almalinux10":
-                cloud_image_func = cloud_image_centos.create_almalinux("10")
-            elif platform == "arch":
-                cloud_image_func = cloud_image_arch.create_arch
-            elif platform == "centos9stream":
-                cloud_image_func = cloud_image_centos.create_centos_stream("9")
-            elif platform == "centos10stream":
-                cloud_image_func = cloud_image_centos.create_centos_stream("10")
-            elif platform == "fedora":
-                cloud_image_func = cloud_image_centos.create_fedora()
-            elif re.search("resolute", vm.platform):
-                cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("resolute", arch="amd64v3")
-            elif re.search("questing", vm.platform):
-                cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("questing")
-            elif re.search("noble", vm.platform):
-                cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("noble")
-            elif re.search("ubuntu", vm.platform):
-                cloud_image_func = cloud_image_ubuntu.create_ubuntu_cloudinit("jammy")
-            elif re.search("debian", vm.platform):
-                cloud_image_func = cloud_image_ubuntu.create_debian_cloudinit("10")
+            if platform in [
+                'almalinux10',
+                'almalinux9',
+                'almalinux8',
+                'fedora',
+                'debian',
+            ]:
+                created_image_path = from_config.create_image(hostname, platform)(session)
+            elif platform.startswith('ubuntu '):
+                ubuntu_platform = platform.split(' ')[1]
+                created_image_path = from_config.create_image(hostname, ubuntu_platform)(session)
             else:
-                print(red("err in prepare_vdisk3: unknown os platform"))
-                sys.exit(1)
-            created_image_path = cloud_image_func(hostname)(session)
+                if platform == "arch":
+                    cloud_image_func = cloud_image_arch.create_arch
+                # elif platform == "centos9stream":
+                #     cloud_image_func = cloud_image_centos.create_centos_stream("9")
+                # elif platform == "centos10stream":
+                #     cloud_image_func = cloud_image_centos.create_centos_stream("10")
+                else:
+                    print(red("err in prepare_vdisk: unknown os platform"))
+                    sys.exit(1)
+                created_image_path = cloud_image_func(hostname)(session)
             if "size" in vm.prepare_vdisk and isinstance(vm.prepare_vdisk["size"], int):
                 size = vm.prepare_vdisk["size"]
                 cloud_image_ops.resize_to(created_image_path, size)(session)

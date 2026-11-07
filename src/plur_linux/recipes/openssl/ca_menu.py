@@ -102,10 +102,10 @@ DEFAULT_ALT_NAMES = [
 ]
 
 def create_default_ca_params():
-    return misc.toml.loads(DEFAULT_CA_CERT_TOML)
+    return misc.load_toml(DEFAULT_CA_CERT_TOML)
 
 def create_default_server_params():
-    default_server_params = misc.toml.loads(DEFAULT_SERVER_CERT_TOML)
+    default_server_params = misc.load_toml(DEFAULT_SERVER_CERT_TOML)
     server_params_list = []
     for server_name in DEFAULT_SERVER_NAME_LIST:
         server_params = copy.deepcopy(default_server_params)
@@ -114,10 +114,10 @@ def create_default_server_params():
     return server_params_list
 
 def input_ca_params(ca_params):
-    return get_obj_by_definition(misc.toml.loads(CA_CERT_DEFINITION_TOML_STR), ca_params)
+    return get_obj_by_definition(misc.load_toml(CA_CERT_DEFINITION_TOML_STR), ca_params)
 
 def input_server_params(server_params):
-    return get_obj_by_definition(misc.toml.loads(SERVER_CERT_DEFINITION_TOML_STR), server_params)
+    return get_obj_by_definition(misc.load_toml(SERVER_CERT_DEFINITION_TOML_STR), server_params)
 
 def input_params(self):
     if not hasattr(self, 'ca_root_dir'):

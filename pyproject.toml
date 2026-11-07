@@ -10,7 +10,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
   "plur>=0.2.1",
-  "mini>=0.2.1",
+  "mini>=0.2.2",
   "passlib>=1.7.4",
 ]
 [project.scripts]

@@ -120,14 +120,11 @@ def add_users(session, users):
         }
     ]
     """
-    # if session.platform == 'centos7':
-    #     session.child.delaybeforesend = 1
     if session.username != 'root':
         # must be root
         return
     platform = session.nodes[-1].platform
     for user in users:
-        # print(ansi_colors.cyan(json.dumps(user, indent=2)))
         if 'username' in user and 'password' in user:
             username = user['username']
             password = user['password']

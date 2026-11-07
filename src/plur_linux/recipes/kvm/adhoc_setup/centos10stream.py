@@ -70,8 +70,8 @@ class Apps(generic.SelectMenu):
             from plur_linux.recipes import vsftpd
             vsftpd.vsftpd_server_setup(session)
         if self.selection['pxe']:
-            from plur_linux.recipes.almalinux8 import pxe
-            pxe.setup_pxe(session)
+            from plur_linux.recipes.pxe import pxe
+            pxe.setup_pxe('AlmaLinux 9')(session)
 
 
 def get_selection():

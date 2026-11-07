@@ -97,7 +97,7 @@ def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_jammy
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_noble
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_resolute
-    from plur_linux.recipes.kvm.adhoc_setup import debian10
+    from plur_linux.recipes.kvm.adhoc_setup import debian
 
     [vm_dict, post_run_list] = select_2nd(
         [
@@ -107,7 +107,7 @@ def select_adhoc(connect_method_list, hostname=None):
             ["Ubuntu resolute", ubuntu_resolute.get_selection],
             ["Ubuntu noble", ubuntu_noble.get_selection],
             ["Fedora", fedora.get_selection],
-            ["Debian10", debian10.get_selection],
+            ["Debian", debian.get_selection],
             ["AlmaLinux8", almalinux8.get_selection],
             ["Ubuntu jammy", ubuntu_jammy.get_selection],
             ["CentOS10Stream", centos10stream.get_selection],

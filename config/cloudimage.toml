@@ -1,0 +1,71 @@
+[[images]]
+platform = 'almalinux10'
+version = '10'
+arch = 'x86_64_v2'
+repo_url = 'https://ftp.riken.jp/Linux'
+tmpl_image_filename = 'AlmaLinux-{version}-GenericCloud-latest.{arch}.qcow2'
+tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_filename}'
+
+[[images]]
+platform = 'almalinux9'
+version = '9'
+arch = 'x86_64'
+repo_url = 'https://ftp.riken.jp/Linux'
+tmpl_image_filename = 'AlmaLinux-{version}-GenericCloud-latest.{arch}.qcow2'
+tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_filename}'
+
+[[images]]
+platform = 'almalinux8'
+version = '8'
+arch = 'x86_64'
+repo_url = 'https://ftp.riken.jp/Linux'
+tmpl_image_filename = 'AlmaLinux-{version}-GenericCloud-latest.{arch}.qcow2'
+tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_filename}'
+
+[[images]]
+platform = 'fedora'
+version = '45'
+minor = '1.4'
+arch = 'x86_64'
+repo_url = 'https://ftp.riken.jp/Linux'
+tmpl_image_filename = 'Fedora-Cloud-Base-Generic-{version}-{minor}.{arch}.qcow2'
+tmpl_download_url = '{repo_url}/fedora/releases/{version}/Cloud/{arch}/images/{image_filename}'
+
+[[images]]
+platform = 'resolute'
+arch = 'amd64v3'
+repo_url = 'http://cloud-images.ubuntu.com'
+tmpl_image_filename = '{platform}-server-cloudimg-{arch}.img'
+tmpl_download_url = '{repo_url}/{platform}/current/{image_filename}'
+
+[[images]]
+platform = 'noble'
+arch = 'amd64'
+repo_url = 'http://cloud-images.ubuntu.com'
+tmpl_image_filename = '{platform}-server-cloudimg-{arch}.img'
+tmpl_download_url = '{repo_url}/{platform}/current/{image_filename}'
+
+[[images]]
+platform = 'jammy'
+arch = 'amd64'
+repo_url = 'http://cloud-images.ubuntu.com'
+tmpl_image_filename = '{platform}-server-cloudimg-{arch}.img'
+tmpl_download_url = '{repo_url}/{platform}/current/{image_filename}'
+
+[[images]]
+platform = 'debian'
+codename = 'trixie'
+version = '13'
+arch = 'amd64'
+repo_url = 'https://cloud.debian.org/images/cloud'
+tmpl_image_filename = 'debian-{version}-generic-{arch}.qcow2'
+tmpl_download_url = '{repo_url}/{codename}/latest/{image_filename}'
+
+[[images]]
+platform = 'centos10stream'
+version = '10'
+arch = 'x86_64'
+repo_url = 'https://cloud.centos.org'
+tmpl_image_filename = 'CentOS-Stream-GenericCloud-{version}-latest.x86_64.qcow2'
+tmpl_download_url = '{repo_url}/centos/{version}-stream/{arch}/images/{image_filename}'
+

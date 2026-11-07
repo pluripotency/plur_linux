@@ -3,7 +3,7 @@ from plur_linux.recipes.ubuntu import ops as ubuntu_ops
 from plur_linux.nodes import new_node
 from plur_linux.recipes.ubuntu import docker_ce
 
-platform = 'noble'
+platform = 'resolute'
 ubu_image = 'ubu_image'
 ubu_docker_image = 'ubu_docker_image'
 ubu_docker_desk_image = 'ubu_docker_desk_image'
@@ -42,8 +42,8 @@ def create_docker_image():
 
 def create_nodes():
     return [
-        ['create ' + ubu_image, create_ubu_image()],
-        ['create ' + ubu_docker_image, create_docker_image()],
+        ['create ' + ubu_image, create_ubu_image],
+        ['create ' + ubu_docker_image, create_docker_image],
     ]
 
 def destroy_nodes():
