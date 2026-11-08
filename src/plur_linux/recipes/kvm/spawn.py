@@ -271,63 +271,6 @@ def create_org_vm(vm):
     print(red("org_hostname is needed"))
     sys.exit(1)
 
-def on_spawn_console(vm):
-    if re.search("^ubuntu", vm.platform):
-        org_vm = create_ubuntu_org_vm(vm)
-    else:
-        org_vm = create_org_vm(vm)
-
-    @virsh.console(org_vm)
-    def offline_setups(session):
-        # hostname setting is needed for non-cloudinit
-        ops.set_hostname(vm.hostname)(session)
-        if re.search("^ubuntu", org_vm.platform):
-            from plur_linux.recipes.ubuntu import netplan
-            from plur_linux.recipes.ubuntu import ops as ubuntu_ops
-            ubuntu_ops.disable_ipv6(session)
-            netplan.configure(vm)(session)
-        elif org_vm.platform == 'arch':
-            from plur_linux.recipes.dists.arch import ops as arch_ops
-            arch_ops.configure_network(vm.ifaces)(session)
-        else:
-            network.configure(vm)(session)
-        if hasattr(vm, "prepare_vdisk"):
-            if vm.platform in ["almalinux8"]:
-                qemu_img.expand_fs(session, "/dev/vda", 2)
-            else:
-                qemu_img.expand_fs(session, "/dev/vda", 1)
-        if hasattr(vm, "offline_setups"):
-            print(red("in offline setups"))
-            setup.offline_setup(session, vm)
-            print(red("out offline setups"))
-
-    @virsh.console(vm)
-    def setups(session):
-        print(red("in setups"))
-        if hasattr(vm, "setups"):
-            setup.run_setup_list(session, vm)
-        print(red("out setups"))
-        on_vm_post(vm)(session)
-        if re.search("^ubuntu", vm.platform):
-            base_shell.run(session, "reset")
-        base_shell.run(session, "ip -4 a")
-
-    @session_wrap.sudo
-    def func(session):
-        success_console_run = offline_setups(session)
-        if not success_console_run:
-            print(red("console run failed on offline setups"))
-            sys.exit(1)
-
-        session.child.delaybeforesend = 1
-        success_console_run = setups(session)
-        if not success_console_run:
-            print(red("console run failed on setups"))
-            sys.exit(1)
-        session.child.delaybeforesend = 0
-    return func
-
-
 def on_create_console_with_cloudinit(vm):
     @session_wrap.sudo
     def offline_setups(session):
