@@ -31,7 +31,7 @@ def configure(node):
                netplan_base.configure_netplan(ifaces)(session)
     return func
 
-def setup_nm(session):
+def setup_nm_til_23(session):
     ops.sudo_apt_get_install_y(["network-manager"])(session)
     base_shell.here_doc(session, "/etc/NetworkManager/conf.d/manage-all.conf", misc.del_indent_lines("""
     [keyfile]
@@ -48,6 +48,20 @@ def setup_nm(session):
     sudo rm -rf /etc/netplan
     """)
     ]
+    base_shell.run(session, "reset")
+
+def setup_nm(session):
+    ops.sudo_apt_get_install_y(["network-manager"])(session)
+    oneliner = "sudo sed -i 's/renderer:\s*networkd/renderer: NetworkManager/g' /etc/netplan/*.yaml && sudo netplan apply"
+    base_shell.run(session, oneliner)
+    [base_shell.run(session, a) for a in misc.del_indent_lines("""
+    sudo systemctl stop systemd-networkd systemd-networkd.socket
+    sudo systemctl disable systemd-networkd systemd-networkd.socket
+    sudo systemctl mask systemd-networkd systemd-networkd.socket
+    sudo systemctl disable systemd-networkd-wait-online.service
+    sudo systemctl mask systemd-networkd-wait-online.service
+    """)]
+    # base_shell.run(session, "sudo systemctl enable --now NetworkManager")
     base_shell.run(session, "reset")
 
 def configure_by_nmcli(ifaces):

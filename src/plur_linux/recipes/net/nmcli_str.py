@@ -2,15 +2,16 @@ import re
 from mini import misc
 ipv6_ignore = 'ipv6.method ignore'
 uuid_exp = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-ex_con_lines = misc.del_indent_lines("""
-    System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0   
-    lo           b76b7e05-32b4-41f6-9ff2-1d86b6303e0e  loopback  lo     
-    eth0         dd164a7c-24ce-4cbb-bcb2-1c10ad39d014  ethernet  --     
-    """)
+ex_con_str = """
+System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0   
+lo           b76b7e05-32b4-41f6-9ff2-1d86b6303e0e  loopback  lo     
+eth0         dd164a7c-24ce-4cbb-bcb2-1c10ad39d014  ethernet  --     
+"""
 
 
 def get_con_uuid(line):
     """
+    >>> ex_con_lines = ex_con_str.splitlines()[1:]
     >>> get_con_uuid(ex_con_lines[0])
     '5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03'
     >>> get_con_uuid(ex_con_lines[2])
@@ -23,6 +24,7 @@ def get_con_uuid(line):
 
 def get_ifname_con_uuid(line, ifname):
     """
+    >>> ex_con_lines = ex_con_str.splitlines()[1:]
     >>> get_ifname_con_uuid(ex_con_lines[0], 'eth0')
     '5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03'
     >>> get_ifname_con_uuid(ex_con_lines[1], 'eth0')
@@ -35,6 +37,7 @@ def get_ifname_con_uuid(line, ifname):
 
 def get_conname_con_uuid(line, conname):
     """
+    >>> ex_con_lines = ex_con_str.splitlines()[1:]
     >>> get_conname_con_uuid(ex_con_lines[0], 'eth0')
     >>> get_conname_con_uuid(ex_con_lines[1], 'eth0')
     >>> get_conname_con_uuid(ex_con_lines[2], 'eth0')
@@ -47,6 +50,7 @@ def get_conname_con_uuid(line, conname):
 
 def get_down_con_uuid(line):
     """
+    >>> ex_con_lines = ex_con_str.splitlines()[1:]
     >>> get_down_con_uuid(ex_con_lines[0])
     >>> get_down_con_uuid(ex_con_lines[2])
     'dd164a7c-24ce-4cbb-bcb2-1c10ad39d014'
