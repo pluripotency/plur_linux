@@ -2,7 +2,7 @@
 platform = 'almalinux10'
 version = '10'
 arch = 'x86_64_v2'
-repo_url = 'https://ftp.riken.jp/Linux'
+repo_url = 'https://ftp.jaist.ac.jp/pub/Linux'
 tmpl_image_filename = 'AlmaLinux-{version}-GenericCloud-latest.{arch}.qcow2'
 tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_filename}'
 
@@ -10,7 +10,7 @@ tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_f
 platform = 'almalinux9'
 version = '9'
 arch = 'x86_64'
-repo_url = 'https://ftp.riken.jp/Linux'
+repo_url = 'https://ftp.jaist.ac.jp/pub/Linux'
 tmpl_image_filename = 'AlmaLinux-{version}-GenericCloud-latest.{arch}.qcow2'
 tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_filename}'
 
@@ -18,7 +18,7 @@ tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_f
 platform = 'almalinux8'
 version = '8'
 arch = 'x86_64'
-repo_url = 'https://ftp.riken.jp/Linux'
+repo_url = 'https://ftp.jaist.ac.jp/pub/Linux'
 tmpl_image_filename = 'AlmaLinux-{version}-GenericCloud-latest.{arch}.qcow2'
 tmpl_download_url = '{repo_url}/almalinux/{version}/cloud/{arch}/images/{image_filename}'
 
@@ -27,7 +27,7 @@ platform = 'fedora'
 version = '45'
 minor = '1.4'
 arch = 'x86_64'
-repo_url = 'https://ftp.riken.jp/Linux'
+repo_url = 'https://ftp.jaist.ac.jp/pub/Linux'
 tmpl_image_filename = 'Fedora-Cloud-Base-Generic-{version}-{minor}.{arch}.qcow2'
 tmpl_download_url = '{repo_url}/fedora/releases/{version}/Cloud/{arch}/images/{image_filename}'
 
