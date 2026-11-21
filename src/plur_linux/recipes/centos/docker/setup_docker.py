@@ -10,7 +10,7 @@ from plur_linux.recipes import firewalld
 def enable_rest_api(session):
     service_port = '2376'
     override_file_path = '/etc/systemd/system/docker.service.d/override.conf'
-    base_shell.create_dir(session, f'mkdir ' + os.path.dirname(override_file_path))
+    base_shell.create_dir(session, 'mkdir ' + os.path.dirname(override_file_path))
     base_shell.here_doc(session, override_file_path, f"""
     [Service]
     ExecStart=

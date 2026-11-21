@@ -80,7 +80,6 @@ def get_selection():
         generic.Initial(platform),
         MinDesk(),
         Apps(),
-        Docker(),
         generic.Languages(platform),
         generic.BaseApps(platform),
     ]
