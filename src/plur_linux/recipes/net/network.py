@@ -37,6 +37,11 @@ def configure(current_node):
         elif re.match(r'^(fedora|centos|almalinux|rocky|redhat).*', platform):
             if hasattr(current_node, 'ifaces'):
                 iface_list = current_node.ifaces
+                if len(iface_list) == 1:
+                    base_shell.run(session, "IFNAME=`ip -o link show | awk -F': ' '$2 != \"lo\" {print $2; exit}'`")
+                    iface_list[0]["con_name"] = "$IFNAME"
+                    base_shell.run(session, "nmcli -t -f UUID,DEVICE con show | awk -F: -v dev=\"$IFNAME\" '$2 == dev {print $1}' | xargs -r nmcli con delete")
+                nmcli.remove_down_nm_entries(session)
                 nmcli.remove_duped_entries(session, iface_list)
                 for iface in iface_list:
                     nmcli.configure(session, iface)
