@@ -184,7 +184,7 @@ class Initial(SelectMenu):
                 "mkswap(1GB)": False,
                 "legacy_devname": False,
                 "ttyS0": False,
-                "disable_ipv6": True,
+                "disable_ipv6": False,
                 "tz Asia/Tokyo": True,
                 "keymap jp106": True,
                 "remove cockpit": True,
@@ -206,7 +206,7 @@ class Initial(SelectMenu):
                 "mkswap(1GB)": False,
                 "legacy_devname": False,
                 "ttyS0": False,
-                "disable_ipv6": True,
+                "disable_ipv6": False,
                 "tz Asia/Tokyo": True,
                 "keymap jp106": True,
             }

@@ -1,31 +1,6 @@
 from plur_linux.recipes.kvm.adhoc_setup import generic
 
 
-class Docker(generic.SelectMenu):
-    def __init__(self):
-        super().__init__({
-            "kubeadm": False,
-            'portainer': False,
-            'cadvisor': False,
-        },
-            exclusive_list=None,
-            menu_title='Docker')
-
-    def setup(self, session):
-        if self.enable:
-            from plur_linux.recipes.almalinux9 import docker
-            docker.install(session)
-
-            from plur_linux.recipes.centos.docker import containers
-            if self.selection['portainer']:
-                containers.create_portainer(session)
-            if self.selection['cadvisor']:
-                containers.create_cadvisor(session)
-            if self.selection['kubeadm']:
-                from plur_linux.recipes.kubernetes import kubeadm
-                kubeadm.setup_kubeadm(session)
-
-
 class MinDesk(generic.SelectMenu):
     def __init__(self):
         super().__init__({
@@ -50,6 +25,7 @@ class Apps(generic.SelectMenu):
     def __init__(self):
         from plur_linux.recipes.openssl import ca_menu
         super().__init__({
+            "docker": False,
             "openvswitch": False,
             "pxe": False,
             "pxe_uefi": False,
@@ -65,6 +41,9 @@ class Apps(generic.SelectMenu):
             extra_menu={'ca': ca_menu.input_params})
 
     def setup(self, session):
+        if self.selection['docker']:
+            from plur_linux.recipes.centos.docker import docker_dnf
+            docker_dnf.install(session)
         if self.selection['rad_ldap']:
             from plur_linux.recipes.centos.freeradius import rad_ldap
             rad_ldap.setup()(session)

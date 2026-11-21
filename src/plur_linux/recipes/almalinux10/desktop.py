@@ -39,6 +39,9 @@ def search_not_root_node(session):
     return False
 
 def enable_rdp(session):
+    if not base_shell.check_command_exists(session, 'openssl'):
+        base_shell.run(session, 'sudo dnf install -y openssl')
+
     user_node = search_not_root_node(session)
     if not user_node:
         print(misc.ansi_colors.red('abort enable rdp: user_node not found'))

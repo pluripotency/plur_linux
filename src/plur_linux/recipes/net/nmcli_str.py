@@ -1,5 +1,6 @@
 import re
 ipv6_ignore = 'ipv6.method ignore'
+ipv6_linklocal= 'ipv6.method link-local'
 uuid_exp = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 ex_con_str = """
 System eth0  5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0   
@@ -73,14 +74,11 @@ def con_up(con_name):
 def con_down(con_name):
     return f'nmcli con down {con_name}'
 
-def mod_disable_ipv6(con_name):
-    return con_mod(con_name, ipv6_ignore)
-
 def create_ipv4_line(ip=None, gw=None, dns_list=None, options=None, **_kwargs):
     if ip is None:
         return f'ipv4.method disabled {ipv6_ignore}'
     elif ip == 'auto' or ip == 'dhcp':
-        return f'ipv4.method auto {ipv6_ignore}'
+        return f'ipv4.method auto {ipv6_linklocal}'
     else:
         ip_str = f' ipv4.method manual ipv4.address {ip}'
         if gw is not None:
@@ -89,9 +87,9 @@ def create_ipv4_line(ip=None, gw=None, dns_list=None, options=None, **_kwargs):
             ns = ' '.join(dns_list)
             ip_str += f' ipv4.dns "{ns}"'
         if options:
-            return f'{ip_str} {ipv6_ignore} {options}'
+            return f'{ip_str} {ipv6_linklocal} {options}'
         else:
-            return f'{ip_str} {ipv6_ignore}'
+            return f'{ip_str} {ipv6_linklocal}'
 
 def mod_ip(con_name, ip=None, gw=None, dns_list=None):
     return con_mod(con_name, create_ipv4_line(ip, gw, dns_list))

@@ -150,7 +150,7 @@ def reboot_from_kvm(session, vm_hostname):
 
 def console_logout(session):
     rows = [
-        ['logout\n.+ login: ', success, None, 'logout']
+        ['.* login:', success, None, 'logout']
         , ['logout', success, None, 'logout']
     ]
     session.do(create_sequence('exit', rows))
