@@ -62,9 +62,14 @@ def install_gui_a8a9(session):
     if username:
         session_wrap.su(username)(gsettings)(session)
 
+def install_gui_a10(session):
+    install_gui_a8a9(session)
+    # avoid waitprompt has complex color
+    base_shell.run(session, 'sudo dnf remove bash-color-prompt')
+
 dict_desktop = {
     'almalinux10': {
-        'desktop': install_gui_a8a9,
+        'desktop': install_gui_a10,
         'vbox': install_vbox_additions_libs
     },
     'almalinux9': {
