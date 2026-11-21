@@ -22,6 +22,24 @@ def con_add_br(bridge_name, phy_dev_name=None, ipv4_params=None):
             , add(phy_dev_name, type='ethernet', ifname=phy_dev_name, options=f'master {br_port}')
         ]
 
+ex_by_gemini = """
+sudo nmcli connection add type ovs-bridge conn.interface br0 con-name ovs-br0 \
+  ipv4.method manual \
+  ipv4.addresses "192.168.0.70/24" \
+  ipv4.gateway "192.168.0.1" \
+  ipv4.dns "8.8.8.8,8.8.4.4" \
+  ipv6.method link-local
+
+sudo nmcli connection add type ovs-port conn.interface eno1 master br0 con-name ovs-port-eno1
+
+sudo nmcli connection add type ethernet conn.interface eno1 master ovs-port-eno1 con-name ovs-iface-eno1 \
+  ipv4.method disabled \
+  ipv6.method disabled
+
+sudo nmcli connection up ovs-br0
+sudo nmcli connection up ovs-port-eno1
+sudo nmcli connection up ovs-iface-eno1
+"""
 
 not_supported = """
 # no way to set ip to br2.4084 by nmcli
