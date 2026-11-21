@@ -2,6 +2,34 @@ from mini import misc
 from plur_linux.recipes.netplan import lib as netplan_lib
 hier_space = netplan_lib.hier_space
 
+ex_ovs = """
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno1:
+      dhcp4: false
+      dhcp6: false
+      accept-ra: false
+  bridges:
+    br0:
+      dhcp4: false
+      dhcp6: false
+      accept-ra: false
+      addresses:
+      - "192.168.0.70/24"
+      nameservers:
+        addresses:
+        - 8.8.8.8
+        - 8.8.4.4
+      interfaces:
+      - eno1
+      routes:
+      - to: "default"
+        via: "192.168.0.1"
+      openvswitch: {}
+"""
+
 def create_ovs_str(ifname, brname, ipv4_with_prefix=None, gw=None, nameservers=None):
     """
     # /etc/netplan/50-ovs.yaml
@@ -14,8 +42,12 @@ def create_ovs_str(ifname, brname, ipv4_with_prefix=None, gw=None, nameservers=N
         eno1:
           dhcp4: false
           dhcp6: false
+          accept-ra: false
       bridges:
         br0:
+          dhcp4: false
+          dhcp6: false
+          accept-ra: false
           interfaces:
           - eno1
           addresses:
@@ -37,8 +69,12 @@ def create_ovs_str(ifname, brname, ipv4_with_prefix=None, gw=None, nameservers=N
         {ifname}:
           dhcp4: false
           dhcp6: false
+          accept-ra: false
       bridges:
         {brname}:
+          dhcp4: false
+          dhcp6: false
+          accept-ra: false
           interfaces:
           - {ifname}
     """)
