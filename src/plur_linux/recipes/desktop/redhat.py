@@ -65,7 +65,7 @@ def install_gui_a8a9(session):
 def install_gui_a10(session):
     install_gui_a8a9(session)
     # avoid waitprompt has complex color
-    base_shell.run(session, 'sudo dnf remove bash-color-prompt')
+    base_shell.run(session, 'sudo dnf remove -y bash-color-prompt')
 
 dict_desktop = {
     'almalinux10': {

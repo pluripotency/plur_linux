@@ -29,6 +29,7 @@ class Docker(generic.SelectMenu):
 class MinDesk(generic.SelectMenu):
     def __init__(self):
         super().__init__({
+            'enable rdp': False,
             'vbox libs': False,
         },
             exclusive_list=None,
@@ -38,6 +39,9 @@ class MinDesk(generic.SelectMenu):
         if self.enable:
             from plur_linux.recipes.desktop import redhat
             redhat.dict_desktop['almalinux10']['desktop'](session)
+            if self.selection['enable rdp']:
+                from plur_linux.recipes.almalinux10 import desktop
+                desktop.enable_rdp(session)
             if self.selection['vbox libs']:
                 redhat.dict_desktop['almalinux10']['vbox'](session)
 
