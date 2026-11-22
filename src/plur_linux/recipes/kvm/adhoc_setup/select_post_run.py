@@ -6,12 +6,41 @@ from plur import base_node
 from plur_linux.nodes import new_node
 
 class VmAccount:
-    def __init__(self, vm):
+    def __init__(self, vm, initial_username=None):
         from plur_linux.lib import env_ops
         self.vm = vm
         self.env_account_set_list = env_ops.EnvAccountSet()
-        self.user_list = self.env_account_set_list.get_current_index_account_set_as_user_list()
+        self.account_index = self._resolve_initial_index(initial_username)
+        self.user_list = self._get_account_set_as_user_list(self.account_index)
         self.set_users()
+
+    def _resolve_initial_index(self, initial_username):
+        account_sets = self.env_account_set_list.get_account_set_list()
+        if initial_username:
+            for idx, acc in enumerate(account_sets):
+                if acc.get('username') == initial_username:
+                    return idx
+        cur_idx = self.env_account_set_list.get_current_index()
+        if 0 <= cur_idx < len(account_sets):
+            return cur_idx
+        return 0
+
+    def _get_selected_account_set(self):
+        return self.env_account_set_list.get_account_set_list()[self.account_index]
+
+    def _get_account_set_as_user_list(self, index):
+        account_set = self.env_account_set_list.get_account_set_list()[index]
+        return [
+            {
+                'username': account_set['username'],
+                'password': account_set['password'],
+                'sudoers': account_set['sudoers'],
+            },
+            {
+                'username': 'root',
+                'password': account_set['root_password'],
+            }
+        ]
 
     def set_users(self):
         self.vm['offline_setups'] = {
@@ -26,14 +55,15 @@ class VmAccount:
 
     def set_users_menu(self):
         self.env_account_set_list.select_account_set_list_index()
-        self.user_list = self.env_account_set_list.get_current_index_account_set_as_user_list()
+        self.account_index = self.env_account_set_list.get_current_index()
+        self.user_list = self._get_account_set_as_user_list(self.account_index)
         self.set_users()
 
     def get_menu_entry(self):
-        return [f'Account({self.env_account_set_list.format_account_set(self.env_account_set_list.get_current_index_account_set())})', self.set_users_menu]
+        return [f'Account({self.env_account_set_list.format_account_set(self._get_selected_account_set())})', self.set_users_menu]
 
 class VmResource:
-    def __init__(self, vm):
+    def __init__(self, vm, initial_resource=None):
         self.vm = vm
         self.resource_list = [
             {'vcpu': 2, 'vmem': 2048}
@@ -41,10 +71,16 @@ class VmResource:
             , {'vcpu': 4, 'vmem': 4096}
             , {'vcpu': 4, 'vmem': 8192}
         ]
-        self.resource = {
-            'vcpu': 2,
-            'vmem': 2048,
-        }
+        if isinstance(initial_resource, dict) and 'vcpu' in initial_resource and 'vmem' in initial_resource:
+            self.resource = {
+                'vcpu': int(initial_resource['vcpu']),
+                'vmem': int(initial_resource['vmem']),
+            }
+        else:
+            self.resource = {
+                'vcpu': 2,
+                'vmem': 2048,
+            }
         self.set_resource()
 
     def format_resource(self, resource):
@@ -88,20 +124,28 @@ def create_virsh_console_params(node_dict):
 def create_ssh_params(node_dict):
     node_dict = set_hostname(node_dict)
     node_dict['login_method'] = 'ssh'
-    if 'access_ip' in node_dict:
-        node_dict['access_ip']
-    else:
-        pass
-    tmp_access_ip = get_input('^(|' + misc.IPV4_EXP_STR + ')$', 'IP (blank to set hostname): ', 'Invalid IP', '')
+    default_ip = node_dict.get('access_ip', '')
+    if default_ip == node_dict['hostname']:
+        default_ip = ''
+    prompt = (
+        f'IP (Default: {default_ip}, blank to set hostname): '
+        if default_ip
+        else 'IP (blank to set hostname): '
+    )
+    tmp_access_ip = get_input('^(|' + misc.IPV4_EXP_STR + ')$', prompt, 'Invalid IP', default_ip)
     if tmp_access_ip == '':
         node_dict['access_ip'] = node_dict['hostname']
     else:
         node_dict['access_ip'] = tmp_access_ip
-    node_dict['ssh_options' ]= '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+    node_dict['ssh_options'] = '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
     return node_dict
+
+def _strip_bound_net_keys(node_dict):
+    return {k: v for k, v in node_dict.items() if k not in ('ifaces', 'vnets')}
 
 def create_vm_params(node_dict):
     from plur_linux.recipes.kvm.kvm_menu import lib as kvm_menu_lib
+    node_dict = _strip_bound_net_keys(node_dict)
     node_dict = set_hostname(node_dict)
     size = int(get_input(r'^\d+$', 'Disk Size (Default: %d(G)): ' % node_dict['size'], 'invalid format', node_dict['size']))
     node_dict['size'] = size
@@ -130,6 +174,7 @@ def create_vm_params(node_dict):
 
 def create_vm_by_copy_params(node_dict):
     from plur_linux.recipes.kvm.kvm_menu import lib as kvm_menu_lib
+    node_dict = _strip_bound_net_keys(node_dict)
     node_dict = set_hostname(node_dict)
     username = node_dict['username']
     hostname = node_dict['hostname']
@@ -145,8 +190,8 @@ def create_vm_by_copy_params(node_dict):
     return node_dict
 
 class VmConnect:
-    def __init__(self, initial_node_dict, connect_method_list):
-        self.initial_node_dict = initial_node_dict
+    def __init__(self, initial_node_dict, connect_method_list, restored_connect=None):
+        self.initial_node_dict = dict(initial_node_dict)
         if connect_method_list:
             self.connect_method_list = connect_method_list
         else:
@@ -159,6 +204,18 @@ class VmConnect:
             ]
         self.node_dict = None
         self.selected_con = None
+        if isinstance(restored_connect, dict):
+            from plur_linux.recipes.kvm.adhoc_setup import adhoc_history
+            selected_con, restored_dict = adhoc_history.restore_connect_node_dict(
+                restored_connect, self.connect_method_list
+            )
+            if selected_con and restored_dict:
+                self.selected_con = selected_con
+                self.node_dict = restored_dict
+            else:
+                for key in ('hostname', 'size', 'restart_before_setup'):
+                    if key in restored_connect:
+                        self.initial_node_dict[key] = restored_connect[key]
 
     def get_format_con(self):
         if not self.selected_con:
@@ -180,6 +237,14 @@ class VmConnect:
                 return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip}  size:{size}G mode:{mode})'
         return red('something wrong in VmConnect')
 
+    def _build_base_node_dict(self):
+        base = dict(self.initial_node_dict)
+        if isinstance(self.node_dict, dict):
+            for key in ('hostname', 'size', 'access_ip', 'restart_before_setup'):
+                if key in self.node_dict:
+                    base[key] = self.node_dict[key]
+        return base
+
     def select_con_menu(self):
         if len(self.connect_method_list) == 1:
             selected = self.connect_method_list[0]
@@ -187,27 +252,44 @@ class VmConnect:
             num = choose_num(self.connect_method_list)
             selected = self.connect_method_list[num]
         self.selected_con = selected
+        base_dict = self._build_base_node_dict()
         if selected == 'ssh':
-            self.node_dict = create_ssh_params(self.initial_node_dict)
+            self.node_dict = create_ssh_params(base_dict)
         elif selected == 'bash':
-            self.node_dict = create_bash_params(self.initial_node_dict)
+            self.node_dict = create_bash_params(base_dict)
         elif selected == 'virsh console':
-            self.node_dict = create_virsh_console_params(self.initial_node_dict)
+            self.node_dict = create_virsh_console_params(base_dict)
         elif selected == 'create vm':
-            self.node_dict = create_vm_params(self.initial_node_dict)
+            self.node_dict = create_vm_params(base_dict)
         elif selected == 'create vm by copy':
-            self.node_dict = create_vm_by_copy_params(self.initial_node_dict)
+            self.node_dict = create_vm_by_copy_params(base_dict)
         else:
             print(red(f'no such connect_method: {selected}'))
 
     def get_menu_entry(self):
         return [f'Connect Method({self.get_format_con()})', self.select_con_menu]
 
-def select_post_run(vm, instance_list, connect_method_list, hostname=None):
+def select_post_run(vm, instance_list, connect_method_list, hostname=None, history_entry=None, os_label=None):
     tmp_vm = {}
-    vm_resource = VmResource(tmp_vm)
-    vm_account = VmAccount(tmp_vm)
-    vm_connect = VmConnect(misc.concat_dict([vm, tmp_vm]), connect_method_list)
+    initial_resource = history_entry.get('resource') if isinstance(history_entry, dict) else None
+    initial_username = (
+        history_entry.get('account', {}).get('username')
+        if isinstance(history_entry, dict) and isinstance(history_entry.get('account'), dict)
+        else None
+    )
+    restored_connect = (
+        history_entry.get('connect')
+        if isinstance(history_entry, dict) and not hostname
+        else None
+    )
+    vm_resource = VmResource(tmp_vm, initial_resource=initial_resource)
+    vm_account = VmAccount(tmp_vm, initial_username=initial_username)
+    vm_connect = VmConnect(
+        misc.concat_dict([vm, tmp_vm]),
+        connect_method_list,
+        restored_connect=restored_connect,
+    )
+    menu_message = f'Select menu ({os_label})' if os_label else 'Select menu'
     while True:
         if hostname:
             menu_list = [
@@ -224,7 +306,7 @@ def select_post_run(vm, instance_list, connect_method_list, hostname=None):
         if vm_connect.node_dict or hostname:
             menu_list += [['Next']]
 
-        num = choose_num([m[0] for m in menu_list], 'Select menu', vertical=True)
+        num = choose_num([m[0] for m in menu_list], menu_message, vertical=True)
         if menu_list[num][0] == 'Next':
             if hostname:
                 vm = misc.concat_dict([

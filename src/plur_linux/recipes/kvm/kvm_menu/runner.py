@@ -1,5 +1,5 @@
-from mini.ansi_colors import red, cyan
-from mini.menu import get_input, choose_num, select_2nd, get_y_n, Selection
+from mini.ansi_colors import red, cyan, yellow
+from mini.menu import get_input, choose_num, get_y_n, Selection
 from plur import base_shell
 from plur import base_node
 from plur import session_wrap
@@ -96,8 +96,7 @@ def create_defined_guest():
 
     create_vm_dict_on(kvm, vm_dict, restart_before_setup=restart_before_setup)
 
-def select_adhoc(connect_method_list, hostname=None):
-    from plur_linux.recipes.kvm.adhoc_setup.select_post_run import select_post_run
+def get_adhoc_os_entries():
     from plur_linux.recipes.kvm.adhoc_setup import arch
     from plur_linux.recipes.kvm.adhoc_setup import almalinux10
     from plur_linux.recipes.kvm.adhoc_setup import almalinux9
@@ -109,22 +108,93 @@ def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup import ubuntu_resolute
     from plur_linux.recipes.kvm.adhoc_setup import debian
 
-    [vm_dict, post_run_list] = select_2nd(
-        [
-            ["AlmaLinux9", almalinux9.get_selection],
-            ["AlmaLinux10", almalinux10.get_selection],
-            ["Arch", arch.get_selection],
-            ["Ubuntu resolute", ubuntu_resolute.get_selection],
-            ["Ubuntu noble", ubuntu_noble.get_selection],
-            ["Fedora", fedora.get_selection],
-            ["Debian", debian.get_selection],
-            ["AlmaLinux8", almalinux8.get_selection],
-            ["Ubuntu jammy", ubuntu_jammy.get_selection],
-            ["CentOS10Stream", centos10stream.get_selection],
-        ],
-        "Ad Hoc Setup: select OS",
+    return [
+        ["AlmaLinux9", almalinux9.get_selection],
+        ["AlmaLinux10", almalinux10.get_selection],
+        ["Arch", arch.get_selection],
+        ["Ubuntu resolute", ubuntu_resolute.get_selection],
+        ["Ubuntu noble", ubuntu_noble.get_selection],
+        ["Fedora", fedora.get_selection],
+        ["Debian", debian.get_selection],
+        ["AlmaLinux8", almalinux8.get_selection],
+        ["Ubuntu jammy", ubuntu_jammy.get_selection],
+        ["CentOS10Stream", centos10stream.get_selection],
+    ]
+
+
+def _resolve_os_entry(os_entries, history_entry):
+    target_os_label = history_entry.get("os_label")
+    for label, factory in os_entries:
+        if label == target_os_label:
+            return label, factory
+    target_platform = history_entry.get("platform")
+    for label, factory in os_entries:
+        vm_dict, _ = factory()
+        if vm_dict.get("platform") == target_platform:
+            return label, factory
+    return None, None
+
+
+def select_adhoc(connect_method_list, hostname=None, history_store=None):
+    from plur_linux.recipes.kvm.adhoc_setup.select_post_run import select_post_run
+    from plur_linux.recipes.kvm.adhoc_setup import adhoc_history
+
+    if history_store is None:
+        history_store = adhoc_history.AdhocHistory()
+
+    os_entries = get_adhoc_os_entries()
+    selected_history_entry = None
+    os_label = None
+    vm_dict = None
+    post_run_list = None
+
+    while True:
+        top_menu_labels = ["History"] + [item[0] for item in os_entries]
+        idx = choose_num(
+            top_menu_labels,
+            "Ad Hoc Setup: select OS",
+            vertical=True,
+            append_exit=True,
+        )
+        if idx == 0:
+            entries = history_store.load_entries()
+            if not entries:
+                print(yellow("No history entries found."))
+                continue
+            history_labels = [
+                adhoc_history.format_history_entry(entry) for entry in entries
+            ] + ["Back"]
+            hist_idx = choose_num(
+                history_labels,
+                "Ad Hoc Setup: select History",
+                vertical=True,
+            )
+            if hist_idx == len(entries):
+                continue
+            chosen_entry = entries[hist_idx]
+            resolved_label, factory = _resolve_os_entry(os_entries, chosen_entry)
+            if not factory:
+                print(red(f"Unknown OS in history: {chosen_entry.get('os_label')}"))
+                continue
+            os_label = resolved_label
+            [vm_dict, post_run_list] = factory()
+            adhoc_history.apply_history_to_post_run_list(post_run_list, chosen_entry)
+            selected_history_entry = chosen_entry
+            break
+        else:
+            os_label, factory = os_entries[idx - 1]
+            [vm_dict, post_run_list] = factory()
+            break
+
+    vm_dict = select_post_run(
+        vm_dict,
+        post_run_list,
+        connect_method_list,
+        hostname,
+        history_entry=selected_history_entry,
+        os_label=os_label,
     )
-    vm_dict = select_post_run(vm_dict, post_run_list, connect_method_list, hostname)
+    history_store.save_selection(os_label, vm_dict, post_run_list)
     return [vm_dict, post_run_list]
 
 

@@ -1,8 +1,20 @@
+import copy
 import re
 from mini.ansi_colors import light_blue, light_green
 from mini.menu import get_y_n, choose_num
 from plur import base_shell
 from plur import session_wrap
+
+SERIALIZABLE_CUSTOM_ATTRS = (
+    "nvim_version",
+    "python_version",
+    "zig_version",
+    "node_installer",
+    "node_version",
+    "ca_root_dir",
+    "ca_params",
+    "server_params_list",
+)
 
 def has_true(obj, key):
     if key in obj and obj[key] is True:
@@ -62,6 +74,46 @@ class SelectMenu:
                         for item in exclusive_entry:
                             if selected != item:
                                 self.selection[item] = False
+
+    def to_history_dict(self):
+        custom_attrs = {}
+        for attr in SERIALIZABLE_CUSTOM_ATTRS:
+            if hasattr(self, attr):
+                custom_attrs[attr] = copy.deepcopy(getattr(self, attr))
+        return {
+            "menu_title": self.menu_title,
+            "enable": bool(self.enable),
+            "selection": {str(k): bool(v) for k, v in self.selection.items()},
+            "extra_params": copy.deepcopy(self.extra_params),
+            "custom_attrs": custom_attrs,
+        }
+
+    def apply_history_dict(self, data):
+        if not isinstance(data, dict):
+            return
+        if "enable" in data:
+            self.enable = bool(data["enable"])
+        saved_selection = data.get("selection", {})
+        if isinstance(saved_selection, dict):
+            for key, val in saved_selection.items():
+                if key in self.selection:
+                    self.selection[key] = bool(val)
+        saved_extra_params = data.get("extra_params", {})
+        if isinstance(saved_extra_params, dict):
+            self.extra_params.update(copy.deepcopy(saved_extra_params))
+        saved_custom_attrs = data.get("custom_attrs", {})
+        if isinstance(saved_custom_attrs, dict):
+            for attr, val in saved_custom_attrs.items():
+                if attr in SERIALIZABLE_CUSTOM_ATTRS:
+                    setattr(self, attr, copy.deepcopy(val))
+
+    def format_history_summary(self):
+        if not self.enable:
+            return None
+        enabled_keys = [k for k, v in self.selection.items() if v is True]
+        if enabled_keys:
+            return f"{self.menu_title}({','.join(enabled_keys)})"
+        return self.menu_title
 
 
 class Pack(SelectMenu):

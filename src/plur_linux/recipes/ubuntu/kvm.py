@@ -13,7 +13,6 @@ def install_resolute(session):
     """)]
 
 def install(session):
-    
     ops.sudo_apt_get_install_y([
         'qemu-kvm libvirt-daemon-system libvirt-daemon virtinst bridge-utils libosinfo-bin virt-manager openvswitch-switch'
     ])(session)
@@ -22,30 +21,4 @@ def install(session):
     sudo systemctl restart libvirtd
     newgrp libvirt
     """)]
-
-netplan_str = """
-# replace /etc/netplan/50-cloud-init.yaml
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    eno1:
-      # dhcp4: true
-      dhcp4: no
-      dhcp6: no
-  openvswitch: {}
-  bridges:
-    br0:
-      interfaces: [eno1]
-      openvswitch: {}
-      addresses:
-        - 192.168.0.70/24
-      nameservers:
-        addresses:
-          - 8.8.8.8
-          - 8.8.4.4
-      routes:
-        - to: default
-          via: 192.168.0.1
-"""
 
