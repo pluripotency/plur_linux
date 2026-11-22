@@ -1,5 +1,5 @@
 from plur import base_shell
-from mini.menu import get_input, red, green
+from mini.menu import get_input, get_y_n, red, green
 import re
 
 ex_vm_image_list = """
@@ -100,6 +100,10 @@ def select_vmname(session, message):
     num_str = get_input(r'\d+', message)
     vmname = vm_state_list[int(num_str)-1][0]
     return vmname
+
+
+def select_restart_before_setup(default=True):
+    return get_y_n("Restart VM before setup (safe reboot)", default=default)
 
 
 

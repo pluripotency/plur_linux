@@ -208,6 +208,38 @@ def start_domain_by_virt_install(vm, iso_full_path, kvm_vdisk_dir):
         )
     return func
 
+def should_restart_before_setup(vm, restart_before_setup=None):
+    if restart_before_setup is not None:
+        return bool(restart_before_setup)
+    if hasattr(vm, "restart_before_setup") and vm.restart_before_setup is not None:
+        return bool(vm.restart_before_setup)
+    if (
+        hasattr(vm, "prepare_vdisk")
+        and isinstance(vm.prepare_vdisk, dict)
+        and "restart_before_setup" in vm.prepare_vdisk
+        and vm.prepare_vdisk["restart_before_setup"] is not None
+    ):
+        return bool(vm.prepare_vdisk["restart_before_setup"])
+    return True
+
+def eject_seed_iso(vm, created_seed_iso_path):
+    hostname = vm.hostname
+
+    def on_kvm(session):
+        if virsh.is_running(session, hostname):
+            base_shell.run(
+                session,
+                f"virsh change-media {hostname} --path sda --eject --force --live --config",
+            )
+        else:
+            base_shell.run(
+                session,
+                f"virsh change-media {hostname} --path sda --eject --config",
+            )
+        base_shell.run(session, f"sudo rm -f {created_seed_iso_path}")
+
+    return on_kvm
+
 def restart_domain(vm, created_seed_iso_path):
     hostname = vm.hostname
     @virsh.console(vm)
@@ -424,7 +456,9 @@ def on_kvm_prepare_cloudinit_seed_iso(vm):
 
     return func
 
-def create_vm_by_virt_install_cloudinit(vm):
+def create_vm_by_virt_install_cloudinit(vm, restart_before_setup=None):
+    do_restart = should_restart_before_setup(vm, restart_before_setup)
+
     def _inner_on_kvm_sudo(created_image_path, created_seed_iso_path, kvm_vdisk_dir):
         @session_wrap.sudo
         def receive_inner_on_kvm_sudo(session):
@@ -432,9 +466,12 @@ def create_vm_by_virt_install_cloudinit(vm):
             base_shell.run(session, f"mv -f {created_image_path} {kvm_vdisk_dir}")
 
             start_domain_by_virt_install(vm, created_seed_iso_path, kvm_vdisk_dir)(session)
-            restart_domain(vm, created_seed_iso_path)(session)
-
-            on_create_console_with_cloudinit(vm)(session)
+            if do_restart:
+                restart_domain(vm, created_seed_iso_path)(session)
+                on_create_console_with_cloudinit(vm)(session)
+            else:
+                on_create_console_with_cloudinit(vm)(session)
+                eject_seed_iso(vm, created_seed_iso_path)(session)
 
             on_kvm_post(vm, kvm_vdisk_dir)(session)
         return receive_inner_on_kvm_sudo

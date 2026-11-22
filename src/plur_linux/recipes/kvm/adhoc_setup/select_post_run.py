@@ -101,6 +101,7 @@ def create_ssh_params(node_dict):
     return node_dict
 
 def create_vm_params(node_dict):
+    from plur_linux.recipes.kvm.kvm_menu import lib as kvm_menu_lib
     node_dict = set_hostname(node_dict)
     size = int(get_input(r'^\d+$', 'Disk Size (Default: %d(G)): ' % node_dict['size'], 'invalid format', node_dict['size']))
     node_dict['size'] = size
@@ -111,9 +112,12 @@ def create_vm_params(node_dict):
         partition = ['/dev/vda', 1]
     else:
         partition = ['/dev/vda', 2]
+    restart_default = node_dict.get('restart_before_setup', True)
+    restart_before_setup = kvm_menu_lib.select_restart_before_setup(default=restart_default)
     node_dict = new_node.create_single_iface_node_dict(hostname, None, misc.concat_dict([
         node_dict,
         {
+            'restart_before_setup': restart_before_setup,
             'prepare_vdisk': {
                 'type': 'cloud_image',
                 'size': size,
@@ -125,10 +129,18 @@ def create_vm_params(node_dict):
     return node_dict
 
 def create_vm_by_copy_params(node_dict):
+    from plur_linux.recipes.kvm.kvm_menu import lib as kvm_menu_lib
     node_dict = set_hostname(node_dict)
     username = node_dict['username']
     hostname = node_dict['hostname']
-    node_dict = new_node.create_single_iface_node_dict(hostname, None, node_dict, login_user=username)
+    restart_default = node_dict.get('restart_before_setup', True)
+    restart_before_setup = kvm_menu_lib.select_restart_before_setup(default=restart_default)
+    node_dict = new_node.create_single_iface_node_dict(hostname, None, misc.concat_dict([
+        node_dict,
+        {
+            'restart_before_setup': restart_before_setup,
+        }
+    ]), login_user=username)
     node_dict['login_method'] = 'create vm by copy'
     return node_dict
 
@@ -156,12 +168,16 @@ class VmConnect:
             if self.selected_con == 'ssh':
                 access_ip = self.node_dict['access_ip']
                 return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip})'
-            if self.selected_con in ['bash', 'virsh console', 'create vm by copy']:
+            if self.selected_con in ['bash', 'virsh console']:
                 return f'{self.selected_con}(hostname:{hostname})'
+            if self.selected_con == 'create vm by copy':
+                mode = 'restart' if self.node_dict.get('restart_before_setup', True) else 'one-shot'
+                return f'{self.selected_con}(hostname:{hostname} mode:{mode})'
             if self.selected_con == 'create vm':
                 size = self.node_dict['size']
                 access_ip = self.node_dict['access_ip']
-                return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip}  size:{size}G)'
+                mode = 'restart' if self.node_dict.get('restart_before_setup', True) else 'one-shot'
+                return f'{self.selected_con}(hostname:{hostname} access_ip:{access_ip}  size:{size}G mode:{mode})'
         return red('something wrong in VmConnect')
 
     def select_con_menu(self):

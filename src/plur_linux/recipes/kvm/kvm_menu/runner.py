@@ -20,16 +20,22 @@ def run_on(kvm, func, log_params=None):
         return session_wrap.bash(log_params=log_params)(func)()
 
 
-def create_vm_dict(vm_dict):
+def create_vm_dict(vm_dict, restart_before_setup=None):
     def func(session):
         vm = base_node.Node(vm_dict)
         if "prepare_vdisk" in vm_dict and "type" in vm_dict['prepare_vdisk']:
-            spawn.create_vm_by_virt_install_cloudinit(vm)(session)
+            spawn.create_vm_by_virt_install_cloudinit(
+                vm, restart_before_setup=restart_before_setup
+            )(session)
     return func
 
 
-def create_vm_dict_on(kvm, vm_dict):
-    run_on(kvm, create_vm_dict(vm_dict), log_params=None)
+def create_vm_dict_on(kvm, vm_dict, restart_before_setup=None):
+    run_on(
+        kvm,
+        create_vm_dict(vm_dict, restart_before_setup=restart_before_setup),
+        log_params=None,
+    )
 
 
 def interact(session):
@@ -81,10 +87,14 @@ def create_defined_guest():
 
     vm_dict = lib_vm_module.select_vm_history(selection)
     kvm = lib_kvm_module.select_kvm_history(selection)
+    default_restart = spawn.should_restart_before_setup(base_node.Node(vm_dict))
+    restart_before_setup = lib.select_restart_before_setup(default=default_restart)
+    vm_dict["restart_before_setup"] = restart_before_setup
+    selection.append({"key": "restart_before_setup", "value": restart_before_setup})
 
     selection.save()
 
-    create_vm_dict_on(kvm, vm_dict)
+    create_vm_dict_on(kvm, vm_dict, restart_before_setup=restart_before_setup)
 
 def select_adhoc(connect_method_list, hostname=None):
     from plur_linux.recipes.kvm.adhoc_setup.select_post_run import select_post_run
