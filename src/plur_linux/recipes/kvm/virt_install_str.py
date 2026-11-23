@@ -1,18 +1,30 @@
 from mini import misc
-
+virt_install_options = r"""
+  --accelerate \
+  --graphics vnc,listen=127.0.0.1 \
+  --noreboot \
+  --noautoconsole
+"""
 
 def virt_install_str(name, option_list, os_variant='almalinux8', cpu=2, mem=2048):
+    r"""
+    >>> gen_str = virt_install_str('testvm', [])
+    >>> print(gen_str) # doctest: +REPORT_NDIFF
+    sudo virt-install \
+      --name testvm --vcpus=2 --ram 2048 \
+      --os-variant=almalinux8 \
+      --accelerate \
+      --graphics vnc,listen=127.0.0.1 \
+      --noreboot \
+      --noautoconsole
+    <BLANKLINE>
+    """
     opt_str = ''.join([f'  {opt} \\\n    ' for opt in option_list])
     return misc.del_indent(rf"""
     sudo virt-install \
       --name {name} --vcpus={cpu} --ram {mem} \
     {opt_str}  --os-variant={os_variant} \
-      --accelerate \
-      --graphics vnc,listen=127.0.0.1 \
-      --noreboot \
-      --noautoconsole
-
-    """)
+    """) + virt_install_options
 
 
 def create_vnet_opt_str(vnet):
@@ -41,29 +53,30 @@ def create_vnet_opt_str(vnet):
     return vnet_opt_str
 
 
-def virt_install_sh_cloudinit_str(name, bridge, disk_full_path, iso_full_path, os_variant='almalinux8', cpu=2, mem=2048):
-    """
-    >>> print(virt_install_sh_cloudinit_str('a8cinit', 'br0', '/vm_images/a8cinit.qcow2' ,'/tmp/seed.iso'))
+def ex_virt_install_sh_cloudinit_str(name, bridge, disk_full_path, iso_full_path, os_variant='almalinux8', cpu=2, mem=2048):
+    r"""
+    >>> gen_str = ex_virt_install_sh_cloudinit_str('a8cinit', 'br0', '/vm_images/a8cinit.qcow2' ,'/tmp/seed.iso')
+    >>> print(gen_str) # doctest: +REPORT_NDIFF
     #! /bin/bash
     NAME=a8cinit
     BRIDGE=br0
     DISK_PATH=/vm_images/a8cinit.qcow2
     ISO_PATH=/tmp/seed.iso
     <BLANKLINE>
-    sudo virt-install \\
-      --name $NAME --vcpus=2 --ram 2048 \\
-      --boot hd \\
-      --disk $DISK_PATH,cache=none --cdrom=$ISO_PATH \\
-      --network bridge=$BRIDGE,virtualport_type=openvswitch \\
-      --os-variant=almalinux8 \\
-      --accelerate \\
-      --graphics vnc,listen=127.0.0.1 \\
-      --noreboot \\
+    sudo virt-install \
+      --name $NAME --vcpus=2 --ram 2048 \
+      --boot hd \
+      --disk $DISK_PATH,cache=none --cdrom=$ISO_PATH \
+      --network bridge=$BRIDGE,virtualport_type=openvswitch \
+      --os-variant=almalinux8 \
+      --accelerate \
+      --graphics vnc,listen=127.0.0.1 \
+      --noreboot \
       --noautoconsole
     <BLANKLINE>
     """
     option_list = ['--boot hd']
-    option_list += [f"--disk $DISK_PATH,cache=none --cdrom=$ISO_PATH"]
+    option_list += ["--disk $DISK_PATH,cache=none --cdrom=$ISO_PATH"]
     option_list += ['--network bridge=$BRIDGE,virtualport_type=openvswitch']
     return misc.del_indent(f"""
     #! /bin/bash
