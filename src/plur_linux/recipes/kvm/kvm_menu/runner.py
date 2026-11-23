@@ -20,20 +20,26 @@ def run_on(kvm, func, log_params=None):
         return session_wrap.bash(log_params=log_params)(func)()
 
 
-def create_vm_dict(vm_dict, restart_before_setup=None):
+def create_vm_dict(vm_dict, restart_before_setup=None, definexml=None):
     def func(session):
         vm = base_node.Node(vm_dict)
         if "prepare_vdisk" in vm_dict and "type" in vm_dict['prepare_vdisk']:
             spawn.create_vm_by_virt_install_cloudinit(
-                vm, restart_before_setup=restart_before_setup
+                vm,
+                restart_before_setup=restart_before_setup,
+                definexml=definexml,
             )(session)
     return func
 
 
-def create_vm_dict_on(kvm, vm_dict, restart_before_setup=None):
+def create_vm_dict_on(kvm, vm_dict, restart_before_setup=None, definexml=None):
     run_on(
         kvm,
-        create_vm_dict(vm_dict, restart_before_setup=restart_before_setup),
+        create_vm_dict(
+            vm_dict,
+            restart_before_setup=restart_before_setup,
+            definexml=definexml,
+        ),
         log_params=None,
     )
 
@@ -87,14 +93,20 @@ def create_defined_guest():
 
     vm_dict = lib_vm_module.select_vm_history(selection)
     kvm = lib_kvm_module.select_kvm_history(selection)
-    default_restart = spawn.should_restart_before_setup(base_node.Node(vm_dict))
-    restart_before_setup = lib.select_restart_before_setup(default=default_restart)
+    definexml, restart_before_setup = lib.select_vm_boot_options(vm_dict)
+    vm_dict["definexml"] = definexml
+    selection.append({"key": "definexml", "value": definexml})
     vm_dict["restart_before_setup"] = restart_before_setup
     selection.append({"key": "restart_before_setup", "value": restart_before_setup})
 
     selection.save()
 
-    create_vm_dict_on(kvm, vm_dict, restart_before_setup=restart_before_setup)
+    create_vm_dict_on(
+        kvm,
+        vm_dict,
+        restart_before_setup=restart_before_setup,
+        definexml=definexml,
+    )
 
 def get_adhoc_os_entries():
     from plur_linux.recipes.kvm.adhoc_setup import arch

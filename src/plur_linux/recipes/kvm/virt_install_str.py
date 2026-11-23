@@ -6,6 +6,13 @@ virt_install_options = r"""
   --noautoconsole
 """
 
+virt_install_define_xml_options = r"""
+  --accelerate \
+  --graphics vnc,listen=127.0.0.1 \
+  --events on_reboot=restart \
+  --print-xml 1
+"""
+
 def virt_install_str(name, option_list, os_variant='almalinux8', cpu=2, mem=2048):
     r"""
     >>> gen_str = virt_install_str('testvm', [])
@@ -25,6 +32,28 @@ def virt_install_str(name, option_list, os_variant='almalinux8', cpu=2, mem=2048
       --name {name} --vcpus={cpu} --ram {mem} \
     {opt_str}  --os-variant={os_variant} \
     """) + virt_install_options
+
+
+def virt_install_print_xml_str(name, option_list, xml_path, os_variant='almalinux8', cpu=2, mem=2048):
+    r"""
+    >>> gen_str = virt_install_print_xml_str('testvm', ['--boot hd'], '/tmp/testvm.xml')
+    >>> print(gen_str) # doctest: +REPORT_NDIFF
+    sudo virt-install \
+      --name testvm --vcpus=2 --ram 2048 \
+      --boot hd \
+      --os-variant=almalinux8 \
+      --accelerate \
+      --graphics vnc,listen=127.0.0.1 \
+      --events on_reboot=restart \
+      --print-xml 1 > /tmp/testvm.xml
+    <BLANKLINE>
+    """
+    opt_str = ''.join([f'  {opt} \\\n    ' for opt in option_list])
+    return misc.del_indent(rf"""
+    sudo virt-install \
+      --name {name} --vcpus={cpu} --ram {mem} \
+    {opt_str}  --os-variant={os_variant} \
+    """) + virt_install_define_xml_options.rstrip('\n') + f' > {xml_path}\n'
 
 
 def create_vnet_opt_str(vnet):

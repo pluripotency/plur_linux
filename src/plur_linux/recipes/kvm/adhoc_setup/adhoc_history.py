@@ -12,6 +12,7 @@ CONNECT_KEYS = (
     "access_ip",
     "ssh_options",
     "size",
+    "definexml",
     "restart_before_setup",
     "prepare_vdisk",
     "ifaces",
@@ -119,16 +120,16 @@ def format_connect_summary(connect_data):
     if not login_method:
         return f"guest(hostname:{hostname})" if hostname else "guest"
     if login_method == "create vm":
+        from plur_linux.recipes.kvm import spawn
+
         access_ip = connect_data.get("access_ip", "")
         size = connect_data.get("size", "")
-        mode = (
-            "restart" if connect_data.get("restart_before_setup", True) else "one-shot"
-        )
+        mode = spawn.get_vm_boot_mode_label(connect_data)
         return f"create vm(hostname:{hostname} ip:{access_ip} size:{size}G mode:{mode})"
     if login_method == "create vm by copy":
-        mode = (
-            "restart" if connect_data.get("restart_before_setup", True) else "one-shot"
-        )
+        from plur_linux.recipes.kvm import spawn
+
+        mode = spawn.get_vm_boot_mode_label(connect_data)
         return f"create vm by copy(hostname:{hostname} mode:{mode})"
     if login_method == "ssh":
         access_ip = connect_data.get("access_ip", "")

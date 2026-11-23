@@ -102,8 +102,33 @@ def select_vmname(session, message):
     return vmname
 
 
-def select_restart_before_setup(default=True):
+def select_define_xml(default=None):
+    from plur_linux.recipes.kvm import spawn
+
+    if default is None:
+        default = spawn.DEFAULT_DEFINE_XML
+    return get_y_n("Start VM by virsh define XML (--print-xml 1)", default=default)
+
+
+def select_restart_before_setup(default=None):
+    from plur_linux.recipes.kvm import spawn
+
+    if default is None:
+        default = spawn.DEFAULT_RESTART_BEFORE_SETUP
     return get_y_n("Restart VM before setup (safe reboot)", default=default)
+
+
+def select_vm_boot_options(vm=None):
+    from plur_linux.recipes.kvm import spawn
+
+    definexml = select_define_xml(default=spawn.should_define_xml(vm))
+    if definexml:
+        restart_before_setup = False
+    else:
+        restart_before_setup = select_restart_before_setup(
+            default=spawn.should_restart_before_setup(vm)
+        )
+    return definexml, restart_before_setup
 
 
 

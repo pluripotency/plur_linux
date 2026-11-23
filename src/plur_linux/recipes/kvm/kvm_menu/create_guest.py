@@ -1,6 +1,4 @@
 from mini.menu import get_y_n, choose_num, Selection
-from plur import base_node
-from plur_linux.recipes.kvm import spawn
 from plur_linux.recipes.kvm.kvm_menu import lib, lib_vm_module, runner
 
 
@@ -8,10 +6,14 @@ def create_guest_by_select(session):
     selection = Selection('create_defined_guest')
     selection.set_title('last')
     vm_dict = lib_vm_module.select_vm_history(selection)
-    default_restart = spawn.should_restart_before_setup(base_node.Node(vm_dict))
-    restart_before_setup = lib.select_restart_before_setup(default=default_restart)
+    definexml, restart_before_setup = lib.select_vm_boot_options(vm_dict)
+    vm_dict['definexml'] = definexml
     vm_dict['restart_before_setup'] = restart_before_setup
-    runner.create_vm_dict(vm_dict, restart_before_setup=restart_before_setup)(session)
+    runner.create_vm_dict(
+        vm_dict,
+        restart_before_setup=restart_before_setup,
+        definexml=definexml,
+    )(session)
 
 
 def create_adhoc(session):

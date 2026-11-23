@@ -9,7 +9,6 @@ from plur_linux.recipes.kvm import virsh
 from plur_linux.recipes.kvm import qemu_img
 from plur_linux.recipes.net import network
 from plur_linux.recipes import setup
-from plur_linux.recipes.ops import ops
 from plur_linux.recipes.kvm import cloudinit_ops
 from plur_linux.recipes.kvm.cloud_image import (
     cloud_image_ops,
@@ -17,6 +16,8 @@ from plur_linux.recipes.kvm.cloud_image import (
 )
 xml_dir = "/etc/libvirt/qemu"
 diskformat = "qcow2"
+DEFAULT_DEFINE_XML = True
+DEFAULT_RESTART_BEFORE_SETUP = True
 
 def prepare_additional_vdisk(session, vm, kvm_vdisk_dir):
     hostname = vm.hostname
@@ -178,6 +179,26 @@ def create_vnet_xml(session, xml_dir, vnet):
     base_shell.here_doc(session, filename, contents)
     return filename
 
+def _build_virt_install_option_list(session, vm, iso_full_path, kvm_vdisk_dir):
+    from plur_linux.recipes.kvm import virt_install_str
+
+    hostname = vm.hostname
+    vnets = []
+    if hasattr(vm, "vnets"):
+        vnets = vm.vnets
+    option_list = ["--boot hd"]
+    for vnet in vnets:
+        option_list += [virt_install_str.create_vnet_opt_str(vnet)]
+
+    disk_full_path = f"{kvm_vdisk_dir}/{hostname}.qcow2"
+    option_list += [f"--disk {disk_full_path},cache=none --cdrom={iso_full_path}"]
+    if hasattr(vm, "additional_vdisks"):
+        vdisk_list = prepare_additional_vdisk(session, vm, kvm_vdisk_dir)
+        for vdisk in vdisk_list:
+            vdisk_path = vdisk["vdisk_path"]
+            option_list += [f"--disk {vdisk_path},cache=none"]
+    return option_list
+
 def start_domain_by_virt_install(vm, iso_full_path, kvm_vdisk_dir):
     def func(session):
         from plur_linux.recipes.kvm import virt_install_str
@@ -185,20 +206,9 @@ def start_domain_by_virt_install(vm, iso_full_path, kvm_vdisk_dir):
         hostname = vm.hostname
         vcpu = vm.vcpu
         vmem = vm.vmem
-        vnets = []
-        if hasattr(vm, "vnets"):
-            vnets = vm.vnets
-        option_list = ["--boot hd"]
-        for vnet in vnets:
-            option_list += [virt_install_str.create_vnet_opt_str(vnet)]
-
-        disk_full_path = f"{kvm_vdisk_dir}/{hostname}.qcow2"
-        option_list += [f"--disk {disk_full_path},cache=none --cdrom={iso_full_path}"]
-        if hasattr(vm, "additional_vdisks"):
-            vdisk_list = prepare_additional_vdisk(session, vm, kvm_vdisk_dir)
-            for vdisk in vdisk_list:
-                vdisk_path = vdisk["vdisk_path"]
-                option_list += [f"--disk {vdisk_path},cache=none"]
+        option_list = _build_virt_install_option_list(
+            session, vm, iso_full_path, kvm_vdisk_dir
+        )
 
         base_shell.run(
             session,
@@ -208,19 +218,89 @@ def start_domain_by_virt_install(vm, iso_full_path, kvm_vdisk_dir):
         )
     return func
 
-def should_restart_before_setup(vm, restart_before_setup=None):
-    if restart_before_setup is not None:
-        return bool(restart_before_setup)
-    if hasattr(vm, "restart_before_setup") and vm.restart_before_setup is not None:
-        return bool(vm.restart_before_setup)
+def start_domain_by_define_xml(vm, iso_full_path, kvm_vdisk_dir):
+    def func(session):
+        from plur_linux.recipes.kvm import virt_install_str
+
+        hostname = vm.hostname
+        vcpu = vm.vcpu
+        vmem = vm.vmem
+        tmp_xml_path = f"/tmp/{hostname}.xml"
+        option_list = _build_virt_install_option_list(
+            session, vm, iso_full_path, kvm_vdisk_dir
+        )
+
+        base_shell.run(session, f"sudo rm -f {tmp_xml_path}")
+        base_shell.run(
+            session,
+            virt_install_str.virt_install_print_xml_str(
+                hostname,
+                option_list,
+                tmp_xml_path,
+                os_variant="almalinux8",
+                cpu=vcpu,
+                mem=vmem,
+            ),
+        )
+        base_shell.run(
+            session,
+            f"sudo sed -i 's|<on_reboot>destroy</on_reboot>|<on_reboot>restart</on_reboot>|g' {tmp_xml_path}",
+        )
+        base_shell.run(session, f"sudo virsh define {tmp_xml_path}")
+        base_shell.run(session, f"sudo virsh start {hostname}")
+    return func
+
+def _extract_vm_flag(vm, key):
+    if isinstance(vm, dict):
+        if key in vm and vm[key] is not None:
+            return bool(vm[key])
+        prepare_vdisk = vm.get("prepare_vdisk")
+        if isinstance(prepare_vdisk, dict) and prepare_vdisk.get(key) is not None:
+            return bool(prepare_vdisk[key])
+        return None
+    if hasattr(vm, key) and getattr(vm, key) is not None:
+        return bool(getattr(vm, key))
     if (
         hasattr(vm, "prepare_vdisk")
         and isinstance(vm.prepare_vdisk, dict)
-        and "restart_before_setup" in vm.prepare_vdisk
-        and vm.prepare_vdisk["restart_before_setup"] is not None
+        and key in vm.prepare_vdisk
+        and vm.prepare_vdisk[key] is not None
     ):
-        return bool(vm.prepare_vdisk["restart_before_setup"])
-    return True
+        return bool(vm.prepare_vdisk[key])
+    return None
+
+def should_define_xml(vm=None, definexml=None):
+    if definexml is not None:
+        return bool(definexml)
+    if vm is not None:
+        extracted = _extract_vm_flag(vm, "definexml")
+        if extracted is not None:
+            return extracted
+    return DEFAULT_DEFINE_XML
+
+def should_restart_before_setup(vm=None, restart_before_setup=None):
+    if restart_before_setup is not None:
+        return bool(restart_before_setup)
+    if vm is not None:
+        extracted = _extract_vm_flag(vm, "restart_before_setup")
+        if extracted is not None:
+            return extracted
+    return DEFAULT_RESTART_BEFORE_SETUP
+
+def get_vm_boot_mode_label(vm=None):
+    if vm is not None:
+        explicit_definexml = _extract_vm_flag(vm, "definexml")
+        explicit_restart = _extract_vm_flag(vm, "restart_before_setup")
+        if explicit_definexml is not None:
+            if explicit_definexml:
+                return "definexml"
+        elif explicit_restart is None and DEFAULT_DEFINE_XML:
+            return "definexml"
+        if explicit_restart is not None:
+            return "restart" if explicit_restart else "one-shot"
+    elif DEFAULT_DEFINE_XML:
+        return "definexml"
+    return "restart" if DEFAULT_RESTART_BEFORE_SETUP else "one-shot"
 
 def eject_seed_iso(vm, created_seed_iso_path):
     hostname = vm.hostname
@@ -456,7 +536,8 @@ def on_kvm_prepare_cloudinit_seed_iso(vm):
 
     return func
 
-def create_vm_by_virt_install_cloudinit(vm, restart_before_setup=None):
+def create_vm_by_virt_install_cloudinit(vm, restart_before_setup=None, definexml=None):
+    do_definexml = should_define_xml(vm, definexml)
     do_restart = should_restart_before_setup(vm, restart_before_setup)
 
     def _inner_on_kvm_sudo(created_image_path, created_seed_iso_path, kvm_vdisk_dir):
@@ -465,13 +546,20 @@ def create_vm_by_virt_install_cloudinit(vm, restart_before_setup=None):
             base_shell.work_on(session, kvm_vdisk_dir)
             base_shell.run(session, f"mv -f {created_image_path} {kvm_vdisk_dir}")
 
-            start_domain_by_virt_install(vm, created_seed_iso_path, kvm_vdisk_dir)(session)
-            if do_restart:
-                restart_domain(vm, created_seed_iso_path)(session)
-                on_create_console_with_cloudinit(vm)(session)
-            else:
+            if do_definexml:
+                start_domain_by_define_xml(vm, created_seed_iso_path, kvm_vdisk_dir)(session)
+                import time
+                time.sleep(1)
                 on_create_console_with_cloudinit(vm)(session)
                 eject_seed_iso(vm, created_seed_iso_path)(session)
+            else:
+                start_domain_by_virt_install(vm, created_seed_iso_path, kvm_vdisk_dir)(session)
+                if do_restart:
+                    restart_domain(vm, created_seed_iso_path)(session)
+                    on_create_console_with_cloudinit(vm)(session)
+                else:
+                    on_create_console_with_cloudinit(vm)(session)
+                    eject_seed_iso(vm, created_seed_iso_path)(session)
 
             on_kvm_post(vm, kvm_vdisk_dir)(session)
         return receive_inner_on_kvm_sudo
